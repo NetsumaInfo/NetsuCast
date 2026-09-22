@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "ar"
+  },
+  "extDescription": {
+    "message": "يرسل فيديو علامة التبويب إلى مشغّل NetsuCast (رفع الدقة باستخدام ArtCNN)."
+  },
+  "actionTitle": {
+    "message": "بث إلى NetsuCast (Alt+Shift+C)"
+  },
+  "commandDescription": {
+    "message": "إرسال فيديو علامة التبويب إلى NetsuCast"
+  },
+  "menuPlay": {
+    "message": "تشغيل في NetsuCast"
+  },
+  "menuPick": {
+    "message": "اختيار مصدر البث…"
+  },
+  "castDone": {
+    "message": "تم بث الفيديو إلى NetsuCast"
+  },
+  "castSending": {
+    "message": "جارٍ البث…"
+  },
+  "castPlaying": {
+    "message": "قيد التشغيل في NetsuCast ✓"
+  },
+  "castButtonTitle": {
+    "message": "متابعة هذا الفيديو في NetsuCast (رفع الدقة باستخدام ArtCNN)"
+  },
+  "errNoVideo": {
+    "message": "تعذّر العثور على الفيديو: مرّر المؤشر فوقه وانقر على زر NetsuCast الخاص به"
+  },
+  "errHttp": {
+    "message": "رفض NetsuCast الفيديو (الخطأ $CODE$)",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "لا يستجيب NetsuCast: شغّل التطبيق."
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast غير مُشغَّل"
+  },
+  "statusOn": {
+    "message": "NetsuCast متصل"
+  },
+  "statusOff": {
+    "message": "NetsuCast غير مُشغَّل"
+  },
+  "popupSendPage": {
+    "message": "بث الصفحة"
+  },
+  "popupHintPageSite": {
+    "message": "موصى به لهذا الموقع: يجلب yt-dlp أفضل جودة والترجمات."
+  },
+  "popupHintGeneric": {
+    "message": "يحاول yt-dlp العثور على الفيديو في الصفحة. إن لم ينجح، اختر بثًا من القائمة أدناه."
+  },
+  "popupNoPage": {
+    "message": "لا توجد صفحة ويب في علامة التبويب هذه."
+  },
+  "popupStreamsTitle": {
+    "message": "مصادر البث المكتشفة"
+  },
+  "popupEmpty": {
+    "message": "لم يُكتشف أي بث. شغّل الفيديو في الصفحة، ثم أعد فتح هذه القائمة."
+  },
+  "popupPort": {
+    "message": "المنفذ"
+  },
+  "popupPlay": {
+    "message": "تشغيل"
+  }
+}

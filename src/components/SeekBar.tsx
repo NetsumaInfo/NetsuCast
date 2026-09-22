@@ -3,6 +3,7 @@ import { formatTime } from "../lib/types";
 
 type Props = { position: number; duration: number; cached: number; onSeek: (seconds: number) => void };
 
+/** Always left to right, even in Arabic and Hebrew: time runs that way on every player. */
 export function SeekBar({ position, duration, cached, onSeek }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<number | null>(null);
@@ -18,7 +19,14 @@ export function SeekBar({ position, duration, cached, onSeek }: Props) {
   return (
     <div
       ref={ref}
-      className="group relative flex h-5 cursor-pointer items-center"
+      dir="ltr"
+      role="slider"
+      aria-valuemin={0}
+      aria-valuemax={Math.round(duration)}
+      aria-valuenow={Math.round(position)}
+      aria-valuetext={`${formatTime(position)} / ${formatTime(duration)}`}
+      tabIndex={-1}
+      className="group relative flex h-5 items-center"
       onMouseMove={(e) => setHover(ratioAt(e.clientX))}
       onMouseLeave={() => setHover(null)}
       onPointerDown={(e) => {
@@ -33,17 +41,17 @@ export function SeekBar({ position, duration, cached, onSeek }: Props) {
         setDrag(null);
       }}
     >
-      <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/20 transition-[height] group-hover:h-1.5">
-        <div className="absolute inset-y-0 left-0 bg-white/30" style={{ width: `${buffered * 100}%` }} />
-        <div className="absolute inset-y-0 left-0 bg-violet-500" style={{ width: `${live * 100}%` }} />
+      <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/20 transition-[height] duration-150 group-hover:h-1.5">
+        <div className="absolute inset-y-0 left-0 bg-white/25" style={{ width: `${buffered * 100}%` }} />
+        <div className="absolute inset-y-0 left-0 bg-accent-text" style={{ width: `${live * 100}%` }} />
       </div>
       <div
-        className="absolute size-3 -translate-x-1/2 rounded-full bg-white opacity-0 shadow group-hover:opacity-100"
+        className="absolute size-3 -translate-x-1/2 scale-0 rounded-full bg-ink transition-transform duration-150 group-hover:scale-100"
         style={{ left: `${live * 100}%` }}
       />
       {hover !== null && duration > 0 && (
         <div
-          className="pointer-events-none absolute bottom-6 -translate-x-1/2 rounded bg-black/80 px-2 py-0.5 text-xs text-white tabular-nums"
+          className="pointer-events-none absolute bottom-6 -translate-x-1/2 rounded-control border border-line bg-overlay px-2 py-0.5 text-xs text-ink tabular-nums shadow-overlay"
           style={{ left: `${hover * 100}%` }}
         >
           {formatTime(hover * duration)}

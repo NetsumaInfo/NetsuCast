@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "it"
+  },
+  "extDescription": {
+    "message": "Trasmette il video della scheda al player NetsuCast (upscaling con ArtCNN)."
+  },
+  "actionTitle": {
+    "message": "Trasmetti a NetsuCast (Alt+Maiusc+C)"
+  },
+  "commandDescription": {
+    "message": "Trasmetti il video della scheda a NetsuCast"
+  },
+  "menuPlay": {
+    "message": "Riproduci in NetsuCast"
+  },
+  "menuPick": {
+    "message": "Scegli lo stream da trasmettere…"
+  },
+  "castDone": {
+    "message": "Video trasmesso a NetsuCast"
+  },
+  "castSending": {
+    "message": "Trasmissione in corso…"
+  },
+  "castPlaying": {
+    "message": "In riproduzione in NetsuCast ✓"
+  },
+  "castButtonTitle": {
+    "message": "Continua questo video in NetsuCast (upscaling con ArtCNN)"
+  },
+  "errNoVideo": {
+    "message": "Video non trovato: passaci sopra con il mouse e fai clic sul suo pulsante NetsuCast"
+  },
+  "errHttp": {
+    "message": "NetsuCast ha rifiutato il video (errore $CODE$)",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCast non risponde: avvia l'app."
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast non è avviato"
+  },
+  "statusOn": {
+    "message": "NetsuCast connesso"
+  },
+  "statusOff": {
+    "message": "NetsuCast non avviato"
+  },
+  "popupSendPage": {
+    "message": "Trasmetti la pagina"
+  },
+  "popupHintPageSite": {
+    "message": "Consigliato per questo sito: yt-dlp recupera la qualità migliore e i sottotitoli."
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlp prova a trovare il video nella pagina. Altrimenti scegli uno stream qui sotto."
+  },
+  "popupNoPage": {
+    "message": "Nessuna pagina web in questa scheda."
+  },
+  "popupStreamsTitle": {
+    "message": "Stream rilevati"
+  },
+  "popupEmpty": {
+    "message": "Nessuno stream rilevato. Avvia il video nella pagina, poi riapri questo menu."
+  },
+  "popupPort": {
+    "message": "Porta"
+  },
+  "popupPlay": {
+    "message": "Riproduci"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "pl"
+  },
+  "extDescription": {
+    "message": "Przesyła film z karty do odtwarzacza NetsuCast (upscaling ArtCNN)."
+  },
+  "actionTitle": {
+    "message": "Przesyłaj do NetsuCast (Alt+Shift+C)"
+  },
+  "commandDescription": {
+    "message": "Przesyłaj film z karty do NetsuCast"
+  },
+  "menuPlay": {
+    "message": "Odtwórz w NetsuCast"
+  },
+  "menuPick": {
+    "message": "Wybierz strumień do przesłania…"
+  },
+  "castDone": {
+    "message": "Film przesłany do NetsuCast"
+  },
+  "castSending": {
+    "message": "Przesyłanie…"
+  },
+  "castPlaying": {
+    "message": "Odtwarzanie w NetsuCast ✓"
+  },
+  "castButtonTitle": {
+    "message": "Oglądaj dalej ten film w NetsuCast (upscaling ArtCNN)"
+  },
+  "errNoVideo": {
+    "message": "Nie znaleziono filmu: najedź na niego kursorem i kliknij jego przycisk NetsuCast"
+  },
+  "errHttp": {
+    "message": "NetsuCast odrzucił film (błąd $CODE$)",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCast nie odpowiada: uruchom aplikację."
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast nie jest uruchomiony"
+  },
+  "statusOn": {
+    "message": "NetsuCast połączony"
+  },
+  "statusOff": {
+    "message": "NetsuCast nie jest uruchomiony"
+  },
+  "popupSendPage": {
+    "message": "Prześlij stronę"
+  },
+  "popupHintPageSite": {
+    "message": "Zalecane dla tej witryny: yt-dlp pobiera najlepszą jakość i napisy."
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlp próbuje znaleźć film na stronie. Jeśli się nie uda, wybierz strumień poniżej."
+  },
+  "popupNoPage": {
+    "message": "Brak strony internetowej w tej karcie."
+  },
+  "popupStreamsTitle": {
+    "message": "Wykryte strumienie"
+  },
+  "popupEmpty": {
+    "message": "Nie wykryto żadnego strumienia. Uruchom film na stronie, a potem ponownie otwórz to menu."
+  },
+  "popupPort": {
+    "message": "Port"
+  },
+  "popupPlay": {
+    "message": "Odtwórz"
+  }
+}

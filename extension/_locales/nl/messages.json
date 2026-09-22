@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "nl"
+  },
+  "extDescription": {
+    "message": "Cast de video van het tabblad naar de NetsuCast-speler (upscaling met ArtCNN)."
+  },
+  "actionTitle": {
+    "message": "Casten naar NetsuCast (Alt+Shift+C)"
+  },
+  "commandDescription": {
+    "message": "Video van het tabblad casten naar NetsuCast"
+  },
+  "menuPlay": {
+    "message": "Afspelen in NetsuCast"
+  },
+  "menuPick": {
+    "message": "Stream kiezen om te casten…"
+  },
+  "castDone": {
+    "message": "Video gecast naar NetsuCast"
+  },
+  "castSending": {
+    "message": "Casten…"
+  },
+  "castPlaying": {
+    "message": "Speelt af in NetsuCast ✓"
+  },
+  "castButtonTitle": {
+    "message": "Deze video verder kijken in NetsuCast (upscaling met ArtCNN)"
+  },
+  "errNoVideo": {
+    "message": "Video niet gevonden: beweeg je muis erover en klik op de NetsuCast-knop"
+  },
+  "errHttp": {
+    "message": "NetsuCast heeft de video geweigerd (fout $CODE$)",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCast reageert niet: start de app."
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast is niet gestart"
+  },
+  "statusOn": {
+    "message": "NetsuCast verbonden"
+  },
+  "statusOff": {
+    "message": "NetsuCast niet gestart"
+  },
+  "popupSendPage": {
+    "message": "Pagina casten"
+  },
+  "popupHintPageSite": {
+    "message": "Aanbevolen voor deze site: yt-dlp haalt de beste kwaliteit en de ondertitels op."
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlp probeert de video op de pagina te vinden. Lukt dat niet, kies dan hieronder een stream."
+  },
+  "popupNoPage": {
+    "message": "Geen webpagina in dit tabblad."
+  },
+  "popupStreamsTitle": {
+    "message": "Gevonden streams"
+  },
+  "popupEmpty": {
+    "message": "Geen stream gevonden. Start de video op de pagina en open dit menu opnieuw."
+  },
+  "popupPort": {
+    "message": "Poort"
+  },
+  "popupPlay": {
+    "message": "Afspelen"
+  }
+}

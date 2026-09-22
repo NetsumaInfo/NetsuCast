@@ -56,6 +56,8 @@ function mpvArgs(env: Environment, s: Settings): string[] {
   if (env.scriptPath) args.push(`--scripts=${env.scriptPath}`);
   if (env.mpvLog) args.push(`--log-file=${env.mpvLog}`);
   if (s.subLangs.trim()) args.push(`--slang=${s.subLangs.trim()}`);
+  if (s.audioLangs.trim()) args.push(`--alang=${s.audioLangs.trim()}`);
+  args.push(`--sub-scale=${s.subScale}`);
   const shaders = shaderList(env, { model: s.model, force: s.forceUpscale, scale: s.upscaleScale });
   // Path lists are separated by ";" on Windows.
   if (shaders.length) args.push(`--glsl-shaders=${shaders.join(";")}`);
@@ -209,6 +211,15 @@ export function markWarmed(upscale: Upscale) {
   }
 }
 
+/** Forgets which models were compiled: they are prepared again on the next launch. */
+export function resetWarmed() {
+  try {
+    localStorage.removeItem(WARMED_KEY);
+  } catch {
+    // storage unavailable: nothing was remembered anyway
+  }
+}
+
 function ytdlFormat(maxHeight: number): string {
   if (!maxHeight) return "";
   const h = `[height<=?${maxHeight}]`;
@@ -256,6 +267,8 @@ export const setSub = (id: number | "no") => setProperty("sid", id);
 export const setAudio = (id: number) => setProperty("aid", id);
 export const setDeband = (on: boolean) => setProperty("deband", on);
 export const setHwdec = (value: string) => setProperty("hwdec", value);
+export const setAlang = (value: string) => setProperty("alang", value.split(",").map((l) => l.trim()).filter(Boolean));
+export const setSubScale = (value: number) => setProperty("sub-scale", value);
 export const setSlang = (value: string) => setProperty("slang", value.split(",").map((l) => l.trim()).filter(Boolean));
 export const toggleStats = () => command("script-binding", ["stats/display-stats-toggle"]);
 export const stop = () => command("stop", []);

@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "NetsuCast",
   "version": "0.1.1",
-  "description": "Caste la vidéo de l'onglet vers le lecteur NetsuCast (upscale ArtCNN).",
+  "description": "__MSG_extDescription__",
+  "default_locale": "fr",
   "permissions": ["webRequest", "storage", "contextMenus", "cookies", "scripting"],
   "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "background.js", "type": "module" },
@@ -15,13 +16,13 @@
     }
   ],
   "action": {
-    "default_title": "Caster vers NetsuCast (Alt+Maj+C)",
+    "default_title": "__MSG_actionTitle__",
     "default_icon": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png" }
   },
   "commands": {
     "_execute_action": {
       "suggested_key": { "default": "Alt+Shift+C" },
-      "description": "Caster la vidéo de l'onglet vers NetsuCast"
+      "description": "__MSG_commandDescription__"
     }
   },
   "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" }

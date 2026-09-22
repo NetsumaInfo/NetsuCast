@@ -1,0 +1,104 @@
+{
+  "langTag": {
+    "message": "fr",
+    "description": "BCP 47 tag of this translation, used for <html lang> and number formatting. Not shown."
+  },
+  "extDescription": {
+    "message": "Caste la vidéo de l'onglet vers le lecteur NetsuCast (upscale ArtCNN).",
+    "description": "Store/extension page description (max 132 characters)."
+  },
+  "actionTitle": {
+    "message": "Caster vers NetsuCast (Alt+Maj+C)",
+    "description": "Tooltip of the toolbar icon. Keyboard shortcut as the OS shows it in this language."
+  },
+  "commandDescription": {
+    "message": "Caster la vidéo de l'onglet vers NetsuCast",
+    "description": "Keyboard shortcut description in chrome://extensions/shortcuts."
+  },
+  "menuPlay": {
+    "message": "Lire dans NetsuCast",
+    "description": "Right-click menu on a page, video or link."
+  },
+  "menuPick": {
+    "message": "Choisir le flux à caster…",
+    "description": "Right-click menu on the toolbar icon; opens the stream picker."
+  },
+  "castDone": {
+    "message": "Vidéo castée vers NetsuCast",
+    "description": "Success: toolbar icon tooltip and popup message after a cast."
+  },
+  "castSending": {
+    "message": "Cast en cours…",
+    "description": "In-page cast button label while the cast is being sent. Short."
+  },
+  "castPlaying": {
+    "message": "Lecture dans NetsuCast ✓",
+    "description": "In-page cast button label after a successful cast. Short."
+  },
+  "castButtonTitle": {
+    "message": "Continuer cette vidéo dans NetsuCast (upscale ArtCNN)",
+    "description": "Tooltip of the in-page cast button drawn over videos."
+  },
+  "errNoVideo": {
+    "message": "Vidéo introuvable : survole-la et clique sur son bouton NetsuCast",
+    "description": "Error: the page is a feed/channel, not one video. Shown in the in-page button and the icon tooltip."
+  },
+  "errHttp": {
+    "message": "NetsuCast a refusé la vidéo (erreur $CODE$)",
+    "description": "Error: the app answered with an HTTP error status.",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCast ne répond pas : lance l'application.",
+    "description": "Error: the app did not answer (not running). Icon tooltip and popup."
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast n'est pas lancé",
+    "description": "Same as errNotRunning, short for the in-page button."
+  },
+  "statusOn": {
+    "message": "NetsuCast connecté",
+    "description": "Popup status: the app answers."
+  },
+  "statusOff": {
+    "message": "NetsuCast non lancé",
+    "description": "Popup status: the app does not answer."
+  },
+  "popupSendPage": {
+    "message": "Caster la page",
+    "description": "Popup primary button: cast the page URL (resolved by yt-dlp)."
+  },
+  "popupHintPageSite": {
+    "message": "Recommandé pour ce site : yt-dlp récupère la meilleure qualité et les sous-titres.",
+    "description": "Popup hint under the button, on sites yt-dlp handles well."
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlp essaie de trouver la vidéo de la page. Sinon, choisis un flux ci-dessous.",
+    "description": "Popup hint under the button, on other sites."
+  },
+  "popupNoPage": {
+    "message": "Aucune page web dans cet onglet.",
+    "description": "Popup hint when the tab is not a web page."
+  },
+  "popupStreamsTitle": {
+    "message": "Flux détectés",
+    "description": "Popup section title: list of detected streams (HLS, DASH, MP4…)."
+  },
+  "popupEmpty": {
+    "message": "Aucun flux détecté. Lance la vidéo dans la page, puis rouvre ce menu.",
+    "description": "Popup empty state of the stream list."
+  },
+  "popupPort": {
+    "message": "Port",
+    "description": "Popup label of the port field (local port of the app)."
+  },
+  "popupPlay": {
+    "message": "Lire",
+    "description": "Popup button on each stream row: play this stream in the app."
+  }
+}

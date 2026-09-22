@@ -2,19 +2,38 @@
   "name": "netsucast",
   "private": true,
   "version": "0.1.0",
+  "license": "AGPL-3.0-only",
+  "author": "Netsuma",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NetsumaInfo/NetsuCast.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NetsumaInfo/NetsuCast/issues"
+  },
+  "homepage": "https://github.com/NetsumaInfo/NetsuCast#readme",
+  "description": "NetsuCast — video player that continues browser videos with real-time ArtCNN upscaling on the GPU, fed by the NetsuCast browser extension",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tools": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-tools.ps1",
+    "package": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1",
+    "update:manifest": "node scripts/create-update-manifest.mjs",
+    "tauri": "tauri",
+    "check:i18n": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-process": "^2",
+    "@tauri-apps/plugin-updater": "^2",
+    "i18next": "^26.4.2",
     "lucide-react": "^1.47.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-i18next": "^17.0.15",
     "tauri-plugin-mpv-api": "0.5.2"
   },
   "devDependencies": {

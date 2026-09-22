@@ -24,4 +24,15 @@ dist-ssr
 *.sw?
 
 # Player tools downloaded by scripts/install-tools.ps1
-tools/
+/tools/
+
+# Updater signing keys. NetsuCast's lives in %USERPROFILE%\.tauri\netsucast.key, outside the
+# repository; these patterns only stop a stray copy from being committed.
+.tauri/
+*.key
+# Authenticode overlay written by scripts/build.ps1 from NETSUCAST_SIGN_COMMAND.
+src-tauri/tauri.sign.conf.json
+# Tools staged by scripts/build.ps1 for the installer. Only the notices and licence texts are tracked.
+src-tauri/resources/tools/mpv/*
+!src-tauri/resources/tools/mpv/THIRD-PARTY-NOTICES.txt
+!src-tauri/resources/tools/mpv/licenses/

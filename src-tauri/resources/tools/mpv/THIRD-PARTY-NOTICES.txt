@@ -1,0 +1,37 @@
+NetsuCast - third-party programs in this folder
+===============================================
+
+NetsuCast itself is distributed under the GNU Affero General Public License v3.0 only
+(see LICENSE in the installation folder). The programs below are NOT part of NetsuCast and are
+NOT covered by its licence. NetsuCast runs them as separate processes; each keeps its own licence.
+
+The exact versions shipped with this build are listed in VERSIONS.txt next to this file.
+
+mpv (mpv.exe, mpv\fonts.conf)
+  Media player, Windows build by shinchiro: https://github.com/shinchiro/mpv-winbuild-cmake
+  Licence: GNU General Public License, version 2 or later. The build statically links FFmpeg,
+  libplacebo, libass and other libraries under the GPL / LGPL; the combined executable is
+  distributed under the terms of the GNU GPL. Texts: licenses\GPL-2.0.txt, licenses\GPL-3.0.txt.
+  Corresponding source:
+    - mpv:        https://github.com/mpv-player/mpv (commit named in VERSIONS.txt)
+    - build recipe and pinned dependency sources:
+                  https://github.com/shinchiro/mpv-winbuild-cmake
+  The NetsuCast release that shipped this installer also carries, or links to, the matching
+  sources (see docs/licensing.md in the NetsuCast repository).
+
+d3dcompiler_43.dll
+  Microsoft Direct3D shader compiler, redistributed unmodified as part of the mpv build above,
+  under the Microsoft DirectX redistributable terms.
+
+yt-dlp (yt-dlp.exe)
+  https://github.com/yt-dlp/yt-dlp - The Unlicense (public domain). Text: licenses\yt-dlp-Unlicense.txt.
+  yt-dlp updates itself in place when NetsuCast asks it to (yt-dlp -U).
+
+Deno (deno.exe)
+  https://github.com/denoland/deno - MIT License. Text: licenses\deno-MIT.txt.
+  Used by yt-dlp as its JavaScript runtime.
+
+ArtCNN shaders (resources\shaders\*.glsl, installed separately)
+  https://github.com/Artoriuz/ArtCNN - MIT License. Text: resources\shaders\LICENSE-ArtCNN.
+
+NetsuCast source code: https://github.com/NetsumaInfo/NetsuCast

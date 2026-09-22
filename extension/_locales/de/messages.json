@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "de"
+  },
+  "extDescription": {
+    "message": "Streamt das Video des Tabs in den NetsuCast-Player (Upscaling mit ArtCNN)."
+  },
+  "actionTitle": {
+    "message": "An NetsuCast streamen (Alt+Umschalt+C)"
+  },
+  "commandDescription": {
+    "message": "Video des Tabs an NetsuCast streamen"
+  },
+  "menuPlay": {
+    "message": "In NetsuCast abspielen"
+  },
+  "menuPick": {
+    "message": "Stream für NetsuCast auswählen…"
+  },
+  "castDone": {
+    "message": "Video an NetsuCast gestreamt"
+  },
+  "castSending": {
+    "message": "Wird gestreamt…"
+  },
+  "castPlaying": {
+    "message": "Läuft in NetsuCast ✓"
+  },
+  "castButtonTitle": {
+    "message": "Dieses Video in NetsuCast weiterschauen (Upscaling mit ArtCNN)"
+  },
+  "errNoVideo": {
+    "message": "Video nicht gefunden: Zeig mit der Maus auf das Video und klick auf den NetsuCast-Button"
+  },
+  "errHttp": {
+    "message": "NetsuCast hat das Video abgelehnt (Fehler $CODE$)",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCast antwortet nicht: Starte die App."
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast läuft nicht"
+  },
+  "statusOn": {
+    "message": "NetsuCast verbunden"
+  },
+  "statusOff": {
+    "message": "NetsuCast läuft nicht"
+  },
+  "popupSendPage": {
+    "message": "Seite streamen"
+  },
+  "popupHintPageSite": {
+    "message": "Empfohlen für diese Website: yt-dlp holt die beste Qualität und die Untertitel."
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlp sucht das Video auf der Seite. Klappt das nicht, wähl unten einen Stream aus."
+  },
+  "popupNoPage": {
+    "message": "Keine Webseite in diesem Tab."
+  },
+  "popupStreamsTitle": {
+    "message": "Erkannte Streams"
+  },
+  "popupEmpty": {
+    "message": "Kein Stream erkannt. Starte das Video auf der Seite und öffne dieses Menü dann erneut."
+  },
+  "popupPort": {
+    "message": "Port"
+  },
+  "popupPlay": {
+    "message": "Abspielen"
+  }
+}

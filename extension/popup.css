@@ -1,58 +1,137 @@
+/* Same tokens as the app (src/index.css): quiet dark surfaces, one blue accent. */
 :root {
   color-scheme: dark;
-  --bg: #0f0f12;
-  --panel: #1a1a20;
-  --line: #2a2a33;
-  --text: #ececf1;
-  --muted: #8b8b96;
-  --accent: #8b5cf6;
+  --surface: #11151d;
+  --raised: #181d27;
+  --overlay: #1d2330;
+  --line: #222836;
+  --line-strong: #5e6a80;
+  --text: #e7eaf0;
+  --muted: #9aa4b5;
+  --accent: #2f6fe0;
+  --accent-hover: #3b7bf0;
+  --accent-text: #4c8dff;
+  --success: #4fc98e;
+  --danger: #f2767a;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
 
 body {
   width: 380px;
   margin: 0;
-  padding: 14px;
-  background: var(--bg);
+  padding: 16px;
+  background: var(--surface);
   color: var(--text);
-  font: 13px/1.4 "Segoe UI", system-ui, sans-serif;
+  font: 13px/1.4 "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-h1 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
-h1 span { color: var(--accent); }
-h2 { margin: 16px 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+h1 span { color: var(--accent-text); }
+h2 { margin: 16px 0 8px; font-size: 12px; font-weight: 600; color: var(--muted); }
 
 .status { font-size: 12px; color: var(--muted); }
-.status::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--muted); }
-.status.on::before { background: #34d399; }
-.status.off::before { background: #f87171; }
+.status::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-inline-end: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.status.on::before { background: var(--success); }
+.status.off::before { background: var(--danger); }
 
 button {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: transparent;
   color: var(--text);
   font: inherit;
   cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
 }
-button:hover { border-color: var(--accent); }
-button:disabled { opacity: 0.4; cursor: default; }
-button.primary { width: 100%; padding: 10px; border: 0; background: var(--accent); font-weight: 600; }
-button.primary:hover { filter: brightness(1.1); }
+button:hover { background: var(--overlay); border-color: var(--muted); }
+button:disabled { opacity: 0.45; cursor: default; }
+button:disabled:hover { background: transparent; border-color: var(--line-strong); }
+button.primary { width: 100%; padding: 8px 12px; border: 0; background: var(--accent); color: #fff; font-weight: 600; }
+button.primary:hover { background: var(--accent-hover); }
+button.primary:disabled:hover { background: var(--accent); }
 
-.hint { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+.hint { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
 
-ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; max-height: 260px; overflow-y: auto; }
-li { display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
-li .type { flex: none; padding: 2px 6px; border-radius: 4px; background: #2e2150; color: #c4b5fd; font-size: 10px; font-weight: 700; }
+/* minmax(0, 1fr): long file names ellipsize instead of widening the row past the list. */
+ul { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; max-height: 260px; overflow-y: auto; }
+li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--raised);
+}
+li .type {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--overlay);
+  color: var(--accent-text);
+  font-size: 10px;
+  font-weight: 600;
+}
 li .info { flex: 1; min-width: 0; }
-li .name, li .host { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+li .name, li .host { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: start; }
 li .host { font-size: 11px; color: var(--muted); }
-li button { flex: none; padding: 5px 10px; }
+li button { flex: none; padding: 4px 12px; }
 
-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-footer input { width: 70px; margin-left: 4px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); }
-#message.ok { color: #34d399; }
-#message.err { color: #f87171; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+}
+footer label { flex: none; }
+footer input {
+  width: 72px;
+  margin-inline-start: 4px;
+  padding: 4px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--raised);
+  color: var(--text);
+  font: inherit;
+}
+#message { min-width: 0; text-align: end; }
+#message.ok { color: var(--success); }
+#message.err { color: var(--danger); }
+
+@media (prefers-reduced-motion: reduce) {
+  button { transition: none; }
+}

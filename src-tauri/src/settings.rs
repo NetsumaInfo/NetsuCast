@@ -33,6 +33,18 @@ pub struct Settings {
     /// Also fetch auto-generated captions (YouTube).
     pub auto_subs: bool,
     pub volume: f64,
+    /// "auto" follows the system language, otherwise a code from src/locales.
+    pub language: String,
+    /// Seconds jumped by the back and forward buttons (J, L).
+    pub seek_step: u32,
+    /// Start where the browser was when the video was cast.
+    pub resume_position: bool,
+    pub fullscreen_on_cast: bool,
+    pub always_on_top: bool,
+    /// mpv `sub-scale`.
+    pub sub_scale: f64,
+    /// Preferred audio languages, comma separated (mpv `alang`).
+    pub audio_langs: String,
     pub receiver_port: u16,
     /// Overrides for the bundled tools. Empty = auto-detect.
     pub mpv_path: String,
@@ -52,6 +64,13 @@ impl Default for Settings {
             sub_langs: "fr,en".into(),
             auto_subs: false,
             volume: 100.0,
+            language: "auto".into(),
+            seek_step: 10,
+            resume_position: true,
+            fullscreen_on_cast: false,
+            always_on_top: false,
+            sub_scale: 1.0,
+            audio_langs: String::new(),
             receiver_port: DEFAULT_RECEIVER_PORT,
             mpv_path: String::new(),
             ytdlp_path: String::new(),

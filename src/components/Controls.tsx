@@ -1,10 +1,11 @@
 import {
-  Info,
   AudioLines,
   Captions,
   Gauge,
+  Info,
   Maximize,
   Minimize,
+  MonitorPlay,
   Pause,
   Play,
   RotateCcw,
@@ -14,27 +15,29 @@ import {
   Volume1,
   Volume2,
   VolumeX,
-  MonitorPlay,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { PlayerState } from "../hooks/usePlayer";
 import * as player from "../lib/player";
 import type { Upscale } from "../lib/player";
 import {
-  MODEL_LABELS,
   MODELS,
   QUALITIES,
-  SCALE_LABELS,
   formatTime,
+  modelLabel,
   qualityLabel,
+  scaleLabel,
   trackLabel,
   type Model,
   type UpscaleScale,
 } from "../lib/types";
 import { modelName, summarize } from "../lib/upscaleInfo";
-import { IconButton, Menu } from "./Menu";
+import { Menu } from "./Menu";
 import { SeekBar } from "./SeekBar";
+import { IconButton } from "./ui";
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+const ICON = { size: 19, strokeWidth: 1.75 };
 
 type Props = {
   state: PlayerState;
@@ -42,6 +45,7 @@ type Props = {
   /** A model is being compiled: the picture is frozen until it is ready. */
   preparing: boolean;
   maxHeight: number;
+  seekStep: number;
   canChangeQuality: boolean;
   fullscreen: boolean;
   infoOpen: boolean;
@@ -49,68 +53,80 @@ type Props = {
   setOpenMenu: (id: string | null) => void;
   onModel: (m: Model) => void;
   onScale: (s: UpscaleScale) => void;
-  onInfo: () => void;
   onQuality: (h: number) => void;
+  onInfo: () => void;
   onFullscreen: () => void;
   onSettings: () => void;
 };
 
 export function Controls(p: Props) {
+  const { t } = useTranslation();
   const { state } = p;
-  const subs = state.tracks.filter((t) => t.type === "sub");
-  const audios = state.tracks.filter((t) => t.type === "audio");
-  const activeSub = subs.find((t) => t.selected);
+  const subs = state.tracks.filter((tr) => tr.type === "sub");
+  const audios = state.tracks.filter((tr) => tr.type === "audio");
+  const activeSub = subs.find((tr) => tr.selected);
   const up = summarize(state, p.upscale, p.preparing);
-  const VolumeIcon = state.mute || state.volume === 0 ? VolumeX : state.volume < 50 ? Volume1 : Volume2;
+  const muted = state.mute || state.volume === 0;
+  const VolumeIcon = muted ? VolumeX : state.volume < 50 ? Volume1 : Volume2;
+  const volume = muted ? 0 : state.volume;
 
   return (
-    <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent px-5 pt-16 pb-3">
+    <div className="bg-gradient-to-t from-black/85 via-black/50 to-transparent px-4 pt-14 pb-2.5">
       <SeekBar position={state.timePos} duration={state.duration} cached={state.cacheTime} onSeek={player.seekAbsolute} />
 
-      <div className="mt-1 flex items-center gap-1">
-        <IconButton title={state.pause ? "Lecture (Espace)" : "Pause (Espace)"} onClick={player.togglePause}>
-          {state.pause ? <Play size={22} fill="currentColor" /> : <Pause size={22} fill="currentColor" />}
+      <div className="mt-1 flex items-center gap-0.5">
+        <IconButton aria-label={state.pause ? t("player.play") : t("player.pause")} shortcut={t("keys.space")} onClick={player.togglePause}>
+          {state.pause ? <Play size={20} fill="currentColor" strokeWidth={0} /> : <Pause size={20} fill="currentColor" strokeWidth={0} />}
         </IconButton>
-        <IconButton title="Reculer 10 s (J)" onClick={() => player.seekRelative(-10)}>
-          <RotateCcw size={19} />
+        <IconButton aria-label={t("player.back", { seconds: p.seekStep })} shortcut="J" onClick={() => player.seekRelative(-p.seekStep)}>
+          <RotateCcw {...ICON} />
         </IconButton>
-        <IconButton title="Avancer 10 s (L)" onClick={() => player.seekRelative(10)}>
-          <RotateCw size={19} />
+        <IconButton aria-label={t("player.forward", { seconds: p.seekStep })} shortcut="L" onClick={() => player.seekRelative(p.seekStep)}>
+          <RotateCw {...ICON} />
         </IconButton>
 
         <div className="group/vol flex items-center">
-          <IconButton title="Muet (M)" onClick={player.toggleMute}>
-            <VolumeIcon size={20} />
+          <IconButton aria-label={muted ? t("player.unmute") : t("player.mute")} shortcut="M" onClick={player.toggleMute}>
+            <VolumeIcon {...ICON} />
           </IconButton>
           <input
             type="range"
             min={0}
             max={130}
-            value={state.mute ? 0 : state.volume}
+            value={volume}
+            aria-label={t("player.volume")}
             onChange={(e) => player.setVolume(Number(e.target.value))}
-            className="w-0 accent-violet-500 opacity-0 transition-all group-hover/vol:w-24 group-hover/vol:opacity-100"
-            title={`Volume ${Math.round(state.volume)} %`}
+            style={{ "--fill": `${(volume / 130) * 100}%` } as React.CSSProperties}
+            className="w-0 opacity-0 transition-[width,opacity] duration-150 group-focus-within/vol:w-24 group-focus-within/vol:opacity-100 group-hover/vol:w-24 group-hover/vol:opacity-100 [@media(hover:none)]:w-24 [@media(hover:none)]:opacity-100"
           />
         </div>
 
-        <span className="ml-2 text-sm text-neutral-200 tabular-nums">
-          {formatTime(state.timePos)} <span className="text-neutral-500">/ {formatTime(state.duration)}</span>
+        <span dir="ltr" className="ms-2 text-sm text-ink tabular-nums">
+          {formatTime(state.timePos)} <span className="text-ink-muted">/ {formatTime(state.duration)}</span>
         </span>
 
         <div className="flex-1" />
 
         {p.upscale.model !== "off" && (
           <button
+            type="button"
             onClick={p.onInfo}
-            title="Détails entrée → upscale → sortie (I)"
-            className={`mr-1 rounded-md px-2 py-1 text-xs font-medium tabular-nums ${
-              up.status === "active" ? "bg-violet-500/25 text-violet-200" : up.status === "preparing" ? "bg-amber-500/20 text-amber-200" : "bg-white/10 text-neutral-400"
+            data-tip={t("player.badgeTip")}
+            data-tip-key="I"
+            className={`me-1 rounded-control px-2 py-1 text-xs font-medium tabular-nums transition-colors ${
+              up.status === "active"
+                ? "bg-accent/20 text-accent-text hover:bg-accent/30"
+                : up.status === "preparing"
+                  ? "bg-warning/15 text-warning"
+                  : "bg-white/8 text-ink-muted hover:bg-white/12"
             }`}
           >
             {modelName(p.upscale.model)}
-            {up.status === "preparing" && " · préparation…"}
-            {up.status === "inactive" && " · inactif"}
-            {up.status === "active" && ` · ${state.videoHeight}p → ${up.upscaledHeight}p ×${up.factor}`}
+            {up.status === "preparing" && ` · ${t("player.badgePreparing")}`}
+            {up.status === "inactive" && ` · ${t("player.badgeInactive")}`}
+            {up.status === "active" && (
+              <span dir="ltr">{` · ${state.videoHeight}p → ${up.upscaledHeight}p ×${up.factor}`}</span>
+            )}
           </button>
         )}
 
@@ -118,17 +134,19 @@ export function Controls(p: Props) {
           id="subs"
           open={p.openMenu}
           setOpen={p.setOpenMenu}
-          title="Sous-titres"
-          icon={<Captions size={20} />}
-          badge={activeSub ? (activeSub.lang ?? "ON").slice(0, 2).toUpperCase() : undefined}
+          title={t("player.subtitles")}
+          shortcut="C"
+          emptyText={t("player.nothing")}
+          icon={<Captions {...ICON} />}
+          badge={activeSub ? (activeSub.lang ?? "on").slice(0, 2).toUpperCase() : undefined}
           items={[
-            { key: "no", label: "Désactivés", active: !activeSub, onSelect: () => player.setSub("no") },
-            ...subs.map((t) => ({
-              key: String(t.id),
-              label: trackLabel(t),
-              hint: t.external ? "externe" : undefined,
-              active: t.selected,
-              onSelect: () => player.setSub(t.id),
+            { key: "no", label: t("player.subtitlesOff"), active: !activeSub, onSelect: () => player.setSub("no") },
+            ...subs.map((tr) => ({
+              key: String(tr.id),
+              label: trackLabel(t, tr),
+              hint: tr.external ? t("player.external") : undefined,
+              active: tr.selected,
+              onSelect: () => player.setSub(tr.id),
             })),
           ]}
         />
@@ -137,13 +155,14 @@ export function Controls(p: Props) {
             id="audio"
             open={p.openMenu}
             setOpen={p.setOpenMenu}
-            title="Piste audio"
-            icon={<AudioLines size={20} />}
-            items={audios.map((t) => ({
-              key: String(t.id),
-              label: trackLabel(t),
-              active: t.selected,
-              onSelect: () => player.setAudio(t.id),
+            title={t("player.audioTrack")}
+            emptyText={t("player.nothing")}
+            icon={<AudioLines {...ICON} />}
+            items={audios.map((tr) => ({
+              key: String(tr.id),
+              label: trackLabel(t, tr),
+              active: tr.selected,
+              onSelect: () => player.setAudio(tr.id),
             }))}
           />
         )}
@@ -151,13 +170,21 @@ export function Controls(p: Props) {
           id="model"
           open={p.openMenu}
           setOpen={p.setOpenMenu}
-          title="Upscale ArtCNN"
-          icon={<Sparkles size={20} />}
+          title={t("player.upscale")}
+          shortcut="U"
+          emptyText={t("player.nothing")}
+          icon={<Sparkles {...ICON} />}
           items={[
-            ...MODELS.map((m) => ({ key: m, label: MODEL_LABELS[m], active: p.upscale.model === m, onSelect: () => p.onModel(m) })),
+            ...MODELS.map((m) => ({
+              key: m,
+              label: modelLabel(t, m),
+              active: p.upscale.model === m,
+              onSelect: () => p.onModel(m),
+            })),
             ...(["auto", "x2"] as const).map((s) => ({
               key: `scale-${s}`,
-              label: `Échelle : ${SCALE_LABELS[s]}`,
+              group: t("settings.scale"),
+              label: scaleLabel(t, s),
               active: p.upscale.scale === s,
               onSelect: () => p.onScale(s),
             })),
@@ -168,11 +195,12 @@ export function Controls(p: Props) {
             id="quality"
             open={p.openMenu}
             setOpen={p.setOpenMenu}
-            title="Qualité source max"
-            icon={<MonitorPlay size={20} />}
+            title={t("player.sourceQuality")}
+            emptyText={t("player.nothing")}
+            icon={<MonitorPlay {...ICON} />}
             items={QUALITIES.map((h) => ({
               key: String(h),
-              label: qualityLabel(h),
+              label: qualityLabel(t, h),
               active: p.maxHeight === h,
               onSelect: () => p.onQuality(h),
             }))}
@@ -182,24 +210,25 @@ export function Controls(p: Props) {
           id="speed"
           open={p.openMenu}
           setOpen={p.setOpenMenu}
-          title="Vitesse"
-          icon={<Gauge size={20} />}
+          title={t("player.speed")}
+          emptyText={t("player.nothing")}
+          icon={<Gauge {...ICON} />}
           badge={state.speed !== 1 ? `${state.speed}×` : undefined}
           items={SPEEDS.map((s) => ({
             key: String(s),
-            label: s === 1 ? "Normale" : `${s}×`,
+            label: s === 1 ? t("player.speedNormal") : `${s}×`,
             active: Math.abs(state.speed - s) < 0.01,
             onSelect: () => player.setSpeed(s),
           }))}
         />
-        <IconButton title="Entrée → upscale → sortie (I)" active={p.infoOpen} onClick={p.onInfo}>
-          <Info size={19} />
+        <IconButton aria-label={t("player.info")} shortcut="I" active={p.infoOpen} onClick={p.onInfo}>
+          <Info {...ICON} />
         </IconButton>
-        <IconButton title="Paramètres" onClick={p.onSettings}>
-          <SettingsIcon size={19} />
+        <IconButton aria-label={t("player.settings")} onClick={p.onSettings}>
+          <SettingsIcon {...ICON} />
         </IconButton>
-        <IconButton title="Plein écran (F)" onClick={p.onFullscreen}>
-          {p.fullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+        <IconButton aria-label={p.fullscreen ? t("player.exitFullscreen") : t("player.fullscreen")} shortcut="F" onClick={p.onFullscreen}>
+          {p.fullscreen ? <Minimize {...ICON} /> : <Maximize {...ICON} />}
         </IconButton>
       </div>
     </div>

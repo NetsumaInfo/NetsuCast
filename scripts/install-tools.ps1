@@ -27,7 +27,10 @@ function Get-File([string]$Url, [string]$OutFile) {
 if ((Test-Path $mpvExe) -and -not $Force) {
     Write-Host "[OK] mpv already installed ($mpvExe). Use -Force to reinstall."
 } else {
-    $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/shinchiro/mpv-winbuild-cmake/releases/latest' -Headers @{ 'User-Agent' = 'NetsuCast-installer' }
+    $apiHeaders = @{ 'User-Agent' = 'NetsuCast-installer' }
+    # CI runners share IPs and hit the anonymous API rate limit; the workflow passes its token.
+    if ($env:GITHUB_TOKEN) { $apiHeaders['Authorization'] = "Bearer $env:GITHUB_TOKEN" }
+    $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/shinchiro/mpv-winbuild-cmake/releases/latest' -Headers $apiHeaders
     # Plain x86_64 build, not "-v3": v3 needs AVX2 and gains nothing measurable for playback.
     $asset = $release.assets | Where-Object { $_.name -match '^mpv-x86_64-\d{8}-git-[0-9a-f]+\.7z$' } | Select-Object -First 1
     if (-not $asset) { throw "No mpv x86_64 asset in release $($release.tag_name)." }

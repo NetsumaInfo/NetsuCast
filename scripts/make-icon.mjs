@@ -1,4 +1,4 @@
-// Renders the NetsuCast logo (violet rounded square, white play triangle, small sparkle) to PNG
+// Renders the NetsuCast logo (blue rounded square, white play triangle, small sparkle) to PNG
 // without any dependency. Usage: node scripts/make-icon.mjs <size> <out.png>
 import { writeFileSync } from "node:fs";
 import { deflateSync } from "node:zlib";
@@ -43,10 +43,10 @@ for (let py = 0; py < size; py++) {
         if (inTriangle(x, y) || inSparkle(x, y)) {
           r += 255; g += 255; b += 255;
         } else {
-          const t = (x + y) / 2; // diagonal gradient #6d28d9 -> #a855f7
-          r += 0x6d + (0xa8 - 0x6d) * t;
-          g += 0x28 + (0x55 - 0x28) * t;
-          b += 0xd9 + (0xf7 - 0xd9) * t;
+          const t = (x + y) / 2; // diagonal gradient #1f4fb8 -> #4c8dff (DESIGN.md accent)
+          r += 0x1f + (0x4c - 0x1f) * t;
+          g += 0x4f + (0x8d - 0x4f) * t;
+          b += 0xb8 + (0xff - 0xb8) * t;
         }
         a += 255;
       }

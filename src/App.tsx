@@ -3,28 +3,25 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
+import { useTranslation } from "react-i18next";
 import { command } from "tauri-plugin-mpv-api";
-import { House, LoaderCircle, Sparkles, X } from "lucide-react";
+import { House, LoaderCircle, Sparkles, TriangleAlert, X } from "lucide-react";
 import { Controls } from "./components/Controls";
+import { InfoPanel } from "./components/InfoPanel";
 import { InstallDialog } from "./components/InstallDialog";
 import { SettingsDialog } from "./components/SettingsDialog";
+import { IconButton, TooltipLayer } from "./components/ui";
 import { Welcome, type Warmup } from "./components/Welcome";
 import { usePlayer } from "./hooks/usePlayer";
+import { applyLanguage } from "./i18n";
 import { describeLoadError } from "./lib/errors";
 import * as player from "./lib/player";
-import { InfoPanel } from "./components/InfoPanel";
-import {
-  MODEL_LABELS,
-  MODELS,
-  type Environment,
-  type LoadTarget,
-  type Model,
-  type Settings,
-  type UpscaleScale,
-} from "./lib/types";
+import { MODELS, type Environment, type LoadTarget, type Model, type Settings, type UpscaleScale } from "./lib/types";
+import { modelName } from "./lib/upscaleInfo";
 
 const HIDE_DELAY = 2500;
 const EXTENSION_SEEN_KEY = "netsucast.extensionSeen";
+const DIRECT_MEDIA = /\.(m3u8|mpd|mp4|m4v|webm|mkv|mov|ts)(\?|#|$)/i;
 
 function readExtensionSeen(): boolean {
   try {
@@ -33,9 +30,8 @@ function readExtensionSeen(): boolean {
     return false;
   }
 }
-const upscaleOf = (s: Settings): player.Upscale => ({ model: s.model, force: s.forceUpscale, scale: s.upscaleScale });
 
-const DIRECT_MEDIA = /\.(m3u8|mpd|mp4|m4v|webm|mkv|mov|ts)(\?|#|$)/i;
+const upscaleOf = (s: Settings): player.Upscale => ({ model: s.model, force: s.forceUpscale, scale: s.upscaleScale });
 
 /** A URL typed by hand: direct media goes straight to mpv, anything else through yt-dlp. */
 function targetFromInput(input: string): LoadTarget {
@@ -44,6 +40,7 @@ function targetFromInput(input: string): LoadTarget {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   const [env, setEnv] = useState<Environment | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [ready, setReady] = useState(false);
@@ -79,6 +76,14 @@ export default function App() {
   });
   live.current = { ...live.current, ready, env, settings, upscale, maxHeight };
 
+  // --- window --------------------------------------------------------------------------------
+  const toggleFullscreen = useCallback(async (force?: boolean) => {
+    const win = getCurrentWindow();
+    const next = force ?? !(await win.isFullscreen());
+    await win.setFullscreen(next);
+    setFullscreen(next);
+  }, []);
+
   // --- startup -------------------------------------------------------------------------------
   const started = useRef(false);
   useEffect(() => {
@@ -86,12 +91,14 @@ export default function App() {
     started.current = true;
     (async () => {
       const [s, e] = await Promise.all([invoke<Settings>("get_settings"), invoke<Environment>("get_environment")]);
+      applyLanguage(s.language);
       setSettings(s);
       setEnv(e);
       setUpscale(upscaleOf(s));
       setMaxHeight(s.maxHeight);
+      if (s.alwaysOnTop) getCurrentWindow().setAlwaysOnTop(true);
       if (!e.mpvPath) {
-        setMpvError("mpv.exe introuvable.");
+        setMpvError(t("welcome.mpvMissing"));
         return;
       }
       try {
@@ -101,7 +108,7 @@ export default function App() {
         setMpvError(String(err));
       }
     })();
-  }, []);
+  }, [t]);
 
   // --- model warm-up -------------------------------------------------------------------------
   // The first compilation of an ArtCNN model freezes the picture for a long while. It is done
@@ -132,33 +139,37 @@ export default function App() {
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- loading -------------------------------------------------------------------------------
-  const open = useCallback(async (t: LoadTarget, start?: number) => {
-    const { ready, env, settings, upscale, maxHeight } = live.current;
-    if (!ready || !env || !settings) {
-      live.current.pending = t;
-      return;
-    }
-    if (live.current.warming) {
-      // A real video wins over the warm-up; the remaining models get compiled next launch.
-      live.current.warming = false;
-      setWarmup(null);
-      await player.applyUpscale(env, upscale);
-    }
-    setTarget(t);
-    setAtHome(false);
-    dismissError();
-    try {
-      await player.load(t, env, { ...settings, maxHeight }, start ?? t.start ?? undefined);
-    } catch (e) {
-      setNotice(`Chargement impossible : ${e}`);
-    }
-  }, [dismissError]);
+  const open = useCallback(
+    async (target: LoadTarget, start?: number) => {
+      const { ready, env, settings, upscale, maxHeight } = live.current;
+      if (!ready || !env || !settings) {
+        live.current.pending = target;
+        return;
+      }
+      if (live.current.warming) {
+        // A real video wins over the warm-up; the remaining models get compiled next launch.
+        live.current.warming = false;
+        setWarmup(null);
+        await player.applyUpscale(env, upscale);
+      }
+      setTarget(target);
+      setAtHome(false);
+      dismissError();
+      const from = start ?? (settings.resumePosition ? (target.start ?? undefined) : undefined);
+      try {
+        await player.load(target, env, { ...settings, maxHeight }, from);
+      } catch (e) {
+        setNotice(t("errors.loadFailed", { reason: String(e) }));
+      }
+    },
+    [dismissError, t],
+  );
 
   useEffect(() => {
     if (ready && live.current.pending) {
-      const t = live.current.pending;
+      const pending = live.current.pending;
       live.current.pending = null;
-      open(t);
+      open(pending);
     }
   }, [ready, open]);
 
@@ -175,6 +186,7 @@ export default function App() {
     const unCast = listen<LoadTarget>("cast", (e) => {
       markExtension();
       open(e.payload);
+      if (live.current.settings?.fullscreenOnCast) toggleFullscreen(true);
     });
     const unDrop = getCurrentWebview().onDragDropEvent((e) => {
       if (e.payload.type === "drop" && e.payload.paths.length) open({ url: e.payload.paths[0], kind: "file" });
@@ -184,15 +196,7 @@ export default function App() {
       unCast.then((u) => u());
       unDrop.then((u) => u());
     };
-  }, [open]);
-
-  // --- window --------------------------------------------------------------------------------
-  const toggleFullscreen = useCallback(async (force?: boolean) => {
-    const win = getCurrentWindow();
-    const next = force ?? !(await win.isFullscreen());
-    await win.setFullscreen(next);
-    setFullscreen(next);
-  }, []);
+  }, [open, toggleFullscreen]);
 
   const playing = ready && !state.idle && !warmup && !atHome;
 
@@ -244,14 +248,8 @@ export default function App() {
     setModelLoading((current) => (current === next.model ? null : current));
   }, []);
 
-  const changeModel = useCallback(
-    (m: Model) => applyUpscale({ ...live.current.upscale, model: m }),
-    [applyUpscale],
-  );
-  const changeScale = useCallback(
-    (scale: UpscaleScale) => applyUpscale({ ...live.current.upscale, scale }),
-    [applyUpscale],
-  );
+  const changeModel = useCallback((m: Model) => applyUpscale({ ...live.current.upscale, model: m }), [applyUpscale]);
+  const changeScale = useCallback((scale: UpscaleScale) => applyUpscale({ ...live.current.upscale, scale }), [applyUpscale]);
 
   const changeQuality = (h: number) => {
     setMaxHeight(h);
@@ -259,32 +257,38 @@ export default function App() {
     if (target?.kind === "page") open(target, state.timePos);
   };
 
+  const closeSettings = useCallback(() => setShowSettings(false), []);
+  const closeInstall = useCallback(() => setShowInstall(false), []);
+
   const saveSettings = async (next: Settings) => {
     await invoke("save_settings", { settings: next });
+    const prev = settings;
     if (ready) {
-      if (
-        next.model !== settings?.model ||
-        next.forceUpscale !== settings?.forceUpscale ||
-        next.upscaleScale !== settings?.upscaleScale
-      ) {
+      if (next.model !== prev?.model || next.forceUpscale !== prev?.forceUpscale || next.upscaleScale !== prev?.upscaleScale) {
         applyUpscale(upscaleOf(next));
       }
-      if (next.deband !== settings?.deband) player.setDeband(next.deband);
-      if (next.hwdec !== settings?.hwdec) player.setHwdec(next.hwdec);
-      if (next.subLangs !== settings?.subLangs) player.setSlang(next.subLangs);
+      if (next.deband !== prev?.deband) player.setDeband(next.deband);
+      if (next.hwdec !== prev?.hwdec) player.setHwdec(next.hwdec);
+      if (next.subLangs !== prev?.subLangs) player.setSlang(next.subLangs);
+      if (next.audioLangs !== prev?.audioLangs) player.setAlang(next.audioLangs);
+      if (next.subScale !== prev?.subScale) player.setSubScale(next.subScale);
     }
-    if (next.maxHeight !== settings?.maxHeight) setMaxHeight(next.maxHeight);
+    if (next.language !== prev?.language) applyLanguage(next.language);
+    if (next.alwaysOnTop !== prev?.alwaysOnTop) getCurrentWindow().setAlwaysOnTop(next.alwaysOnTop);
+    if (next.maxHeight !== prev?.maxHeight) setMaxHeight(next.maxHeight);
     setSettings(next);
     setShowSettings(false);
   };
 
   // --- keyboard ------------------------------------------------------------------------------
+  const seekStep = settings?.seekStep ?? 10;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
-      if (showSettings || tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+      if (showSettings || showInstall || tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
       if (e.key === "Escape") {
         if (openMenu) setOpenMenu(null);
+        else if (showInfo) setShowInfo(false);
         else if (fullscreen) toggleFullscreen(false);
         return;
       }
@@ -296,8 +300,8 @@ export default function App() {
         k: player.togglePause,
         ArrowLeft: () => player.seekRelative(-5),
         ArrowRight: () => player.seekRelative(5),
-        j: () => player.seekRelative(-10),
-        l: () => player.seekRelative(10),
+        j: () => player.seekRelative(-seekStep),
+        l: () => player.seekRelative(seekStep),
         ArrowUp: () => player.setVolume(state.volume + 5),
         ArrowDown: () => player.setVolume(state.volume - 5),
         m: player.toggleMute,
@@ -315,7 +319,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [playing, state.volume, showSettings, openMenu, fullscreen, model, poke, toggleFullscreen, changeModel, goHome]);
+  }, [playing, state.volume, showSettings, showInstall, showInfo, openMenu, fullscreen, model, seekStep, poke, toggleFullscreen, changeModel, goHome]);
 
   // Single click = pause, double click = fullscreen: the single click waits to be sure.
   const clickTimer = useRef<number>(undefined);
@@ -328,13 +332,15 @@ export default function App() {
     toggleFullscreen();
   };
 
+  const fade = controlsVisible ? "opacity-100" : "pointer-events-none opacity-0";
+
   return (
     <div
-      className={`relative h-screen w-screen overflow-hidden select-none ${ready ? "" : "bg-neutral-950"} ${playing && !controlsVisible ? "cursor-none" : ""}`}
+      className={`relative h-screen w-screen overflow-hidden select-none ${ready ? "" : "bg-page"} ${playing && !controlsVisible ? "cursor-none" : ""}`}
       onMouseMove={poke}
     >
       {!playing && (
-        <div className="absolute inset-0 bg-neutral-950">
+        <div className="absolute inset-0 bg-page">
           <Welcome
             mpvError={mpvError}
             warmup={warmup}
@@ -355,38 +361,37 @@ export default function App() {
             onWheel={(e) => player.setVolume(state.volume + (e.deltaY < 0 ? 5 : -5))}
           />
 
-          <div className={`absolute inset-x-0 top-0 flex items-center gap-2 bg-gradient-to-b from-black/80 to-transparent px-3 pt-2 pb-10 transition-opacity duration-300 ${controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-            <button
-              onClick={goHome}
-              title="Accueil (H)"
-              className="grid size-9 shrink-0 place-items-center rounded-lg text-neutral-100 hover:bg-white/15"
-            >
-              <House size={19} />
-            </button>
-            <span className="truncate text-sm font-medium text-neutral-100">{state.title}</span>
+          <div className={`absolute inset-x-0 top-0 flex items-center gap-1.5 bg-gradient-to-b from-black/75 to-transparent px-3 pt-2 pb-10 transition-opacity duration-200 ${fade}`}>
+            <IconButton aria-label={t("player.home")} shortcut="H" onClick={goHome}>
+              <House size={19} strokeWidth={1.75} />
+            </IconButton>
+            <span className="truncate text-sm text-ink" dir="auto">
+              {state.title}
+            </span>
           </div>
 
           {(state.loading || state.buffering) && !modelLoading && (
             <div className="pointer-events-none absolute inset-0 grid place-items-center">
-              <LoaderCircle className="animate-spin text-white/80" size={48} />
+              <LoaderCircle className="animate-spin text-white/80" size={40} strokeWidth={1.5} />
             </div>
           )}
 
           {modelLoading && (
-            <div className="pointer-events-none absolute inset-0 grid place-items-center">
-              <div className="flex items-center gap-3 rounded-xl bg-black/80 px-5 py-3 text-sm text-neutral-100 shadow-xl">
-                <Sparkles size={18} className="animate-pulse text-violet-400" />
-                Préparation de {MODEL_LABELS[modelLoading].split(" ·")[0]}… (première fois seulement)
+            <div role="status" className="pointer-events-none absolute inset-0 grid place-items-center">
+              <div className="flex items-center gap-2.5 rounded-panel border border-line bg-page/90 px-4 py-2.5 text-sm text-ink shadow-overlay">
+                <Sparkles size={16} strokeWidth={1.75} className="animate-pulse text-accent-text" />
+                {t("player.preparingModel", { model: modelName(modelLoading) })}
               </div>
             </div>
           )}
 
-          <div className={`absolute inset-x-0 bottom-0 transition-opacity duration-300 ${controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+          <div className={`absolute inset-x-0 bottom-0 transition-opacity duration-200 ${fade}`}>
             <Controls
               state={state}
               upscale={upscale}
               preparing={modelLoading !== null}
               maxHeight={maxHeight}
+              seekStep={seekStep}
               canChangeQuality={target?.kind === "page"}
               fullscreen={fullscreen}
               infoOpen={showInfo}
@@ -416,21 +421,33 @@ export default function App() {
       )}
 
       {(state.error || notice) && (
-        <div className="absolute top-16 left-1/2 z-40 flex max-w-xl -translate-x-1/2 items-start gap-3 rounded-xl border border-red-500/30 bg-neutral-900/95 px-4 py-3 text-sm text-red-200 shadow-xl">
-          <span className="break-all">{notice ?? describeLoadError(state.error ?? "", state.ytdlError, target)}</span>
-          <button onClick={() => { setNotice(null); dismissError(); }} className="text-neutral-400 hover:text-white">
-            <X size={16} />
-          </button>
+        <div
+          role="alert"
+          className="absolute top-14 left-1/2 z-40 flex w-[min(36rem,calc(100%-2rem))] -translate-x-1/2 animate-fade-in items-start gap-3 rounded-panel border border-danger/30 bg-page/95 py-2 ps-4 pe-1.5 text-sm shadow-overlay"
+        >
+          <TriangleAlert size={16} className="mt-2 shrink-0 text-danger" />
+          <span className="min-w-0 flex-1 py-1.5 break-words text-ink">
+            {notice ?? describeLoadError(state.error ?? "", state.ytdlError, target)}
+          </span>
+          <IconButton
+            aria-label={t("player.dismiss")}
+            onClick={() => {
+              setNotice(null);
+              dismissError();
+            }}
+          >
+            <X size={15} strokeWidth={1.75} className="text-ink-muted" />
+          </IconButton>
         </div>
       )}
 
       {showInstall && env?.extensionDir && (
-        <InstallDialog extensionDir={env.extensionDir} installed={extensionInstalled} onClose={() => setShowInstall(false)} />
+        <InstallDialog extensionDir={env.extensionDir} installed={extensionInstalled} onClose={closeInstall} />
       )}
 
-      {showSettings && settings && (
-        <SettingsDialog settings={settings} env={env} onClose={() => setShowSettings(false)} onSave={saveSettings} />
-      )}
+      {showSettings && settings && <SettingsDialog settings={settings} env={env} onClose={closeSettings} onSave={saveSettings} />}
+
+      <TooltipLayer />
     </div>
   );
 }

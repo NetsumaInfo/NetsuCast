@@ -1,15 +1,126 @@
 @import "tailwindcss";
 
-/* mpv draws into the window behind the webview: every pixel left transparent shows the video. */
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-  background: transparent;
-  color: #f5f5f5;
-  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
-  /* A player is not a page: nothing scrolls except inside dialogs and panels. */
-  overflow: hidden;
-  overscroll-behavior: none;
+/* Tokens: see DESIGN.md ## Look. Ratios measured with the netsu-peccable contrast scan. */
+@theme {
+  --color-page: #0a0d13;
+  --color-surface: #11151d;
+  --color-raised: #181d27;
+  --color-overlay: #1d2330;
+  --color-ink: #e7eaf0; /* 15.17 on surface */
+  --color-ink-muted: #9aa4b5; /* 7.27 on surface, 6.71 on raised */
+  --color-ink-faint: #7d889c; /* placeholders, 4.72 on raised */
+  --color-line: #222836;
+  --color-line-strong: #5e6a80; /* control borders, 3.35 on surface */
+  --color-accent: #2f6fe0; /* fills; white ink 4.70 */
+  --color-accent-hover: #3b7bf0;
+  --color-accent-ink: #ffffff;
+  --color-accent-text: #4c8dff; /* text, icons, focus: 5.71 on surface */
+  --color-danger: #f2767a; /* 6.66 on surface */
+  --color-warning: #e8b452; /* 9.65 */
+  --color-success: #4fc98e; /* 8.77 */
+
+  --font-sans: "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+
+  --radius-control: 6px;
+  --radius-panel: 10px;
+
+  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 45%);
+
+  --animate-fade-in: fade-in 140ms ease-out;
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  /* mpv draws into the window behind the webview: every pixel left transparent shows the video.
+     A player is not a page: nothing scrolls except inside dialogs and panels. */
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 45%, transparent);
+  }
+
+  /* One focus style everywhere; transparent outline stays visible in Windows high contrast. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+
+  button {
+    cursor: default;
+  }
+
+  /* Thin scrollbars, never the native ones. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-ink-faint);
+  }
+
+  /* Range inputs (volume): a thin track, the filled part in accent via --fill. */
+  input[type="range"] {
+    appearance: none;
+    height: 16px;
+    background: transparent;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--color-accent-text) var(--fill, 0%),
+      rgb(255 255 255 / 22%) var(--fill, 0%)
+    );
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
+    border-radius: 999px;
+    background: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      transition-duration: 1ms !important;
+    }
+  }
 }

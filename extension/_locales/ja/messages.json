@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "ja"
+  },
+  "extDescription": {
+    "message": "タブの動画をNetsuCastプレーヤーにキャストします（ArtCNNでアップスケール）。"
+  },
+  "actionTitle": {
+    "message": "NetsuCastにキャスト（Alt+Shift+C）"
+  },
+  "commandDescription": {
+    "message": "タブの動画をNetsuCastにキャスト"
+  },
+  "menuPlay": {
+    "message": "NetsuCastで再生"
+  },
+  "menuPick": {
+    "message": "キャストするストリームを選択…"
+  },
+  "castDone": {
+    "message": "NetsuCastにキャストしました"
+  },
+  "castSending": {
+    "message": "キャスト中…"
+  },
+  "castPlaying": {
+    "message": "NetsuCastで再生中 ✓"
+  },
+  "castButtonTitle": {
+    "message": "この動画の続きをNetsuCastで再生（ArtCNNでアップスケール）"
+  },
+  "errNoVideo": {
+    "message": "動画が見つかりません。動画にカーソルを合わせて、NetsuCastボタンをクリックしてください"
+  },
+  "errHttp": {
+    "message": "NetsuCastが動画を受け付けませんでした（エラー$CODE$）",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCastが応答しません。アプリを起動してください。"
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCastが起動していません"
+  },
+  "statusOn": {
+    "message": "NetsuCastに接続済み"
+  },
+  "statusOff": {
+    "message": "NetsuCast未起動"
+  },
+  "popupSendPage": {
+    "message": "ページをキャスト"
+  },
+  "popupHintPageSite": {
+    "message": "このサイトにおすすめです。yt-dlpが最高画質と字幕を取得します。"
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlpがページ内の動画を探します。見つからない場合は、下のストリームを選んでください。"
+  },
+  "popupNoPage": {
+    "message": "このタブにはWebページがありません。"
+  },
+  "popupStreamsTitle": {
+    "message": "検出されたストリーム"
+  },
+  "popupEmpty": {
+    "message": "ストリームが検出されていません。ページで動画を再生してから、このメニューをもう一度開いてください。"
+  },
+  "popupPort": {
+    "message": "ポート"
+  },
+  "popupPlay": {
+    "message": "再生"
+  }
+}

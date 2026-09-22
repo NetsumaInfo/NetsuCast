@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# One run per branch: a push that follows closely cancels the previous one.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  renderer:
+    name: Renderer (tsc + build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Type-check and build the renderer
+        run: pnpm build
+      - name: Translations (every locale matches the French source)
+        run: pnpm check:i18n
+      - name: Updater manifest script (dry run)
+        run: node scripts/create-update-manifest.mjs --dry-run
+
+  rust:
+    name: Rust shell (check)
+    runs-on: windows-latest
+    # `cargo check` on the Tauri dependencies is long and depends on an external cache: it must not
+    # block a PR whose code it does not judge. Deliberately informative, as in NetsuBoard.
+    continue-on-error: true
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      # tauri-build only needs every bundle.resources path to EXIST. The mpv/yt-dlp/deno binaries
+      # are not versioned (scripts/install-tools.ps1); their staging folder
+      # src-tauri/resources/tools/mpv/ is kept in git by its notice and licence texts, so the shell
+      # checks without them. No full build here.
+      - name: cargo check
+        working-directory: src-tauri
+        run: cargo check --locked

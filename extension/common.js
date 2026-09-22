@@ -81,7 +81,8 @@ export async function cast({ url, kind, title, referer, start }) {
     }),
     signal: AbortSignal.timeout(3000),
   });
-  if (!res.ok) throw new Error(`NetsuCast a répondu ${res.status}`);
+  // Error codes, not sentences: the text is translated where it is shown.
+  if (!res.ok) throw new Error(`http-status:${res.status}`);
 }
 
 /** On sites handled by yt-dlp, whether the URL is one video rather than a feed or a channel. */

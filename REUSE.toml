@@ -1,0 +1,45 @@
+version = 1
+
+[[annotations]]
+path = [
+  "package.json",
+  "pnpm-lock.yaml",
+  "index.html",
+  "vite.config.ts",
+  "tsconfig*.json",
+  "src/**/*.ts",
+  "src/**/*.tsx",
+  "src/**/*.css",
+  "src/**/*.json",
+  "extension/**/*.js",
+  "extension/**/*.json",
+  "extension/**/*.html",
+  "extension/**/*.css",
+  "scripts/**/*.ps1",
+  "scripts/**/*.mjs",
+  "src-tauri/build.rs",
+  "src-tauri/windows/**/*.nsh",
+  "src-tauri/Cargo.toml",
+  "src-tauri/tauri.conf.json",
+  "src-tauri/capabilities/**/*.json",
+  "src-tauri/src/**/*.rs",
+  "src-tauri/resources/scripts/**/*.lua",
+  "README.md",
+  "AGENTS.md",
+  "DESIGN.md",
+  "CONTRIBUTING.md",
+  "CODE_OF_CONDUCT.md",
+  "SECURITY.md",
+  "docs/**/*.md",
+  "run.bat"
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Haim Faraj <https://github.com/NetsumaInfo/NetsuCast>"
+SPDX-License-Identifier = "AGPL-3.0-only"
+
+# ArtCNN shaders: third-party, MIT (text in src-tauri/resources/shaders/LICENSE-ArtCNN).
+[[annotations]]
+path = ["src-tauri/resources/shaders/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "ArtCNN authors <https://github.com/Artoriuz/ArtCNN>"
+SPDX-License-Identifier = "MIT"

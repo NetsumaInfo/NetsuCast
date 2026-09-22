@@ -1,7 +1,16 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Check } from "lucide-react";
+import { IconButton } from "./ui";
 
-export type MenuItem = { key: string; label: string; hint?: string; active?: boolean; onSelect: () => void };
+export type MenuItem = {
+  key: string;
+  label: string;
+  hint?: string;
+  active?: boolean;
+  /** Items sharing a group sit together; a new group starts after a divider and its title. */
+  group?: string;
+  onSelect: () => void;
+};
 
 type Props = {
   id: string;
@@ -9,12 +18,14 @@ type Props = {
   setOpen: (id: string | null) => void;
   icon: ReactNode;
   title: string;
+  shortcut?: string;
   items: MenuItem[];
   badge?: string;
+  emptyText: string;
 };
 
-/** Icon button with a popover list above it. One menu open at a time (`open` holds its id). */
-export function Menu({ id, open, setOpen, icon, title, items, badge }: Props) {
+/** Icon button with a list above it. One menu open at a time (`open` holds its id). */
+export function Menu({ id, open, setOpen, icon, title, shortcut, items, badge, emptyText }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const isOpen = open === id;
 
@@ -29,56 +40,51 @@ export function Menu({ id, open, setOpen, icon, title, items, badge }: Props) {
 
   return (
     <div ref={ref} className="relative">
-      <IconButton title={title} active={isOpen} onClick={() => setOpen(isOpen ? null : id)}>
+      <IconButton aria-label={title} shortcut={shortcut} active={isOpen} onClick={() => setOpen(isOpen ? null : id)}>
         {icon}
         {badge && (
-          <span className="absolute -top-1 -right-1 rounded bg-violet-500 px-1 text-[9px] leading-3 font-bold text-white">
+          <span className="absolute -top-0.5 -end-0.5 rounded-sm bg-accent px-1 text-[9px] leading-3.5 font-semibold text-accent-ink tabular-nums">
             {badge}
           </span>
         )}
       </IconButton>
       {isOpen && (
-        <div className="absolute right-0 bottom-full mb-3 max-h-[60vh] min-w-56 overflow-y-auto rounded-xl border border-white/10 bg-neutral-900/95 p-1.5 shadow-2xl backdrop-blur">
-          <div className="px-3 pt-1.5 pb-2 text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">{title}</div>
-          {items.length === 0 && <div className="px-3 py-2 text-sm text-neutral-500">Rien de disponible</div>}
-          {items.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => {
-                item.onSelect();
-                setOpen(null);
-              }}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-neutral-200 hover:bg-white/10"
-            >
-              <span className="w-4 shrink-0 text-violet-400">{item.active && <Check size={16} />}</span>
-              <span className="flex-1">{item.label}</span>
-              {item.hint && <span className="text-xs text-neutral-500">{item.hint}</span>}
-            </button>
-          ))}
+        <div
+          role="menu"
+          aria-label={title}
+          className="absolute end-0 bottom-full mb-2 max-h-[60vh] min-w-60 animate-fade-in overflow-y-auto rounded-panel border border-line bg-overlay p-1 shadow-overlay"
+        >
+          <div className="px-2.5 pt-1.5 pb-1 text-xs font-medium text-ink-muted">{title}</div>
+          {items.length === 0 && <div className="px-2.5 py-2 text-sm text-ink-faint">{emptyText}</div>}
+          {items.map((item, i) => {
+            const newGroup = i > 0 && item.group !== items[i - 1].group;
+            return (
+              <div key={item.key}>
+                {newGroup && (
+                  <>
+                    <div className="mx-2 my-1 h-px bg-line" />
+                    {item.group && <div className="px-2.5 pt-1 pb-1 text-xs font-medium text-ink-muted">{item.group}</div>}
+                  </>
+                )}
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={!!item.active}
+                  onClick={() => {
+                    item.onSelect();
+                    setOpen(null);
+                  }}
+                  className={`flex w-full items-center gap-2.5 rounded-control px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-white/8 ${item.active ? "text-ink" : "text-ink-muted hover:text-ink"}`}
+                >
+                  <span className="w-4 shrink-0 text-accent-text">{item.active && <Check size={15} strokeWidth={2} />}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {item.hint && <span className="text-xs text-ink-faint">{item.hint}</span>}
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
-  );
-}
-
-export function IconButton({
-  title,
-  onClick,
-  active,
-  children,
-}: {
-  title: string;
-  onClick: () => void;
-  active?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      title={title}
-      onClick={onClick}
-      className={`relative grid size-9 place-items-center rounded-lg text-neutral-100 transition hover:bg-white/15 ${active ? "bg-white/15" : ""}`}
-    >
-      {children}
-    </button>
   );
 }

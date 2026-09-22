@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "tr"
+  },
+  "extDescription": {
+    "message": "Sekmedeki videoyu NetsuCast oynatıcısına yayınlar (ArtCNN ile çözünürlük yükseltme)."
+  },
+  "actionTitle": {
+    "message": "NetsuCast'a yayınla (Alt+Shift+C)"
+  },
+  "commandDescription": {
+    "message": "Sekmedeki videoyu NetsuCast'a yayınla"
+  },
+  "menuPlay": {
+    "message": "NetsuCast'ta oynat"
+  },
+  "menuPick": {
+    "message": "Yayınlanacak akışı seç…"
+  },
+  "castDone": {
+    "message": "Video NetsuCast'a yayınlandı"
+  },
+  "castSending": {
+    "message": "Yayınlanıyor…"
+  },
+  "castPlaying": {
+    "message": "NetsuCast'ta oynatılıyor ✓"
+  },
+  "castButtonTitle": {
+    "message": "Bu videoyu NetsuCast'ta izlemeye devam et (ArtCNN ile çözünürlük yükseltme)"
+  },
+  "errNoVideo": {
+    "message": "Video bulunamadı: imleci videonun üzerine getir ve NetsuCast düğmesine tıkla"
+  },
+  "errHttp": {
+    "message": "NetsuCast videoyu reddetti (hata $CODE$)",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCast yanıt vermiyor: uygulamayı başlat."
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast çalışmıyor"
+  },
+  "statusOn": {
+    "message": "NetsuCast bağlı"
+  },
+  "statusOff": {
+    "message": "NetsuCast çalışmıyor"
+  },
+  "popupSendPage": {
+    "message": "Sayfayı yayınla"
+  },
+  "popupHintPageSite": {
+    "message": "Bu site için önerilir: yt-dlp en iyi kaliteyi ve altyazıları alır."
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlp sayfadaki videoyu bulmaya çalışır. Bulamazsa aşağıdan bir akış seç."
+  },
+  "popupNoPage": {
+    "message": "Bu sekmede web sayfası yok."
+  },
+  "popupStreamsTitle": {
+    "message": "Algılanan akışlar"
+  },
+  "popupEmpty": {
+    "message": "Akış algılanmadı. Videoyu sayfada başlat, sonra bu menüyü yeniden aç."
+  },
+  "popupPort": {
+    "message": "Port"
+  },
+  "popupPlay": {
+    "message": "Oynat"
+  }
+}

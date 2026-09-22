@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "he"
+  },
+  "extDescription": {
+    "message": "מעביר את הסרטון מהכרטיסייה לנגן NetsuCast (הגדלת רזולוציה עם ArtCNN)."
+  },
+  "actionTitle": {
+    "message": "הפעלת Cast ל-NetsuCast (Alt+Shift+C)"
+  },
+  "commandDescription": {
+    "message": "העברת הסרטון מהכרטיסייה ל-NetsuCast"
+  },
+  "menuPlay": {
+    "message": "הפעלה ב-NetsuCast"
+  },
+  "menuPick": {
+    "message": "בחירת הזרם ל-Cast…"
+  },
+  "castDone": {
+    "message": "הסרטון הועבר ב-Cast ל-NetsuCast"
+  },
+  "castSending": {
+    "message": "מפעיל Cast…"
+  },
+  "castPlaying": {
+    "message": "מופעל ב-NetsuCast ✓"
+  },
+  "castButtonTitle": {
+    "message": "המשך הצפייה בסרטון ב-NetsuCast (הגדלת רזולוציה עם ArtCNN)"
+  },
+  "errNoVideo": {
+    "message": "הסרטון לא נמצא: יש להעביר את העכבר מעליו וללחוץ על כפתור NetsuCast שלו"
+  },
+  "errHttp": {
+    "message": "NetsuCast דחה את הסרטון (שגיאה $CODE$)",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCast לא מגיב: יש להפעיל את האפליקציה."
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast לא פועל"
+  },
+  "statusOn": {
+    "message": "NetsuCast מחובר"
+  },
+  "statusOff": {
+    "message": "NetsuCast לא פועל"
+  },
+  "popupSendPage": {
+    "message": "הפעלת Cast לדף"
+  },
+  "popupHintPageSite": {
+    "message": "מומלץ לאתר הזה: yt-dlp משיג את האיכות הטובה ביותר ואת הכתוביות."
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlp מנסה למצוא את הסרטון בדף. אם זה לא מצליח, אפשר לבחור זרם למטה."
+  },
+  "popupNoPage": {
+    "message": "אין דף אינטרנט בכרטיסייה הזו."
+  },
+  "popupStreamsTitle": {
+    "message": "זרמים שזוהו"
+  },
+  "popupEmpty": {
+    "message": "לא זוהו זרמים. יש להפעיל את הסרטון בדף ואז לפתוח שוב את התפריט."
+  },
+  "popupPort": {
+    "message": "פורט"
+  },
+  "popupPlay": {
+    "message": "הפעלה"
+  }
+}

@@ -108,7 +108,7 @@ async function pickSource(tab, { frameUrl, src, pageUrl: videoPage } = {}) {
   const pageUrl = videoPage ?? tab.url;
   if (isPageSite(pageUrl)) {
     // A feed, channel or home page is a list: yt-dlp would play its first entry.
-    if (!isVideoPage(pageUrl)) throw new Error("Vidéo introuvable : survole-la et clique sur son bouton NetsuCast");
+    if (!isVideoPage(pageUrl)) throw new Error("no-video");
     return { url: pageUrl, kind: "page" };
   }
 
@@ -143,13 +143,15 @@ async function castTab(tab, info = {}) {
 const grabVideo = () => window.__netsucastGrab?.() ?? null;
 const pauseVideos = () => window.__netsucastPause?.();
 
+const t = (key, subs) => chrome.i18n.getMessage(key, subs);
+
 async function flash(tabId, ok, title) {
-  await chrome.action.setBadgeBackgroundColor({ tabId, color: ok ? "#7c3aed" : "#dc2626" });
+  await chrome.action.setBadgeBackgroundColor({ tabId, color: ok ? "#2F6FE0" : "#dc2626" });
   await chrome.action.setBadgeText({ tabId, text: ok ? "✓" : "!" });
   await chrome.action.setTitle({ tabId, title });
   setTimeout(() => {
     chrome.action.setBadgeText({ tabId, text: "" });
-    chrome.action.setTitle({ tabId, title: "Caster vers NetsuCast (Alt+Maj+C)" });
+    chrome.action.setTitle({ tabId, title: t("actionTitle") });
   }, ok ? 2500 : 6000);
 }
 
@@ -167,13 +169,13 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
   try {
     await castTab(tab, found?.result ?? {});
-    await flash(tab.id, true, "Envoyé à NetsuCast");
+    await flash(tab.id, true, t("castDone"));
     if (found) {
       chrome.scripting.executeScript({ target: { tabId: tab.id, frameIds: [found.frameId] }, func: pauseVideos }).catch(() => {});
     }
   } catch (e) {
-    const text = String(e?.message ?? e);
-    await flash(tab.id, false, text.startsWith("Vidéo") ? text : "NetsuCast ne répond pas : lance l'application.");
+    const code = String(e?.message ?? e);
+    await flash(tab.id, false, code === "no-video" ? t("errNoVideo") : t("errNotRunning"));
   }
 });
 
@@ -200,8 +202,8 @@ chrome.runtime.onStartup.addListener(hello);
 
 chrome.runtime.onInstalled.addListener(() => {
   hello();
-  chrome.contextMenus.create({ id: "netsucast-play", title: "Lire dans NetsuCast", contexts: ["page", "video", "link"] });
-  chrome.contextMenus.create({ id: "netsucast-pick", title: "Choisir le flux à envoyer…", contexts: ["action"] });
+  chrome.contextMenus.create({ id: "netsucast-play", title: t("menuPlay"), contexts: ["page", "video", "link"] });
+  chrome.contextMenus.create({ id: "netsucast-pick", title: t("menuPick"), contexts: ["action"] });
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
@@ -217,8 +219,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     } else {
       await castTab(tab, { src: info.srcUrl, frameUrl: info.frameUrl });
     }
-    await flash(tab.id, true, "Envoyé à NetsuCast");
+    await flash(tab.id, true, t("castDone"));
   } catch {
-    await flash(tab.id, false, "NetsuCast ne répond pas : lance l'application.");
+    await flash(tab.id, false, t("errNotRunning"));
   }
 });

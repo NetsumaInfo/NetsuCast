@@ -2,28 +2,30 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    <title>NetsuCast</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
+    <!-- Text comes from _locales via data-i18n (filled by popup.js); the French here is the fallback. -->
     <header>
-      <h1>Netsu<span>Cast</span></h1>
+      <h1 translate="no">Netsu<span>Cast</span></h1>
       <span id="status" class="status">…</span>
     </header>
 
     <section>
-      <button id="send-page" class="primary">Envoyer la page</button>
+      <button id="send-page" class="primary" data-i18n="popupSendPage">Caster la page</button>
       <p id="page-hint" class="hint"></p>
     </section>
 
     <section>
-      <h2>Flux détectés <span id="count"></span></h2>
+      <h2><span data-i18n="popupStreamsTitle">Flux détectés</span> <span id="count"></span></h2>
       <ul id="streams"></ul>
-      <p id="empty" class="hint" hidden>Aucun flux détecté. Lance la vidéo dans la page puis rouvre ce menu.</p>
+      <p id="empty" class="hint" data-i18n="popupEmpty" hidden>Aucun flux détecté. Lance la vidéo dans la page, puis rouvre ce menu.</p>
     </section>
 
     <footer>
-      <label>Port <input id="port" type="number" min="1" max="65535" /></label>
-      <span id="message"></span>
+      <label><span data-i18n="popupPort">Port</span> <input id="port" type="number" min="1" max="65535" /></label>
+      <span id="message" role="status"></span>
     </footer>
 
     <script type="module" src="popup.js"></script>

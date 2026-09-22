@@ -1,0 +1,80 @@
+{
+  "langTag": {
+    "message": "zh-CN"
+  },
+  "extDescription": {
+    "message": "将标签页中的视频投放到NetsuCast播放器（ArtCNN画质放大）。"
+  },
+  "actionTitle": {
+    "message": "投放到NetsuCast（Alt+Shift+C）"
+  },
+  "commandDescription": {
+    "message": "将标签页中的视频投放到NetsuCast"
+  },
+  "menuPlay": {
+    "message": "在NetsuCast中播放"
+  },
+  "menuPick": {
+    "message": "选择要投放的视频流…"
+  },
+  "castDone": {
+    "message": "已投放到NetsuCast"
+  },
+  "castSending": {
+    "message": "正在投放…"
+  },
+  "castPlaying": {
+    "message": "正在NetsuCast中播放 ✓"
+  },
+  "castButtonTitle": {
+    "message": "在NetsuCast中继续观看此视频（ArtCNN画质放大）"
+  },
+  "errNoVideo": {
+    "message": "找不到视频：将鼠标悬停在视频上，然后点击它的NetsuCast按钮"
+  },
+  "errHttp": {
+    "message": "NetsuCast拒绝了该视频（错误$CODE$）",
+    "placeholders": {
+      "code": {
+        "content": "$1",
+        "example": "500"
+      }
+    }
+  },
+  "errNotRunning": {
+    "message": "NetsuCast没有响应：启动应用后再试一次。"
+  },
+  "errNotRunningShort": {
+    "message": "NetsuCast未运行"
+  },
+  "statusOn": {
+    "message": "NetsuCast已连接"
+  },
+  "statusOff": {
+    "message": "NetsuCast未运行"
+  },
+  "popupSendPage": {
+    "message": "投放此页面"
+  },
+  "popupHintPageSite": {
+    "message": "推荐用于此网站：yt-dlp会获取最佳画质和字幕。"
+  },
+  "popupHintGeneric": {
+    "message": "yt-dlp会尝试查找页面中的视频。如果找不到，你可以在下方选择一个视频流。"
+  },
+  "popupNoPage": {
+    "message": "此标签页中没有网页。"
+  },
+  "popupStreamsTitle": {
+    "message": "检测到的视频流"
+  },
+  "popupEmpty": {
+    "message": "未检测到视频流。在页面中播放视频，然后重新打开此菜单。"
+  },
+  "popupPort": {
+    "message": "端口"
+  },
+  "popupPlay": {
+    "message": "播放"
+  }
+}

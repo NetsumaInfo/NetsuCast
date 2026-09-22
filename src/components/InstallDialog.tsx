@@ -1,16 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { useTranslation } from "react-i18next";
 import { Check, ClipboardCopy, ExternalLink, LoaderCircle, X } from "lucide-react";
+import { IconButton } from "./ui";
 
 type Browser = { id: string; name: string; extensionsUrl: string; supported: boolean };
-
-/** Button names differ slightly between Chromium browsers. */
-const LABELS: Record<string, { dev: string; where: string; load: string }> = {
-  edge: { dev: "Mode développeur", where: "dans le menu de gauche, en bas", load: "Charger l'extension décompressée" },
-  opera: { dev: "Mode développeur", where: "en haut à droite", load: "Charger l'extension décompressée" },
-  "opera-gx": { dev: "Mode développeur", where: "en haut à droite", load: "Charger l'extension décompressée" },
-};
-const DEFAULT_LABELS = { dev: "Mode développeur", where: "en haut à droite", load: "Charger l'extension non empaquetée" };
 
 type Props = {
   extensionDir: string;
@@ -19,21 +13,34 @@ type Props = {
 };
 
 export function InstallDialog({ extensionDir, installed, onClose }: Props) {
+  const { t } = useTranslation();
   const [browsers, setBrowsers] = useState<Browser[] | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [opened, setOpened] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const dialog = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     invoke<Browser[]>("list_browsers").then((list) => {
       setBrowsers(list);
       setSelected(list.find((b) => b.supported)?.id ?? null);
     });
-  }, []);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    dialog.current?.querySelector<HTMLElement>("button")?.focus();
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   const browser = browsers?.find((b) => b.id === selected);
-  const labels = (selected && LABELS[selected]) || DEFAULT_LABELS;
+  // Button names differ slightly between Chromium browsers.
+  const edgeLike = selected === "edge" || selected === "opera" || selected === "opera-gx";
+  const labels = {
+    dev: selected === "edge" ? t("install.devModeEdge") : t("install.devMode"),
+    where: selected === "edge" ? t("install.whereLeftBottom") : t("install.whereTopRight"),
+    load: edgeLike ? t("install.loadUnpackedEdge") : t("install.loadUnpacked"),
+    select: t("install.selectFolder"),
+  };
 
   const copyPath = async () => {
     try {
@@ -57,34 +64,46 @@ export function InstallDialog({ extensionDir, installed, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-6 backdrop-blur-sm" onMouseDown={onClose}>
+    <div className="fixed inset-0 z-50 grid animate-fade-in place-items-center bg-black/60 p-6" onMouseDown={onClose}>
       <div
-        className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 shadow-2xl"
+        ref={dialog}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="nc-install-title"
+        className="w-full max-w-md overflow-hidden rounded-panel border border-line bg-surface shadow-overlay"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-          <h2 className="text-lg font-semibold">Installer l'extension NetsuCast</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-neutral-400 hover:bg-white/10 hover:text-white">
-            <X size={18} />
-          </button>
+        <div className="flex items-center justify-between ps-5 pe-2 pt-2">
+          <h2 id="nc-install-title" className="text-base font-semibold text-ink">
+            {t("install.title")}
+          </h2>
+          <IconButton aria-label={t("install.close")} shortcut={t("keys.escape")} onClick={onClose}>
+            <X size={17} strokeWidth={1.75} className="text-ink-muted" />
+          </IconButton>
         </div>
 
-        <div className="grid gap-5 px-6 py-5 text-sm">
+        <div className="grid gap-5 px-5 pt-2 pb-5 text-sm">
           {installed && (
-            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-200">
-              <Check size={18} /> Extension installée. Le bouton NetsuCast apparaît maintenant sur les vidéos.
+            <div role="status" className="flex items-center gap-2 rounded-control bg-success/10 px-3 py-2.5 text-success">
+              <Check size={16} strokeWidth={2} /> {t("install.installed")}
             </div>
           )}
 
-          <div>
-            <div className="mb-2 text-xs font-semibold tracking-wider text-violet-300 uppercase">Navigateur</div>
-            {!browsers && <LoaderCircle className="animate-spin text-neutral-500" size={18} />}
-            {browsers?.length === 0 && <div className="text-neutral-400">Aucun navigateur compatible trouvé.</div>}
-            <div className="grid gap-2">
+          <fieldset>
+            <legend className="mb-2 text-xs font-medium text-ink-muted">{t("install.browser")}</legend>
+            {!browsers && (
+              <div className="flex items-center gap-2 text-ink-muted">
+                <LoaderCircle className="animate-spin" size={15} /> {t("install.searching")}
+              </div>
+            )}
+            {browsers?.length === 0 && <div className="text-ink-muted">{t("install.noBrowser")}</div>}
+            <div className="grid gap-1.5">
               {browsers?.map((b) => (
                 <label
                   key={b.id}
-                  className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${b.supported ? "cursor-pointer hover:bg-white/5" : "opacity-50"} ${selected === b.id ? "border-violet-500/60 bg-violet-500/10" : "border-white/10"}`}
+                  className={`flex items-center gap-3 rounded-control border px-3 py-2 transition-colors ${
+                    !b.supported ? "border-line opacity-50" : selected === b.id ? "border-accent-text/70 bg-accent/10" : "border-line hover:bg-white/5"
+                  }`}
                 >
                   <input
                     type="radio"
@@ -95,64 +114,71 @@ export function InstallDialog({ extensionDir, installed, onClose }: Props) {
                       setSelected(b.id);
                       setOpened(false);
                     }}
-                    className="accent-violet-500"
+                    className="accent-accent"
                   />
-                  <span className="flex-1">{b.name}</span>
-                  {!b.supported && <span className="text-xs text-neutral-500">pas encore pris en charge</span>}
+                  <span className="flex-1 text-ink">{b.name}</span>
+                  {!b.supported && <span className="text-xs text-ink-faint">{t("install.notSupported")}</span>}
                 </label>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           <button
+            type="button"
             onClick={start}
             disabled={!browser}
-            className="flex items-center justify-center gap-2 rounded-xl bg-violet-600 py-2.5 font-semibold hover:bg-violet-500 disabled:opacity-40"
+            className="flex h-9 items-center justify-center gap-2 rounded-control bg-accent font-medium text-accent-ink transition-colors hover:bg-accent-hover disabled:opacity-40"
           >
-            <ExternalLink size={16} /> {opened ? `Rouvrir ${browser?.name}` : `Ouvrir ${browser?.name ?? "le navigateur"}`}
+            <ExternalLink size={15} strokeWidth={1.75} />
+            {opened ? t("install.reopen", { browser: browser?.name }) : t("install.open", { browser: browser?.name ?? "" })}
           </button>
-          {error && <div className="text-red-300">{error}</div>}
+          {error && <div role="alert" className="text-danger">{error}</div>}
 
           {opened && (
-            <ol className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-neutral-300">
-              <Step n={1}>
-                Active <b className="text-white">« {labels.dev} »</b> ({labels.where}).
-              </Step>
-              <Step n={2}>
-                Clique sur <b className="text-white">« {labels.load} »</b>.
-              </Step>
-              <Step n={3}>
-                Dans la fenêtre qui s'ouvre, colle le chemin (<b className="text-white">Ctrl+V</b>) dans la barre
-                d'adresse en haut, appuie sur <b className="text-white">Entrée</b>, puis clique sur{" "}
-                <b className="text-white">« Sélectionner un dossier »</b>.
-              </Step>
-              <li className="flex items-center gap-2 pt-1 text-xs text-neutral-500">
+            <ol className="grid gap-3 text-ink-muted">
+              <Step n={1}>{t("install.step1", { dev: labels.dev, where: labels.where })}</Step>
+              <Step n={2}>{t("install.step2", { load: labels.load })}</Step>
+              <Step n={3}>{t("install.step3", { select: labels.select })}</Step>
+              <li className="flex items-center gap-2 ps-8 text-xs">
                 {installed ? (
-                  <><Check size={14} className="text-emerald-400" /> Terminé !</>
+                  <span className="flex items-center gap-1.5 text-success">
+                    <Check size={14} /> {t("install.done")}
+                  </span>
                 ) : (
-                  <><LoaderCircle size={14} className="animate-spin" /> NetsuCast attend l'extension…</>
+                  <span className="flex items-center gap-1.5 text-ink-faint">
+                    <LoaderCircle size={14} className="animate-spin" /> {t("install.waiting")}
+                  </span>
                 )}
               </li>
             </ol>
           )}
 
-          <div className="flex items-center gap-2 text-xs text-neutral-500">
-            <code className="flex-1 truncate rounded bg-black/40 px-2 py-1" title={extensionDir}>{extensionDir}</code>
-            <button onClick={copyPath} className="flex items-center gap-1 rounded px-2 py-1 hover:bg-white/10 hover:text-white">
-              {copied ? <Check size={14} /> : <ClipboardCopy size={14} />} {copied ? "Copié" : "Copier"}
+          <div className="flex items-center gap-2 border-t border-line pt-4 text-xs">
+            <code dir="ltr" className="min-w-0 flex-1 truncate text-ink-faint" data-tip={extensionDir}>
+              {extensionDir}
+            </code>
+            <button
+              type="button"
+              onClick={copyPath}
+              className="flex shrink-0 items-center gap-1.5 rounded-control px-2 py-1 text-ink-muted transition-colors hover:bg-white/8 hover:text-ink"
+            >
+              {copied ? <Check size={14} /> : <ClipboardCopy size={14} strokeWidth={1.75} />} {copied ? t("install.copied") : t("install.copy")}
             </button>
           </div>
+          <p className="text-xs text-ink-faint">{t("install.whyManual")}</p>
         </div>
       </div>
     </div>
   );
 }
 
-function Step({ n, children }: { n: number; children: React.ReactNode }) {
+function Step({ n, children }: { n: number; children: ReactNode }) {
   return (
     <li className="flex gap-3">
-      <span className="grid size-6 shrink-0 place-items-center rounded-full bg-violet-500/20 text-xs font-bold text-violet-200">{n}</span>
-      <span className="pt-0.5">{children}</span>
+      <span className="grid size-5 shrink-0 place-items-center rounded-full bg-accent/20 text-[11px] font-semibold text-accent-text tabular-nums">
+        {n}
+      </span>
+      <span className="leading-relaxed">{children}</span>
     </li>
   );
 }
