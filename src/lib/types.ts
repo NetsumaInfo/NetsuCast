@@ -30,6 +30,7 @@ export type Settings = {
 export type Environment = {
   mpvPath: string | null;
   ytdlpPath: string | null;
+  denoPath: string | null;
   shadersDir: string | null;
   forcedShadersDir: string | null;
   shaderCacheDir: string | null;
@@ -46,6 +47,8 @@ export type LoadTarget = {
   title?: string | null;
   /** Where the browser was in the video, in seconds. */
   start?: number | null;
+  /** Netscape cookie file with the site session, for yt-dlp. */
+  cookieFile?: string | null;
   headers?: { referer?: string | null; userAgent?: string | null; cookie?: string | null };
 };
 

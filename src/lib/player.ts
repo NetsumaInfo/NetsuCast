@@ -130,7 +130,7 @@ function ytdlFormat(maxHeight: number): string {
   return `bestvideo*${h}+bestaudio/best${h}/bestvideo*+bestaudio/best`;
 }
 
-export async function load(target: LoadTarget, s: Settings, start = target.start ?? undefined) {
+export async function load(target: LoadTarget, env: Environment, s: Settings, start = target.start ?? undefined) {
   // Headers are global mpv options: reset them on every load so one site's cookies never leak
   // into the next request.
   const h = target.headers ?? {};
@@ -148,6 +148,9 @@ export async function load(target: LoadTarget, s: Settings, start = target.start
     .join(",");
   if (langs) await command("change-list", ["ytdl-raw-options", "append", `sub-langs=${langs}`]);
   if (s.autoSubs) await command("change-list", ["ytdl-raw-options", "append", "write-auto-subs="]);
+  // YouTube needs a JavaScript runtime (player challenges) and the signed-in session (bot check).
+  if (env.denoPath) await command("change-list", ["ytdl-raw-options", "append", `js-runtimes=deno:${env.denoPath}`]);
+  if (target.cookieFile) await command("change-list", ["ytdl-raw-options", "append", `cookies=${target.cookieFile}`]);
 
   // `ytdl://` sends page URLs straight to yt-dlp instead of first letting ffmpeg fail on HTML.
   const url = target.kind === "page" ? `ytdl://${target.url}` : target.url;

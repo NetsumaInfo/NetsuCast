@@ -5,6 +5,7 @@
 //! accepted: a web page must not be able to make the player open a URL of its choosing.
 
 use serde::{Deserialize, Serialize};
+use std::fs;
 use std::io::Read;
 use std::sync::Mutex;
 use std::thread;
@@ -43,6 +44,63 @@ pub struct CastRequest {
     /// Position (seconds) the video had in the browser, to resume there.
     #[serde(default)]
     pub start: Option<f64>,
+    /// Site cookies for "page" casts. Written to `cookie_file`, never forwarded to the webview.
+    #[serde(default, skip_serializing)]
+    pub cookies: Vec<Cookie>,
+    #[serde(default)]
+    pub cookie_file: Option<String>,
+}
+
+/// A cookie as `chrome.cookies` returns it.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Cookie {
+    pub domain: String,
+    #[serde(default)]
+    pub host_only: bool,
+    #[serde(default = "root_path")]
+    pub path: String,
+    #[serde(default)]
+    pub secure: bool,
+    #[serde(default)]
+    pub http_only: bool,
+    #[serde(default)]
+    pub expiration_date: Option<f64>,
+    pub name: String,
+    pub value: String,
+}
+
+fn root_path() -> String {
+    "/".into()
+}
+
+/// Netscape cookies.txt, the format yt-dlp's `--cookies` reads. One file, overwritten by each
+/// cast, in the app's local cache folder.
+fn write_cookie_file(app: &AppHandle, cookies: &[Cookie]) -> Option<String> {
+    let dir = app.path().app_cache_dir().ok()?;
+    fs::create_dir_all(&dir).ok()?;
+    let path = dir.join("cookies.txt");
+    let mut text = String::from("# Netscape HTTP Cookie File\n");
+    for c in cookies {
+        // Tabs or newlines inside a field would break the line format.
+        if [&c.domain, &c.path, &c.name, &c.value].iter().any(|f| f.contains(['\t', '\n', '\r'])) {
+            continue;
+        }
+        let domain = if c.host_only { c.domain.trim_start_matches('.').to_string() } else { c.domain.clone() };
+        let prefix = if c.http_only { "#HttpOnly_" } else { "" };
+        let flag = |b: bool| if b { "TRUE" } else { "FALSE" };
+        let expiry = c.expiration_date.map(|e| e as i64).unwrap_or(0);
+        text.push_str(&format!(
+            "{prefix}{domain}\t{}\t{}\t{}\t{expiry}\t{}\t{}\n",
+            flag(!c.host_only),
+            c.path,
+            flag(c.secure),
+            c.name,
+            c.value
+        ));
+    }
+    fs::write(&path, text).ok()?;
+    Some(path.to_string_lossy().into_owned())
 }
 
 fn default_kind() -> String {
@@ -105,7 +163,7 @@ fn handle(app: &AppHandle, request: &mut tiny_http::Request) -> Response<std::io
             if request.as_reader().take(MAX_BODY).read_to_string(&mut body).is_err() {
                 return json(400, r#"{"error":"unreadable body"}"#);
             }
-            let cast: CastRequest = match serde_json::from_str(&body) {
+            let mut cast: CastRequest = match serde_json::from_str(&body) {
                 Ok(cast) => cast,
                 Err(_) => return json(400, r#"{"error":"invalid JSON"}"#),
             };
@@ -115,6 +173,7 @@ fn handle(app: &AppHandle, request: &mut tiny_http::Request) -> Response<std::io
             if !(lower.starts_with("http://") || lower.starts_with("https://")) {
                 return json(400, r#"{"error":"only http(s) URLs"}"#);
             }
+            cast.cookie_file = if cast.cookies.is_empty() { None } else { write_cookie_file(app, &cast.cookies) };
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.unminimize();
                 let _ = window.show();

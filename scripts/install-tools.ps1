@@ -58,4 +58,18 @@ if ((Test-Path $ytdlpExe) -and -not $Force) {
     Write-Host '[OK] yt-dlp installed.'
 }
 
+# --- deno ------------------------------------------------------------------------------------
+# yt-dlp needs a JavaScript runtime to solve YouTube's player challenges; without it formats go
+# missing. Deno is the one it enables by default.
+$denoExe = Join-Path $dest 'deno.exe'
+if ((Test-Path $denoExe) -and -not $Force) {
+    Write-Host "[OK] deno already installed."
+} else {
+    $zip = Join-Path $env:TEMP 'netsucast-deno.zip'
+    Get-File 'https://github.com/denoland/deno/releases/latest/download/deno-x86_64-pc-windows-msvc.zip' $zip
+    Expand-Archive -Path $zip -DestinationPath $dest -Force
+    Remove-Item -Force $zip
+    Write-Host '[OK] deno installed.'
+}
+
 & $mpvExe --version | Select-Object -First 1

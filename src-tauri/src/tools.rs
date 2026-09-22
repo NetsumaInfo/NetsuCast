@@ -15,6 +15,8 @@ use crate::settings::SettingsState;
 pub struct Environment {
     pub mpv_path: Option<String>,
     pub ytdlp_path: Option<String>,
+    /// JavaScript runtime yt-dlp needs for YouTube.
+    pub deno_path: Option<String>,
     pub shaders_dir: Option<String>,
     /// Same shaders without their `//!WHEN` size check, for the forced-upscale mode.
     pub forced_shaders_dir: Option<String>,
@@ -91,6 +93,7 @@ pub fn get_environment(
     Environment {
         mpv_path: find_tool(&settings.mpv_path, "mpv.exe").map(display),
         ytdlp_path: find_tool(&settings.ytdlp_path, "yt-dlp.exe").map(display),
+        deno_path: find_tool("", "deno.exe").map(display),
         shaders_dir: shaders_dir.map(display),
         forced_shaders_dir: forced_shaders_dir.map(display),
         shader_cache_dir: shader_cache_dir.map(display),

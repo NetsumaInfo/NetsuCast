@@ -130,7 +130,7 @@ export default function App() {
     setTarget(t);
     dismissError();
     try {
-      await player.load(t, { ...settings, maxHeight }, start ?? t.start ?? undefined);
+      await player.load(t, env, { ...settings, maxHeight }, start ?? t.start ?? undefined);
     } catch (e) {
       setNotice(`Chargement impossible : ${e}`);
     }
