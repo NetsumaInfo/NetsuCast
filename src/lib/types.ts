@@ -50,6 +50,8 @@ export type LoadTarget = {
   start?: number | null;
   /** Netscape cookie file with the site session, for yt-dlp. */
   cookieFile?: string | null;
+  /** What the extension saw when it sent the cast. */
+  diag?: { extensionVersion?: string | null; cookiesFound?: number | null; cookieError?: string | null } | null;
   headers?: { referer?: string | null; userAgent?: string | null; cookie?: string | null };
 };
 

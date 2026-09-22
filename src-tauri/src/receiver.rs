@@ -49,6 +49,43 @@ pub struct CastRequest {
     pub cookies: Vec<Cookie>,
     #[serde(default)]
     pub cookie_file: Option<String>,
+    /// What the extension saw, shown when a site still refuses playback.
+    #[serde(default)]
+    pub diag: Option<CastDiag>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct CastDiag {
+    pub extension_version: Option<String>,
+    pub cookies_found: Option<u32>,
+    pub cookie_error: Option<String>,
+}
+
+/// One line per cast in the app's cache folder: enough to debug a refused playback, never a
+/// cookie value.
+fn log_cast(app: &AppHandle, cast: &CastRequest) {
+    let Ok(dir) = app.path().app_cache_dir() else { return };
+    let diag = cast.diag.clone().unwrap_or_default();
+    let host = cast.url.split('/').nth(2).unwrap_or("?");
+    let line = format!(
+        "{} kind={} host={} extension={} cookies_found={} cookies_received={} cookie_file={} cookie_error={}\n",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0),
+        cast.kind,
+        host,
+        diag.extension_version.as_deref().unwrap_or("?"),
+        diag.cookies_found.map(|n| n.to_string()).unwrap_or("?".into()),
+        cast.cookies.len(),
+        cast.cookie_file.is_some(),
+        diag.cookie_error.as_deref().unwrap_or("-"),
+    );
+    use std::io::Write;
+    if let Ok(mut file) = fs::OpenOptions::new().create(true).append(true).open(dir.join("receiver.log")) {
+        let _ = file.write_all(line.as_bytes());
+    }
 }
 
 /// A cookie as `chrome.cookies` returns it.
@@ -174,6 +211,7 @@ fn handle(app: &AppHandle, request: &mut tiny_http::Request) -> Response<std::io
                 return json(400, r#"{"error":"only http(s) URLs"}"#);
             }
             cast.cookie_file = if cast.cookies.is_empty() { None } else { write_cookie_file(app, &cast.cookies) };
+            log_cast(app, &cast);
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.unminimize();
                 let _ = window.show();
