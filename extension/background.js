@@ -4,12 +4,15 @@ import { cast, isPageSite } from "./common.js";
 // Entry: { url, type: "HLS" | "DASH" | "MP4" | "WEBM", referer, at }
 
 const MAX_PER_TAB = 30;
-const PLAYLIST_URL = /\.(m3u8|mpd)(\?|#|$)/i;
 const FILE_URL = /\.(mp4|webm|m4v|mov|mkv)(\?|#|$)/i;
+const PLAYLIST_URL = /\.(m3u8|mpd)(\?|#|$)/i;
 // Segments of an HLS/DASH stream: useless alone, the playlist is what matters.
 const SEGMENT_URL = /\.(ts|m4s|aac|m4a|vtt|webvtt)(\?|#|$)|\/(init|seg|segment|chunk|frag)[-_]?\d/i;
 // YouTube serves split, signed streams that only yt-dlp can replay: the page URL is used instead.
 const IGNORED_HOSTS = /(^|\.)(googlevideo\.com|doubleclick\.net|googlesyndication\.com)$/i;
+// Playlists of one video arrive together (master, then variants): anything older belongs to an
+// earlier video of the same page.
+const SAME_VIDEO_WINDOW_MS = 15_000;
 
 const referers = new Map(); // requestId -> Referer header, filled before the response arrives
 
@@ -22,7 +25,6 @@ async function getStreams(tabId) {
 
 async function setStreams(tabId, streams) {
   await chrome.storage.session.set({ [key(tabId)]: streams });
-  await chrome.action.setBadgeText({ tabId, text: streams.length ? String(streams.length) : "" });
 }
 
 function typeOf(url, contentType, requestType) {
@@ -93,33 +95,134 @@ chrome.webRequest.onBeforeRequest.addListener(
 
 chrome.tabs.onRemoved.addListener((tabId) => chrome.storage.session.remove(key(tabId)));
 
-// --- context menu ------------------------------------------------------------------------------
+// --- choosing what to send ---------------------------------------------------------------------
+
+/**
+ * Best source for the video playing in `tab`:
+ * 1. sites yt-dlp knows (YouTube, X…) → the page, for the best quality and subtitles;
+ * 2. an HLS/DASH playlist seen in the tab → the master of the latest video;
+ * 3. a progressive file the <video> loaded directly;
+ * 4. otherwise the page, and yt-dlp's generic extractor tries its luck.
+ */
+async function pickSource(tab, { frameUrl, src } = {}) {
+  const pageUrl = tab.url;
+  if (isPageSite(pageUrl)) return { url: pageUrl, kind: "page" };
+
+  if (src && /^https?:/i.test(src) && (FILE_URL.test(src) || PLAYLIST_URL.test(src))) {
+    return { url: src, kind: "stream", referer: frameUrl ?? pageUrl };
+  }
+
+  const streams = await getStreams(tab.id);
+  const playlists = streams.filter((s) => s.type === "HLS" || s.type === "DASH");
+  if (playlists.length) {
+    const latest = playlists[playlists.length - 1].at;
+    const group = playlists.filter((s) => latest - s.at <= SAME_VIDEO_WINDOW_MS);
+    const master = group.find((s) => /master|playlist|index\.m3u8/i.test(s.url)) ?? group[0];
+    return { url: master.url, kind: "stream", referer: master.referer ?? frameUrl ?? pageUrl };
+  }
+
+  const files = streams.filter((s) => s.type === "MP4" || s.type === "WEBM");
+  if (files.length) {
+    const file = files[files.length - 1];
+    return { url: file.url, kind: "stream", referer: file.referer ?? frameUrl ?? pageUrl };
+  }
+
+  return { url: pageUrl, kind: "page" };
+}
+
+async function castTab(tab, info = {}) {
+  const source = await pickSource(tab, info);
+  await cast({ ...source, title: tab.title, start: info.start ?? null });
+}
+
+/** Runs in every frame: finds the main video (playing first, then biggest). */
+function grabVideo() {
+  const videos = [...document.querySelectorAll("video")].filter((v) => {
+    const r = v.getBoundingClientRect();
+    return r.width >= 240 && r.height >= 135;
+  });
+  if (!videos.length) return null;
+  const area = (v) => v.getBoundingClientRect().width * v.getBoundingClientRect().height;
+  videos.sort((a, b) => Number(a.paused) - Number(b.paused) || area(b) - area(a));
+  const v = videos[0];
+  return {
+    start: Number.isFinite(v.duration) ? v.currentTime : null,
+    frameUrl: location.href,
+    src: v.currentSrc,
+    playing: !v.paused,
+    area: area(v),
+  };
+}
+
+function pauseVideos() {
+  for (const v of document.querySelectorAll("video")) v.pause();
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+}
+
+async function flash(tabId, ok, title) {
+  await chrome.action.setBadgeBackgroundColor({ tabId, color: ok ? "#7c3aed" : "#dc2626" });
+  await chrome.action.setBadgeText({ tabId, text: ok ? "✓" : "!" });
+  await chrome.action.setTitle({ tabId, title });
+  setTimeout(() => {
+    chrome.action.setBadgeText({ tabId, text: "" });
+    chrome.action.setTitle({ tabId, title: "Caster vers NetsuCast (Alt+Maj+C)" });
+  }, ok ? 2500 : 6000);
+}
+
+// Toolbar icon or Alt+Shift+C: cast right away, no menu.
+chrome.action.onClicked.addListener(async (tab) => {
+  if (!tab.id || !/^https?:/i.test(tab.url ?? "")) return;
+  let found = null;
+  try {
+    const results = await chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: true }, func: grabVideo });
+    found = results
+      .filter((r) => r.result)
+      .sort((a, b) => Number(b.result.playing) - Number(a.result.playing) || b.result.area - a.result.area)[0];
+  } catch {
+    // restricted page: fall back to the page URL
+  }
+  try {
+    await castTab(tab, found?.result ?? {});
+    await flash(tab.id, true, "Envoyé à NetsuCast");
+    if (found) {
+      chrome.scripting.executeScript({ target: { tabId: tab.id, frameIds: [found.frameId] }, func: pauseVideos }).catch(() => {});
+    }
+  } catch {
+    await flash(tab.id, false, "NetsuCast ne répond pas : lance l'application.");
+  }
+});
+
+// Cast button drawn over a video by content.js.
+chrome.runtime.onMessage.addListener((message, sender, reply) => {
+  if (message?.type !== "cast" || !sender.tab) return;
+  castTab(sender.tab, message)
+    .then(() => reply({ ok: true }))
+    .catch((e) => reply({ ok: false, error: String(e?.message ?? e) }));
+  return true;
+});
+
+// --- context menus -----------------------------------------------------------------------------
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: "netsucast-play",
-    title: "Lire dans NetsuCast",
-    contexts: ["page", "video", "link"],
-  });
+  chrome.contextMenus.create({ id: "netsucast-play", title: "Lire dans NetsuCast", contexts: ["page", "video", "link"] });
+  chrome.contextMenus.create({ id: "netsucast-pick", title: "Choisir le flux à envoyer…", contexts: ["action"] });
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  const title = tab?.title;
-  let request;
-  if (info.srcUrl && /^https?:/i.test(info.srcUrl)) {
-    request = { url: info.srcUrl, kind: "stream", referer: info.pageUrl };
-  } else if (info.linkUrl) {
-    request = { url: info.linkUrl, kind: PLAYLIST_URL.test(info.linkUrl) || FILE_URL.test(info.linkUrl) ? "stream" : "page", referer: info.pageUrl };
-  } else {
-    // A <video> fed by MSE has a blob: source; the best bet is then the detected playlist, or
-    // the page itself for sites yt-dlp knows.
-    const streams = tab ? await getStreams(tab.id) : [];
-    const best = !isPageSite(info.pageUrl) && streams.find((s) => s.type === "HLS" || s.type === "DASH");
-    request = best ? { url: best.url, kind: "stream", referer: best.referer ?? info.pageUrl } : { url: info.pageUrl, kind: "page" };
+  if (info.menuItemId === "netsucast-pick") {
+    chrome.windows.create({ url: `popup.html?tab=${tab?.id ?? ""}`, type: "popup", width: 420, height: 560 });
+    return;
   }
+  if (!tab) return;
   try {
-    await cast({ ...request, title });
+    if (info.linkUrl) {
+      const kind = PLAYLIST_URL.test(info.linkUrl) || FILE_URL.test(info.linkUrl) ? "stream" : "page";
+      await cast({ url: info.linkUrl, kind, referer: info.pageUrl, title: tab.title });
+    } else {
+      await castTab(tab, { src: info.srcUrl, frameUrl: info.frameUrl });
+    }
+    await flash(tab.id, true, "Envoyé à NetsuCast");
   } catch {
-    if (tab) chrome.action.setBadgeText({ tabId: tab.id, text: "!" });
+    await flash(tab.id, false, "NetsuCast ne répond pas : lance l'application.");
   }
 });

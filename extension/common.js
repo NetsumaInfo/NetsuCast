@@ -24,8 +24,9 @@ export async function ping() {
  * kind "stream": `url` is the media itself (m3u8, mpd, mp4) and is played with the browser's
  *                Referer, User-Agent and cookies, which most CDNs check.
  * kind "page":   `url` is a web page that yt-dlp resolves inside the player.
+ * start:         position in seconds the browser was at, so playback continues there.
  */
-export async function cast({ url, kind, title, referer }) {
+export async function cast({ url, kind, title, referer, start }) {
   const headers = { userAgent: navigator.userAgent };
   if (kind === "stream") {
     if (referer) headers.referer = referer;
@@ -35,7 +36,7 @@ export async function cast({ url, kind, title, referer }) {
   const res = await fetch(`http://127.0.0.1:${await getPort()}/cast`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url, kind, title, headers }),
+    body: JSON.stringify({ url, kind, title, headers, start: Number.isFinite(start) ? start : null }),
     signal: AbortSignal.timeout(3000),
   });
   if (!res.ok) throw new Error(`NetsuCast a répondu ${res.status}`);

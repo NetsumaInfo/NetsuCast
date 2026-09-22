@@ -20,18 +20,22 @@ Menu `[1] Start NetsuCast`. Au premier lancement, le script télécharge mpv et 
 
 Prérequis : Node 22+, pnpm, Rust stable (MSVC), WebView2 (déjà présent sur Windows 11).
 
-## Extension Chrome
+## Caster depuis Chrome
 
-`run.bat` → `[3]`, puis dans `chrome://extensions` : mode développeur → « Charger l'extension non
-empaquetée » → dossier `extension\`.
+Installation (une fois) : `run.bat` → `[3]`, puis dans `chrome://extensions` : mode développeur →
+« Charger l'extension non empaquetée » → dossier `extension\`.
 
-- **Envoyer la page** : yt-dlp résout la vidéo (recommandé pour YouTube, X, Twitch…).
-- **Flux détectés** : les `.m3u8` / `.mpd` / `.mp4` vus pendant la lecture dans l'onglet. Envoyés
-  avec le Referer, le User-Agent et les cookies du site, que la plupart des CDN exigent.
-- Clic droit sur une page, une vidéo ou un lien → « Lire dans NetsuCast ».
+- **Bouton NetsuCast sur la vidéo** : il apparaît au survol de n'importe quelle vidéo (iframes
+  comprises). Un clic met la vidéo en pause dans Chrome et la continue dans l'appli, au même moment.
+- **Icône de l'extension ou Alt+Maj+C** : même chose pour la vidéo principale de l'onglet.
+- Clic droit sur l'icône → « Choisir le flux à envoyer… » si le choix automatique se trompe.
 
-L'extension parle au récepteur local de l'appli : `http://127.0.0.1:47800` (port réglable des deux
-côtés). Il n'écoute que la machine locale et refuse les requêtes venant de pages web.
+Choix automatique de la source : sites connus de yt-dlp (YouTube, X, Twitch…) → la page ; sinon le
+dernier flux HLS/DASH vu dans l'onglet, envoyé avec le Referer, le User-Agent et les cookies du site ;
+sinon le fichier vidéo ; sinon la page (extracteur générique de yt-dlp).
+
+L'extension parle à un serveur local de l'appli (`http://127.0.0.1:47800`), qui n'écoute que la
+machine et refuse les requêtes venant de pages web.
 
 ## Lecteur
 
@@ -50,8 +54,13 @@ côtés). Il n'écoute que la machine locale et refuse les requêtes venant de p
 Menus : sous-titres, piste audio, modèle ArtCNN (C4F16, C4F16 DS, C4F32, C4F32 DS), qualité source max
 (jusqu'à 4K, pour les sites yt-dlp), vitesse, paramètres.
 
-ArtCNN n'agit que si l'image est affichée au moins 1,3× plus grande que la source : une vidéo 1080p
-dans une fenêtre 1080p n'est pas upscalée. Le badge à côté des menus indique l'état réel.
+Par défaut : source 1080p max, modèle **C4F32 DS** et **upscale forcé**. Même quand la vidéo a déjà
+la taille de la fenêtre, ArtCNN double la résolution puis l'image est ramenée à l'écran (plus nette,
+moins de bruit). Désactivable dans les paramètres (« Toujours upscaler »).
+
+mpv tourne en **Vulkan** : en Direct3D 11, compiler un modèle ArtCNN prenait plus de 5 minutes (et
+tombait sur la puce AMD des portables hybrides). Au premier lancement, les 4 modèles sont préparés
+derrière l'écran d'accueil (~1 à 2 min) ; le cache de shaders rend ensuite les changements rapides.
 
 ## Architecture
 

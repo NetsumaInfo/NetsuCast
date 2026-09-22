@@ -37,7 +37,8 @@
       "icons/icon.ico"
     ],
     "resources": {
-      "resources/shaders/": "resources/shaders/"
+      "resources/shaders/": "resources/shaders/",
+      "../extension/": "extension/"
     }
   }
 }

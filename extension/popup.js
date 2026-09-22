@@ -1,7 +1,9 @@
 import { cast, DEFAULT_PORT, getPort, isPageSite, ping } from "./common.js";
 
 const $ = (id) => document.getElementById(id);
-const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+// Opened from the toolbar icon's context menu, in its own window: the tab comes as ?tab=<id>.
+const tabId = Number(new URLSearchParams(location.search).get("tab"));
+const tab = tabId ? await chrome.tabs.get(tabId).catch(() => null) : (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
 
 function say(text, ok) {
   const el = $("message");

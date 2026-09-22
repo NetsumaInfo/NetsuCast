@@ -40,6 +40,9 @@ pub struct CastRequest {
     pub title: Option<String>,
     #[serde(default)]
     pub headers: CastHeaders,
+    /// Position (seconds) the video had in the browser, to resume there.
+    #[serde(default)]
+    pub start: Option<f64>,
 }
 
 fn default_kind() -> String {

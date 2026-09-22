@@ -4,13 +4,13 @@ import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { command } from "tauri-plugin-mpv-api";
-import { LoaderCircle, Plus, X } from "lucide-react";
+import { LoaderCircle, Sparkles, X } from "lucide-react";
 import { Controls } from "./components/Controls";
 import { SettingsDialog } from "./components/SettingsDialog";
-import { Welcome } from "./components/Welcome";
+import { Welcome, type Warmup } from "./components/Welcome";
 import { usePlayer } from "./hooks/usePlayer";
 import * as player from "./lib/player";
-import { MODELS, type Environment, type LoadTarget, type Model, type Settings } from "./lib/types";
+import { MODEL_LABELS, MODELS, type Environment, type LoadTarget, type Model, type Settings } from "./lib/types";
 
 const HIDE_DELAY = 2500;
 const DIRECT_MEDIA = /\.(m3u8|mpd|mp4|m4v|webm|mkv|mov|ts)(\?|#|$)/i;
@@ -34,7 +34,21 @@ export default function App() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [active, setActive] = useState(true);
+  const [warmup, setWarmup] = useState<Warmup | null>(null);
+  const [modelLoading, setModelLoading] = useState<Model | null>(null);
   const { state, dismissError } = usePlayer(ready);
+
+  // Casts can arrive at any time (even before mpv is up), so the latest values live in a ref.
+  const live = useRef({
+    ready,
+    env,
+    settings,
+    model,
+    maxHeight,
+    pending: null as LoadTarget | null,
+    warming: false,
+  });
+  live.current = { ...live.current, ready, env, settings, model, maxHeight };
 
   // --- startup -------------------------------------------------------------------------------
   const started = useRef(false);
@@ -60,21 +74,51 @@ export default function App() {
     })();
   }, []);
 
-  // --- loading -------------------------------------------------------------------------------
-  // Casts can arrive at any time (even before mpv is up), so the latest values live in a ref.
-  const live = useRef({ ready, settings, maxHeight, pending: null as LoadTarget | null });
-  live.current = { ...live.current, ready, settings, maxHeight };
+  // --- model warm-up -------------------------------------------------------------------------
+  // The first compilation of an ArtCNN model freezes the picture for a long while. It is done
+  // once, on a hidden black clip behind the welcome screen; mpv's shader cache keeps the result.
+  useEffect(() => {
+    if (!ready || !env || !settings) return;
+    const force = settings.forceUpscale;
+    const todo = [settings.model, ...MODELS.filter((m) => m !== settings.model)].filter(
+      (m) => !player.isWarmed(m, force),
+    );
+    if (!todo.length || live.current.pending) return;
 
+    live.current.warming = true;
+    (async () => {
+      await command("loadfile", [player.WARMUP_SOURCE, "replace"]);
+      for (const [i, m] of todo.entries()) {
+        if (!live.current.warming) return;
+        setWarmup({ model: m, index: i + 1, total: todo.length });
+        await player.applyModel(env, m, force);
+        if (await player.waitForModel(m)) player.markWarmed(m, force);
+      }
+      if (!live.current.warming) return;
+      live.current.warming = false;
+      setWarmup(null);
+      await player.stop();
+      await player.applyModel(env, live.current.model, force);
+    })();
+  }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // --- loading -------------------------------------------------------------------------------
   const open = useCallback(async (t: LoadTarget, start?: number) => {
-    const { ready, settings, maxHeight } = live.current;
-    if (!ready || !settings) {
+    const { ready, env, settings, model, maxHeight } = live.current;
+    if (!ready || !env || !settings) {
       live.current.pending = t;
       return;
+    }
+    if (live.current.warming) {
+      // A real video wins over the warm-up; the remaining models get compiled next launch.
+      live.current.warming = false;
+      setWarmup(null);
+      await player.applyModel(env, model, settings.forceUpscale);
     }
     setTarget(t);
     dismissError();
     try {
-      await player.load(t, { ...settings, maxHeight }, start);
+      await player.load(t, { ...settings, maxHeight }, start ?? t.start ?? undefined);
     } catch (e) {
       setNotice(`Chargement impossible : ${e}`);
     }
@@ -107,9 +151,11 @@ export default function App() {
     setFullscreen(next);
   }, []);
 
+  const playing = ready && !state.idle && !warmup;
+
   useEffect(() => {
-    getCurrentWindow().setTitle(state.title && !state.idle ? `${state.title} — NetsuCast` : "NetsuCast");
-  }, [state.title, state.idle]);
+    getCurrentWindow().setTitle(playing && state.title ? `${state.title} — NetsuCast` : "NetsuCast");
+  }, [state.title, playing]);
 
   // Remember the volume between sessions (debounced: the slider fires on every pixel).
   useEffect(() => {
@@ -128,13 +174,25 @@ export default function App() {
     clearTimeout(hideTimer.current);
     hideTimer.current = window.setTimeout(() => setActive(false), HIDE_DELAY);
   }, []);
-  const controlsVisible = active || state.pause || state.idle || openMenu !== null || showSettings;
+  const controlsVisible = active || state.pause || openMenu !== null || showSettings;
 
   // --- actions -------------------------------------------------------------------------------
-  const changeModel = useCallback((m: Model) => {
+  const applyModel = useCallback(async (m: Model, force: boolean) => {
+    const env = live.current.env;
+    if (!env) return;
     setModel(m);
-    if (env) player.applyModel(env, m);
-  }, [env]);
+    live.current.model = m;
+    await player.applyModel(env, m, force);
+    if (player.isWarmed(m, force)) return;
+    setModelLoading(m);
+    if (await player.waitForModel(m)) player.markWarmed(m, force);
+    setModelLoading((current) => (current === m ? null : current));
+  }, []);
+
+  const changeModel = useCallback(
+    (m: Model) => applyModel(m, live.current.settings?.forceUpscale ?? true),
+    [applyModel],
+  );
 
   const changeQuality = (h: number) => {
     setMaxHeight(h);
@@ -145,7 +203,9 @@ export default function App() {
   const saveSettings = async (next: Settings) => {
     await invoke("save_settings", { settings: next });
     if (ready) {
-      if (next.model !== settings?.model) changeModel(next.model);
+      if (next.model !== settings?.model || next.forceUpscale !== settings?.forceUpscale) {
+        applyModel(next.model, next.forceUpscale);
+      }
       if (next.deband !== settings?.deband) player.setDeband(next.deband);
       if (next.hwdec !== settings?.hwdec) player.setHwdec(next.hwdec);
       if (next.subLangs !== settings?.subLangs) player.setSlang(next.subLangs);
@@ -166,7 +226,7 @@ export default function App() {
         return;
       }
       if (e.key.toLowerCase() === "f") return void toggleFullscreen();
-      if (!ready || state.idle) return;
+      if (!playing) return;
       poke();
       const actions: Record<string, () => unknown> = {
         " ": player.togglePause,
@@ -190,7 +250,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [ready, state.idle, state.volume, showSettings, openMenu, fullscreen, model, poke, toggleFullscreen, changeModel]);
+  }, [playing, state.volume, showSettings, openMenu, fullscreen, model, poke, toggleFullscreen, changeModel]);
 
   // Single click = pause, double click = fullscreen: the single click waits to be sure.
   const clickTimer = useRef<number>(undefined);
@@ -203,14 +263,13 @@ export default function App() {
     toggleFullscreen();
   };
 
-  // ArtCNN only runs when the picture is drawn at least 1.3× larger than the source.
-  const upscaling =
-    model !== "off" &&
+  // Without forcing, ArtCNN only runs when the picture is drawn at least 1.3× larger than the source.
+  const forced = settings?.forceUpscale ?? true;
+  const enlarged =
     state.videoHeight > 0 &&
     state.displayHeight > state.videoHeight * 1.3 &&
     state.displayWidth > state.videoWidth * 1.3;
-
-  const playing = ready && !state.idle;
+  const upscaling = model !== "off" && (forced || enlarged);
 
   return (
     <div
@@ -218,8 +277,14 @@ export default function App() {
       onMouseMove={poke}
     >
       {!playing && (
-        <div className="absolute inset-0 bg-neutral-950/40">
-          <Welcome env={env} mpvError={mpvError} onOpen={(url) => open(targetFromInput(url))} />
+        <div className="absolute inset-0 bg-neutral-950">
+          <Welcome
+            env={env}
+            mpvError={mpvError}
+            warmup={warmup}
+            onOpen={(url) => open(targetFromInput(url))}
+            onSettings={settings ? () => setShowSettings(true) : undefined}
+          />
         </div>
       )}
 
@@ -227,22 +292,22 @@ export default function App() {
         <>
           <div className="absolute inset-0" onClick={onSurfaceClick} onDoubleClick={onSurfaceDoubleClick} />
 
-          <div className={`absolute inset-x-0 top-0 flex items-center gap-3 bg-gradient-to-b from-black/80 to-transparent px-5 pt-3 pb-10 transition-opacity duration-300 ${controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"}`}>
-            <span className="truncate text-sm font-medium text-neutral-100">{state.title}</span>
-            <div className="flex-1" />
-            <span className="flex items-center gap-1.5 text-xs text-neutral-400" title="Récepteur de l'extension Chrome">
-              <span className={`size-2 rounded-full ${env?.receiverError ? "bg-red-400" : "bg-emerald-400"}`} />
-              Récepteur :{env?.receiverPort}
-            </span>
-            <button onClick={() => player.stop()} title="Nouvelle vidéo"
-              className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs hover:bg-white/20">
-              <Plus size={14} /> Nouvelle vidéo
-            </button>
+          <div className={`pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-black/80 to-transparent px-5 pt-3 pb-10 transition-opacity duration-300 ${controlsVisible ? "opacity-100" : "opacity-0"}`}>
+            <span className="block truncate text-sm font-medium text-neutral-100">{state.title}</span>
           </div>
 
-          {(state.loading || state.buffering) && (
+          {(state.loading || state.buffering) && !modelLoading && (
             <div className="pointer-events-none absolute inset-0 grid place-items-center">
               <LoaderCircle className="animate-spin text-white/80" size={48} />
+            </div>
+          )}
+
+          {modelLoading && (
+            <div className="pointer-events-none absolute inset-0 grid place-items-center">
+              <div className="flex items-center gap-3 rounded-xl bg-black/80 px-5 py-3 text-sm text-neutral-100 shadow-xl">
+                <Sparkles size={18} className="animate-pulse text-violet-400" />
+                Préparation de {MODEL_LABELS[modelLoading].split(" ·")[0]}… (première fois seulement)
+              </div>
             </div>
           )}
 
@@ -253,6 +318,7 @@ export default function App() {
               maxHeight={maxHeight}
               canChangeQuality={target?.kind === "page"}
               upscaling={upscaling}
+              refining={upscaling && !enlarged}
               fullscreen={fullscreen}
               openMenu={openMenu}
               setOpenMenu={setOpenMenu}
@@ -272,13 +338,6 @@ export default function App() {
             <X size={16} />
           </button>
         </div>
-      )}
-
-      {!playing && settings && (
-        <button onClick={() => setShowSettings(true)}
-          className="absolute top-4 right-4 rounded-lg px-3 py-1.5 text-sm text-neutral-400 hover:bg-white/10 hover:text-white">
-          Paramètres
-        </button>
       )}
 
       {showSettings && settings && (

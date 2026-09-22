@@ -5,20 +5,24 @@ use std::sync::Mutex;
 use tauri::{AppHandle, Manager, State};
 
 pub const DEFAULT_RECEIVER_PORT: u16 = 47800;
+/// Bumped when a default changes in a way existing settings files must pick up.
+const DEFAULTS_VERSION: u32 = 2;
 
 /// Everything the settings window edits. Stored as JSON in the app config dir; a missing or
 /// partial file falls back field by field to the defaults below.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
+    pub defaults_version: u32,
     /// "off" or an ArtCNN shader name without prefix/extension ("C4F32_DS"…).
     pub model: String,
+    /// Run ArtCNN even when the window is not bigger than the video: the 2x result is then
+    /// scaled back down, which still denoises and sharpens.
+    pub force_upscale: bool,
     /// Upper bound on the source height requested from yt-dlp. 0 = best available.
     pub max_height: u32,
     /// "auto-safe" or "no".
     pub hwdec: String,
-    /// "auto" or "nvidia" (forces the discrete GPU on hybrid laptops).
-    pub gpu: String,
     /// Debanding smooths the colour steps that heavy web compression leaves behind.
     pub deband: bool,
     /// Preferred subtitle languages, comma separated ("fr,en"). Empty = never auto-select.
@@ -35,10 +39,11 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            model: "C4F32".into(),
-            max_height: 2160,
+            defaults_version: DEFAULTS_VERSION,
+            model: "C4F32_DS".into(),
+            force_upscale: true,
+            max_height: 1080,
             hwdec: "auto-safe".into(),
-            gpu: "auto".into(),
             deband: true,
             sub_langs: "fr,en".into(),
             auto_subs: false,
@@ -57,10 +62,19 @@ fn settings_file(app: &AppHandle) -> Option<PathBuf> {
 }
 
 pub fn load(app: &AppHandle) -> Settings {
-    settings_file(app)
+    let mut settings: Settings = settings_file(app)
         .and_then(|path| fs::read_to_string(path).ok())
         .and_then(|text| serde_json::from_str(&text).ok())
-        .unwrap_or_default()
+        .unwrap_or_default();
+    // Files written before v2 predate the 1080p source + DS model + forced upscale defaults.
+    if settings.defaults_version < DEFAULTS_VERSION {
+        let fresh = Settings::default();
+        settings.model = fresh.model;
+        settings.force_upscale = fresh.force_upscale;
+        settings.max_height = fresh.max_height;
+        settings.defaults_version = DEFAULTS_VERSION;
+    }
+    settings
 }
 
 #[tauri::command]

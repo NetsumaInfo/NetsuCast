@@ -30,6 +30,8 @@ type Props = {
   maxHeight: number;
   canChangeQuality: boolean;
   upscaling: boolean;
+  /** Forced run on a picture that is not enlarged: denoise/sharpen pass only. */
+  refining: boolean;
   fullscreen: boolean;
   openMenu: string | null;
   setOpenMenu: (id: string | null) => void;
@@ -85,14 +87,17 @@ export function Controls(p: Props) {
         {p.model !== "off" && (
           <span
             title={
-              p.upscaling
-                ? "L'upscale ArtCNN est appliqué"
-                : "Inactif : la vidéo est déjà aussi grande que la fenêtre (ArtCNN n'agit qu'au-delà de ×1,3)"
+              !p.upscaling
+                ? "Inactif : la vidéo est déjà aussi grande que la fenêtre (active « Toujours upscaler » dans les paramètres)"
+                : p.refining
+                  ? "ArtCNN double la résolution puis l'image est ramenée à la taille de la fenêtre : plus nette et moins de bruit"
+                  : "L'upscale ArtCNN est appliqué"
             }
             className={`mr-1 rounded-md px-2 py-1 text-xs font-medium ${p.upscaling ? "bg-violet-500/25 text-violet-200" : "bg-white/10 text-neutral-400"}`}
           >
             {p.model.replace("_", " ")}
-            {state.videoHeight > 0 && ` · ${state.videoHeight}p → ${p.upscaling ? `${state.displayHeight}p` : "inactif"}`}
+            {state.videoHeight > 0 &&
+              ` · ${state.videoHeight}p ${!p.upscaling ? "· inactif" : p.refining ? "· affiné" : `→ ${state.displayHeight}p`}`}
           </span>
         )}
 

@@ -13,10 +13,11 @@ export const MODEL_LABELS: Record<Model, string> = {
 export const QUALITIES = [0, 2160, 1440, 1080, 720, 480] as const;
 
 export type Settings = {
+  defaultsVersion: number;
   model: Model;
+  forceUpscale: boolean;
   maxHeight: number;
   hwdec: "auto-safe" | "no";
-  gpu: "auto" | "nvidia";
   deband: boolean;
   subLangs: string;
   autoSubs: boolean;
@@ -30,6 +31,10 @@ export type Environment = {
   mpvPath: string | null;
   ytdlpPath: string | null;
   shadersDir: string | null;
+  forcedShadersDir: string | null;
+  shaderCacheDir: string | null;
+  extensionDir: string | null;
+  mpvLog: string | null;
   receiverPort: number;
   receiverError: string | null;
 };
@@ -39,6 +44,8 @@ export type LoadTarget = {
   url: string;
   kind: "stream" | "page" | "file";
   title?: string | null;
+  /** Where the browser was in the video, in seconds. */
+  start?: number | null;
   headers?: { referer?: string | null; userAgent?: string | null; cookie?: string | null };
 };
 

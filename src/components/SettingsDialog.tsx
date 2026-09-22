@@ -11,7 +11,7 @@ type Props = {
 };
 
 /** Fields that mpv only reads at startup, or that the receiver binds once. */
-const RESTART_FIELDS: (keyof Settings)[] = ["gpu", "receiverPort", "mpvPath", "ytdlpPath"];
+const RESTART_FIELDS: (keyof Settings)[] = ["receiverPort", "mpvPath", "ytdlpPath"];
 
 export function SettingsDialog({ settings, env, onClose, onSave }: Props) {
   const [draft, setDraft] = useState(settings);
@@ -48,6 +48,8 @@ export function SettingsDialog({ settings, env, onClose, onSave }: Props) {
               <Select value={draft.model} onChange={(v) => set("model", v as Settings["model"])}
                 options={MODELS.map((m) => [m, MODEL_LABELS[m]])} />
             </Field>
+            <Toggle label="Toujours upscaler" hint="Même quand la vidéo a déjà la taille de la fenêtre : ArtCNN double la résolution puis l'image est ramenée à l'écran, plus nette et moins bruitée."
+              checked={draft.forceUpscale} onChange={(v) => set("forceUpscale", v)} />
             <Field label="Qualité source max" hint="Pour YouTube, X et les sites gérés par yt-dlp.">
               <Select value={String(draft.maxHeight)} onChange={(v) => set("maxHeight", Number(v))}
                 options={QUALITIES.map((h) => [String(h), qualityLabel(h)])} />
@@ -65,18 +67,14 @@ export function SettingsDialog({ settings, env, onClose, onSave }: Props) {
           </Section>
 
           <Section title="Performances">
-            <Field label="Carte graphique" hint="Sur un portable hybride, « NVIDIA » force la carte dédiée.">
-              <Select value={draft.gpu} onChange={(v) => set("gpu", v as Settings["gpu"])}
-                options={[["auto", "Automatique"], ["nvidia", "NVIDIA"]]} />
-            </Field>
             <Field label="Décodage matériel">
               <Select value={draft.hwdec} onChange={(v) => set("hwdec", v as Settings["hwdec"])}
                 options={[["auto-safe", "Activé"], ["no", "Désactivé (processeur)"]]} />
             </Field>
           </Section>
 
-          <Section title="Récepteur et outils">
-            <Field label="Port du récepteur" hint="Doit correspondre à celui de l'extension Chrome.">
+          <Section title="Avancé">
+            <Field label="Port du récepteur" hint="Port local utilisé par l'extension Chrome (même valeur des deux côtés).">
               <Text value={String(draft.receiverPort)} onChange={(v) => set("receiverPort", Number(v.replace(/\D/g, "")) || 0)} />
             </Field>
             <Field label="Chemin de mpv" hint={`Vide = automatique${env?.mpvPath ? ` (${env.mpvPath})` : ""}`}>

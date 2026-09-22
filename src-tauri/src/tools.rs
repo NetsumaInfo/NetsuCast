@@ -1,4 +1,5 @@
 use serde::Serialize;
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use tauri::path::BaseDirectory;
@@ -15,6 +16,13 @@ pub struct Environment {
     pub mpv_path: Option<String>,
     pub ytdlp_path: Option<String>,
     pub shaders_dir: Option<String>,
+    /// Same shaders without their `//!WHEN` size check, for the forced-upscale mode.
+    pub forced_shaders_dir: Option<String>,
+    /// Where mpv keeps compiled shaders, so a model is only compiled once.
+    pub shader_cache_dir: Option<String>,
+    pub extension_dir: Option<String>,
+    /// mpv log, written in debug builds only.
+    pub mpv_log: Option<String>,
     pub receiver_port: u16,
     pub receiver_error: Option<String>,
 }
@@ -72,14 +80,61 @@ pub fn get_environment(
         .ok()
         .filter(|p| p.is_dir());
     let receiver = receiver.0.lock().unwrap().clone();
+    let cache_dir = app.path().app_cache_dir().ok();
+    let forced_shaders_dir = match (&shaders_dir, &cache_dir) {
+        (Some(src), Some(cache)) => write_forced_shaders(src, &cache.join("shaders-forced")),
+        _ => None,
+    };
+    let mpv_log = cache_dir.as_ref().filter(|_| cfg!(debug_assertions)).map(|dir| dir.join("mpv.log"));
+    let shader_cache_dir = cache_dir.map(|dir| dir.join("shader-cache")).filter(|dir| fs::create_dir_all(dir).is_ok());
 
     Environment {
         mpv_path: find_tool(&settings.mpv_path, "mpv.exe").map(display),
         ytdlp_path: find_tool(&settings.ytdlp_path, "yt-dlp.exe").map(display),
         shaders_dir: shaders_dir.map(display),
+        forced_shaders_dir: forced_shaders_dir.map(display),
+        shader_cache_dir: shader_cache_dir.map(display),
+        extension_dir: extension_dir(&app).map(display),
+        mpv_log: mpv_log.map(|p| p.to_string_lossy().into_owned()),
         receiver_port: receiver.port,
         receiver_error: receiver.error,
     }
+}
+
+/// ArtCNN hooks carry `//!WHEN OUTPUT.w LUMA.w / 1.3 > …`: they skip frames that are not being
+/// enlarged. Stripping that line makes them run on every frame; mpv then scales the 2x result
+/// back to the window, a supersampling pass that still cleans compression artefacts.
+fn write_forced_shaders(src_dir: &Path, out_dir: &Path) -> Option<PathBuf> {
+    fs::create_dir_all(out_dir).ok()?;
+    for entry in fs::read_dir(src_dir).ok()?.flatten() {
+        let path = entry.path();
+        if path.extension().is_none_or(|ext| ext != "glsl") {
+            continue;
+        }
+        let source = fs::read_to_string(&path).ok()?;
+        let forced: String = source
+            .lines()
+            .filter(|line| !line.starts_with("//!WHEN"))
+            .map(|line| format!("{line}\n"))
+            .collect();
+        let target = out_dir.join(entry.file_name());
+        // Rewriting an identical file would change its mtime and could invalidate mpv's cache.
+        if fs::read_to_string(&target).ok().as_deref() != Some(forced.as_str()) {
+            fs::write(&target, forced).ok()?;
+        }
+    }
+    Some(out_dir.to_path_buf())
+}
+
+/// The unpacked Chrome extension: bundled resource in an installed app, repository folder in dev.
+fn extension_dir(app: &AppHandle) -> Option<PathBuf> {
+    if cfg!(debug_assertions) {
+        let dev = Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("extension");
+        if dev.is_dir() {
+            return Some(dev);
+        }
+    }
+    app.path().resolve("extension", BaseDirectory::Resource).ok().filter(|p| p.is_dir())
 }
 
 /// yt-dlp breaks whenever a site changes its player; `-U` pulls the fix.
