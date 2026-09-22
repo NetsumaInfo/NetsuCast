@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { command, listenEvents, observeProperties } from "tauri-plugin-mpv-api";
+import { listenEvents, observeProperties } from "tauri-plugin-mpv-api";
 import { OBSERVED } from "../lib/player";
 import type { Track } from "../lib/types";
 
@@ -22,6 +22,8 @@ export type PlayerState = {
   displayWidth: number;
   displayHeight: number;
   error: string | null;
+  /** Last yt-dlp error, kept by the netsucast.lua mpv script. */
+  ytdlError: string;
 };
 
 const INITIAL: PlayerState = {
@@ -42,18 +44,8 @@ const INITIAL: PlayerState = {
   displayWidth: 0,
   displayHeight: 0,
   error: null,
+  ytdlError: "",
 };
-
-/** Turns yt-dlp's last error into something readable; mpv itself only says "loading failed". */
-function explain(ytdlError: string | null, fallback: string): string {
-  if (!ytdlError) return fallback;
-  if (/not a bot|Sign in to confirm/i.test(ytdlError)) {
-    return "YouTube demande d'être connecté : relance la vidéo depuis l'extension (elle transmet ta session YouTube).";
-  }
-  if (/Unsupported URL/i.test(ytdlError)) return "Ce site n'est pas reconnu : lance la vidéo dans la page puis caste le flux détecté.";
-  if (/Private video|members-only|This video is available to/i.test(ytdlError)) return "Vidéo privée ou réservée aux membres.";
-  return ytdlError.replace(/^ERROR:\s*(\[[^\]]+\]\s*[^:]+:\s*)?/, "");
-}
 
 type OsdDimensions = { w: number; h: number; ml: number; mr: number; mt: number; mb: number };
 
@@ -81,6 +73,7 @@ export function usePlayer(ready: boolean) {
         case "demuxer-cache-time": return patch({ cacheTime: (d as number) ?? 0 });
         case "width": return patch({ videoWidth: (d as number) ?? 0 });
         case "height": return patch({ videoHeight: (d as number) ?? 0 });
+        case "user-data/netsucast/ytdl-error": return patch({ ytdlError: (d as string) ?? "" });
         case "osd-dimensions": {
           const o = d as OsdDimensions | null;
           if (!o) return;
@@ -89,23 +82,13 @@ export function usePlayer(ready: boolean) {
       }
     });
 
-    // Errors only: enough to explain a failed load without flooding the IPC channel.
-    command("request_log_messages", ["error"]).catch(() => {});
-    let ytdlError: string | null = null;
-
     const events = listenEvents((e) => {
-      const ev = e as { event?: string; reason?: string; file_error?: string; prefix?: string; text?: string };
-      if (ev.event === "log-message" && ev.prefix === "ytdl_hook" && ev.text?.startsWith("ERROR")) {
-        ytdlError = ev.text.trim();
-      }
-      if (ev.event === "start-file") {
-        ytdlError = null;
-        patch({ loading: true, error: null });
-      }
+      const ev = e as { event?: string; reason?: string; file_error?: string };
+      if (ev.event === "start-file") patch({ loading: true, error: null });
       if (ev.event === "file-loaded" || ev.event === "playback-restart") patch({ loading: false });
       if (ev.event === "end-file") {
         patch({ loading: false });
-        if (ev.reason === "error") patch({ error: explain(ytdlError, ev.file_error ?? "lecture impossible") });
+        if (ev.reason === "error") patch({ error: ev.file_error ?? "lecture impossible" });
       }
     });
 

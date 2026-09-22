@@ -10,6 +10,7 @@ import { InstallDialog } from "./components/InstallDialog";
 import { SettingsDialog } from "./components/SettingsDialog";
 import { Welcome, type Warmup } from "./components/Welcome";
 import { usePlayer } from "./hooks/usePlayer";
+import { describeLoadError } from "./lib/errors";
 import * as player from "./lib/player";
 import { MODEL_LABELS, MODELS, type Environment, type LoadTarget, type Model, type Settings } from "./lib/types";
 
@@ -359,7 +360,7 @@ export default function App() {
 
       {(state.error || notice) && (
         <div className="absolute top-16 left-1/2 z-40 flex max-w-xl -translate-x-1/2 items-start gap-3 rounded-xl border border-red-500/30 bg-neutral-900/95 px-4 py-3 text-sm text-red-200 shadow-xl">
-          <span className="break-all">{notice ?? `Lecture impossible : ${state.error}`}</span>
+          <span className="break-all">{notice ?? describeLoadError(state.error ?? "", state.ytdlError, target)}</span>
           <button onClick={() => { setNotice(null); dismissError(); }} className="text-neutral-400 hover:text-white">
             <X size={16} />
           </button>

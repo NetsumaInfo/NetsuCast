@@ -18,6 +18,8 @@ pub struct Environment {
     /// JavaScript runtime yt-dlp needs for YouTube.
     pub deno_path: Option<String>,
     pub shaders_dir: Option<String>,
+    /// mpv helper script (resources/scripts/netsucast.lua).
+    pub script_path: Option<String>,
     /// Same shaders without their `//!WHEN` size check, for the forced-upscale mode.
     pub forced_shaders_dir: Option<String>,
     /// Where mpv keeps compiled shaders, so a model is only compiled once.
@@ -95,6 +97,12 @@ pub fn get_environment(
         ytdlp_path: find_tool(&settings.ytdlp_path, "yt-dlp.exe").map(display),
         deno_path: find_tool("", "deno.exe").map(display),
         shaders_dir: shaders_dir.map(display),
+        script_path: app
+            .path()
+            .resolve("resources/scripts/netsucast.lua", BaseDirectory::Resource)
+            .ok()
+            .filter(|p| p.is_file())
+            .map(display),
         forced_shaders_dir: forced_shaders_dir.map(display),
         shader_cache_dir: shader_cache_dir.map(display),
         extension_dir: extension_dir(&app).map(display),

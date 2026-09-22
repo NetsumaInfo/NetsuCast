@@ -32,6 +32,7 @@ export type Environment = {
   ytdlpPath: string | null;
   denoPath: string | null;
   shadersDir: string | null;
+  scriptPath: string | null;
   forcedShadersDir: string | null;
   shaderCacheDir: string | null;
   extensionDir: string | null;

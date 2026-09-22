@@ -16,6 +16,7 @@ export const OBSERVED = [
   "width",
   "height",
   "osd-dimensions",
+  "user-data/netsucast/ytdl-error",
 ] as const;
 
 // mpv's own default ("libmpv") gets refused by some CDNs. Replaced by the browser's own
@@ -48,6 +49,7 @@ function mpvArgs(env: Environment, s: Settings): string[] {
   ];
   if (env.ytdlpPath) args.push(`--script-opts=ytdl_hook-ytdl_path=${env.ytdlpPath}`);
   if (env.shaderCacheDir) args.push("--gpu-shader-cache=yes", `--gpu-shader-cache-dir=${env.shaderCacheDir}`);
+  if (env.scriptPath) args.push(`--scripts=${env.scriptPath}`);
   if (env.mpvLog) args.push(`--log-file=${env.mpvLog}`);
   if (s.subLangs.trim()) args.push(`--slang=${s.subLangs.trim()}`);
   const shader = shaderPath(env, s.model, s.forceUpscale);
