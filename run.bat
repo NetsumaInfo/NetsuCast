@@ -41,7 +41,7 @@ call :print_tools_summary
 echo.
 echo   [1] Start NetsuCast
 echo   [2] Install / update player tools ^(mpv + yt-dlp^)
-echo   [3] Chrome extension ^(open folder + how to load it^)
+echo   [3] Browser extension ^(manual steps - easier: button in the app^)
 echo   [4] Switch branch
 echo   [5] Refresh branch list ^(fetch^)
 echo   [6] Update current branch ^(safe pull^)
