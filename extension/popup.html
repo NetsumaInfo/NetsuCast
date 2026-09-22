@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Netsu<span>Cast</span></h1>
+      <span id="status" class="status">…</span>
+    </header>
+
+    <section>
+      <button id="send-page" class="primary">Envoyer la page</button>
+      <p id="page-hint" class="hint"></p>
+    </section>
+
+    <section>
+      <h2>Flux détectés <span id="count"></span></h2>
+      <ul id="streams"></ul>
+      <p id="empty" class="hint" hidden>Aucun flux détecté. Lance la vidéo dans la page puis rouvre ce menu.</p>
+    </section>
+
+    <footer>
+      <label>Port <input id="port" type="number" min="1" max="65535" /></label>
+      <span id="message"></span>
+    </footer>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

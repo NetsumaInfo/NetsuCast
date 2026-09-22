@@ -1,0 +1,58 @@
+:root {
+  color-scheme: dark;
+  --bg: #0f0f12;
+  --panel: #1a1a20;
+  --line: #2a2a33;
+  --text: #ececf1;
+  --muted: #8b8b96;
+  --accent: #8b5cf6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  width: 380px;
+  margin: 0;
+  padding: 14px;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.4 "Segoe UI", system-ui, sans-serif;
+}
+
+header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+h1 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
+h1 span { color: var(--accent); }
+h2 { margin: 16px 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+.status { font-size: 12px; color: var(--muted); }
+.status::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--muted); }
+.status.on::before { background: #34d399; }
+.status.off::before { background: #f87171; }
+
+button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: default; }
+button.primary { width: 100%; padding: 10px; border: 0; background: var(--accent); font-weight: 600; }
+button.primary:hover { filter: brightness(1.1); }
+
+.hint { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+
+ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; max-height: 260px; overflow-y: auto; }
+li { display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+li .type { flex: none; padding: 2px 6px; border-radius: 4px; background: #2e2150; color: #c4b5fd; font-size: 10px; font-weight: 700; }
+li .info { flex: 1; min-width: 0; }
+li .name, li .host { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+li .host { font-size: 11px; color: var(--muted); }
+li button { flex: none; padding: 5px 10px; }
+
+footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+footer input { width: 70px; margin-left: 4px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); }
+#message.ok { color: #34d399; }
+#message.err { color: #f87171; }

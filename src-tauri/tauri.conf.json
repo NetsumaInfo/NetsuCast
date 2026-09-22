@@ -12,9 +12,14 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "NetsuCast",
         "width": 1280,
-        "height": 800
+        "height": 760,
+        "minWidth": 640,
+        "minHeight": 400,
+        "transparent": true,
+        "center": true
       }
     ],
     "security": {
@@ -30,6 +35,9 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "resources": {
+      "resources/shaders/": "resources/shaders/"
+    }
   }
 }

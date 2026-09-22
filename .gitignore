@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Player tools downloaded by scripts/install-tools.ps1
+tools/
