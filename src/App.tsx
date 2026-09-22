@@ -6,6 +6,7 @@ import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { command } from "tauri-plugin-mpv-api";
 import { LoaderCircle, Sparkles, X } from "lucide-react";
 import { Controls } from "./components/Controls";
+import { InstallDialog } from "./components/InstallDialog";
 import { SettingsDialog } from "./components/SettingsDialog";
 import { Welcome, type Warmup } from "./components/Welcome";
 import { usePlayer } from "./hooks/usePlayer";
@@ -13,6 +14,15 @@ import * as player from "./lib/player";
 import { MODEL_LABELS, MODELS, type Environment, type LoadTarget, type Model, type Settings } from "./lib/types";
 
 const HIDE_DELAY = 2500;
+const EXTENSION_SEEN_KEY = "netsucast.extensionSeen";
+
+function readExtensionSeen(): boolean {
+  try {
+    return localStorage.getItem(EXTENSION_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 const DIRECT_MEDIA = /\.(m3u8|mpd|mp4|m4v|webm|mkv|mov|ts)(\?|#|$)/i;
 
 /** A URL typed by hand: direct media goes straight to mpv, anything else through yt-dlp. */
@@ -36,6 +46,8 @@ export default function App() {
   const [active, setActive] = useState(true);
   const [warmup, setWarmup] = useState<Warmup | null>(null);
   const [modelLoading, setModelLoading] = useState<Model | null>(null);
+  const [extensionInstalled, setExtensionInstalled] = useState(readExtensionSeen);
+  const [showInstall, setShowInstall] = useState(false);
   const { state, dismissError } = usePlayer(ready);
 
   // Casts can arrive at any time (even before mpv is up), so the latest values live in a ref.
@@ -133,11 +145,24 @@ export default function App() {
   }, [ready, open]);
 
   useEffect(() => {
-    const unCast = listen<LoadTarget>("cast", (e) => open(e.payload));
+    const markExtension = () => {
+      setExtensionInstalled(true);
+      try {
+        localStorage.setItem(EXTENSION_SEEN_KEY, "1");
+      } catch {
+        // not persisted: the guide shows again next launch
+      }
+    };
+    const unHello = listen("extension-hello", markExtension);
+    const unCast = listen<LoadTarget>("cast", (e) => {
+      markExtension();
+      open(e.payload);
+    });
     const unDrop = getCurrentWebview().onDragDropEvent((e) => {
       if (e.payload.type === "drop" && e.payload.paths.length) open({ url: e.payload.paths[0], kind: "file" });
     });
     return () => {
+      unHello.then((u) => u());
       unCast.then((u) => u());
       unDrop.then((u) => u());
     };
@@ -279,11 +304,12 @@ export default function App() {
       {!playing && (
         <div className="absolute inset-0 bg-neutral-950">
           <Welcome
-            env={env}
             mpvError={mpvError}
             warmup={warmup}
             onOpen={(url) => open(targetFromInput(url))}
             onSettings={settings ? () => setShowSettings(true) : undefined}
+            extensionInstalled={extensionInstalled}
+            onInstallExtension={env?.extensionDir ? () => setShowInstall(true) : undefined}
           />
         </div>
       )}
@@ -338,6 +364,10 @@ export default function App() {
             <X size={16} />
           </button>
         </div>
+      )}
+
+      {showInstall && env?.extensionDir && (
+        <InstallDialog extensionDir={env.extensionDir} installed={extensionInstalled} onClose={() => setShowInstall(false)} />
       )}
 
       {showSettings && settings && (

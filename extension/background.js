@@ -1,4 +1,4 @@
-import { cast, isPageSite } from "./common.js";
+import { cast, getPort, isPageSite } from "./common.js";
 
 // Detected streams per tab, kept in session storage because the service worker is short-lived.
 // Entry: { url, type: "HLS" | "DASH" | "MP4" | "WEBM", referer, at }
@@ -203,7 +203,18 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
 
 // --- context menus -----------------------------------------------------------------------------
 
+// Tells the app the extension is here (it then hides its install guide). Silent if the app is closed.
+async function hello() {
+  try {
+    await fetch(`http://127.0.0.1:${await getPort()}/hello`, { method: "POST", signal: AbortSignal.timeout(1500) });
+  } catch {
+    // app not running
+  }
+}
+chrome.runtime.onStartup.addListener(hello);
+
 chrome.runtime.onInstalled.addListener(() => {
+  hello();
   chrome.contextMenus.create({ id: "netsucast-play", title: "Lire dans NetsuCast", contexts: ["page", "video", "link"] });
   chrome.contextMenus.create({ id: "netsucast-pick", title: "Choisir le flux à envoyer…", contexts: ["action"] });
 });

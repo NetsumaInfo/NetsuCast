@@ -22,6 +22,8 @@ pub fn run() {
             settings::save_settings,
             tools::get_environment,
             tools::update_ytdlp,
+            tools::list_browsers,
+            tools::open_browser_extensions,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

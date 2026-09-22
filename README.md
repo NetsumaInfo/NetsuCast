@@ -22,8 +22,13 @@ Prérequis : Node 22+, pnpm, Rust stable (MSVC), WebView2 (déjà présent sur W
 
 ## Caster depuis Chrome
 
-Installation (une fois) : `run.bat` → `[3]`, puis dans `chrome://extensions` : mode développeur →
-« Charger l'extension non empaquetée » → dossier `extension\`.
+Installation (une fois) : bouton **« Installer l'extension »** sur l'écran d'accueil. L'appli détecte
+les navigateurs installés (Chrome, Edge, Brave, Opera, Opera GX, Vivaldi, Chromium), ouvre la page
+d'extensions de celui choisi, copie le chemin du dossier et détecte la fin de l'installation.
+Il reste 3 clics à faire soi-même (mode développeur, « Charger l'extension non empaquetée », coller
+le chemin) : les navigateurs interdisent toute installation automatique hors de leur store
+(`--load-extension` est supprimé de Chrome depuis la version 137). Firefox n'est pas encore pris en
+charge (il n'accepte que les extensions signées par Mozilla).
 
 - **Bouton NetsuCast sur la vidéo** : il apparaît au survol de n'importe quelle vidéo (iframes
   comprises). Un clic met la vidéo en pause dans Chrome et la continue dans l'appli, au même moment.

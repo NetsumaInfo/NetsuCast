@@ -94,6 +94,12 @@ fn handle(app: &AppHandle, request: &mut tiny_http::Request) -> Response<std::io
             200,
             &format!(r#"{{"app":"NetsuCast","version":"{}"}}"#, env!("CARGO_PKG_VERSION")),
         ),
+        // Sent by the extension when it is installed or Chrome starts: lets the app know the
+        // extension exists, so it can stop showing the install guide.
+        (Method::Post, "/hello") => {
+            let _ = app.emit("extension-hello", ());
+            json(200, r#"{"ok":true}"#)
+        }
         (Method::Post, "/cast") => {
             let mut body = String::new();
             if request.as_reader().take(MAX_BODY).read_to_string(&mut body).is_err() {

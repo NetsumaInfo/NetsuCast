@@ -137,6 +137,69 @@ fn extension_dir(app: &AppHandle) -> Option<PathBuf> {
     app.path().resolve("extension", BaseDirectory::Resource).ok().filter(|p| p.is_dir())
 }
 
+/// A browser the extension can be installed in.
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Browser {
+    pub id: &'static str,
+    pub name: &'static str,
+    /// The browser's own extensions page (`edge://extensions/`…).
+    pub extensions_url: &'static str,
+    /// Chromium-based browsers load the unpacked extension; Firefox only takes signed add-ons.
+    pub supported: bool,
+    #[serde(skip)]
+    pub path: PathBuf,
+}
+
+/// (id, name, extensions page, supported, install locations relative to the env var roots)
+const BROWSERS: &[(&str, &str, &str, bool, &[&str])] = &[
+    ("chrome", "Google Chrome", "chrome://extensions/", true, &[r"Google\Chrome\Application\chrome.exe"]),
+    ("edge", "Microsoft Edge", "edge://extensions/", true, &[r"Microsoft\Edge\Application\msedge.exe"]),
+    ("brave", "Brave", "brave://extensions/", true, &[r"BraveSoftware\Brave-Browser\Application\brave.exe"]),
+    ("opera", "Opera", "opera://extensions/", true, &[r"Programs\Opera\opera.exe", r"Opera\opera.exe"]),
+    ("opera-gx", "Opera GX", "opera://extensions/", true, &[r"Programs\Opera GX\opera.exe", r"Opera GX\opera.exe"]),
+    ("vivaldi", "Vivaldi", "vivaldi://extensions/", true, &[r"Vivaldi\Application\vivaldi.exe"]),
+    ("chromium", "Chromium", "chrome://extensions/", true, &[r"Chromium\Application\chrome.exe"]),
+    ("firefox", "Firefox", "about:addons", false, &[r"Mozilla Firefox\firefox.exe"]),
+];
+
+fn detect_browsers() -> Vec<Browser> {
+    let roots: Vec<PathBuf> = ["ProgramFiles", "ProgramFiles(x86)", "LOCALAPPDATA"]
+        .iter()
+        .filter_map(|var| std::env::var_os(var).map(PathBuf::from))
+        .collect();
+    BROWSERS
+        .iter()
+        .filter_map(|&(id, name, extensions_url, supported, locations)| {
+            let path = roots
+                .iter()
+                .flat_map(|root| locations.iter().map(move |rel| root.join(rel)))
+                .find(|p| p.is_file())?;
+            Some(Browser { id, name, extensions_url, supported, path })
+        })
+        .collect()
+}
+
+#[tauri::command]
+pub fn list_browsers() -> Vec<Browser> {
+    detect_browsers()
+}
+
+/// Browsers refuse to install an unpacked extension on their own (`--load-extension` is gone
+/// from branded Chrome), so the app opens the extensions page and guides the last clicks.
+#[tauri::command]
+pub fn open_browser_extensions(id: String) -> Result<(), String> {
+    let browser = detect_browsers()
+        .into_iter()
+        .find(|b| b.id == id)
+        .ok_or("Navigateur introuvable")?;
+    Command::new(&browser.path)
+        .arg(browser.extensions_url)
+        .spawn()
+        .map(|_| ())
+        .map_err(|e| e.to_string())
+}
+
 /// yt-dlp breaks whenever a site changes its player; `-U` pulls the fix.
 #[tauri::command]
 pub async fn update_ytdlp(settings: State<'_, SettingsState>) -> Result<String, String> {

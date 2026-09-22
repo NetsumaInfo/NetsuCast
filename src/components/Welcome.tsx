@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { revealItemInDir } from "@tauri-apps/plugin-opener";
-import { FileVideo, FolderOpen, Link2, Play, Settings as SettingsIcon, Sparkles, TriangleAlert, Cast } from "lucide-react";
-import { MODEL_LABELS, type Environment, type Model } from "../lib/types";
+import { Check, FileVideo, Download, Link2, Play, Settings as SettingsIcon, Sparkles, TriangleAlert, Cast } from "lucide-react";
+import { MODEL_LABELS, type Model } from "../lib/types";
 
 export type Warmup = { model: Model; index: number; total: number };
 
 type Props = {
-  env: Environment | null;
   mpvError: string | null;
   warmup: Warmup | null;
   onOpen: (url: string) => void;
   onSettings?: () => void;
+  extensionInstalled: boolean;
+  onInstallExtension?: () => void;
 };
 
-export function Welcome({ env, mpvError, warmup, onOpen, onSettings }: Props) {
+export function Welcome({ mpvError, warmup, onOpen, onSettings, extensionInstalled, onInstallExtension }: Props) {
   const [url, setUrl] = useState("");
   const submit = () => url.trim() && onOpen(url.trim());
 
@@ -63,20 +63,28 @@ export function Welcome({ env, mpvError, warmup, onOpen, onSettings }: Props) {
 
         <div className="mt-8 rounded-xl border border-white/10 bg-white/[0.03] p-5">
           <div className="flex items-center gap-2 font-medium">
-            <Cast size={18} className="text-violet-400" /> Caster depuis Chrome
+            <Cast size={18} className="text-violet-400" /> Caster depuis ton navigateur
           </div>
           <p className="mt-2 text-sm text-neutral-400">
             Sur n'importe quelle vidéo, clique sur le bouton <b className="text-neutral-200">NetsuCast</b> qui apparaît
-            au survol, ou sur l'icône de l'extension (Alt+Maj+C). La vidéo se met en pause dans Chrome et continue ici.
+            au survol, ou sur l'icône de l'extension (Alt+Maj+C). La vidéo se met en pause dans le navigateur et continue ici.
           </p>
-          {env?.extensionDir && (
-            <button
-              onClick={() => revealItemInDir(env.extensionDir!)}
-              className="mt-3 flex items-center gap-2 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-neutral-300 hover:bg-white/10"
-            >
-              <FolderOpen size={14} /> Installer l'extension (dossier à charger dans chrome://extensions)
-            </button>
-          )}
+          {onInstallExtension &&
+            (extensionInstalled ? (
+              <div className="mt-3 flex items-center gap-2 text-xs text-emerald-300">
+                <Check size={14} /> Extension installée ·
+                <button onClick={onInstallExtension} className="text-neutral-400 underline-offset-2 hover:text-white hover:underline">
+                  installer dans un autre navigateur
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={onInstallExtension}
+                className="mt-3 flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold hover:bg-violet-500"
+              >
+                <Download size={15} /> Installer l'extension
+              </button>
+            ))}
         </div>
 
         <form
