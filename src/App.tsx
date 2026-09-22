@@ -4,7 +4,7 @@ import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { command } from "tauri-plugin-mpv-api";
-import { LoaderCircle, Sparkles, X } from "lucide-react";
+import { House, LoaderCircle, Sparkles, X } from "lucide-react";
 import { Controls } from "./components/Controls";
 import { InstallDialog } from "./components/InstallDialog";
 import { SettingsDialog } from "./components/SettingsDialog";
@@ -62,6 +62,9 @@ export default function App() {
   const [extensionInstalled, setExtensionInstalled] = useState(readExtensionSeen);
   const [showInstall, setShowInstall] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  // Set by the home button: shows the welcome screen right away, without waiting for mpv to
+  // report that it went idle.
+  const [atHome, setAtHome] = useState(false);
   const { state, dismissError } = usePlayer(ready);
 
   // Casts can arrive at any time (even before mpv is up), so the latest values live in a ref.
@@ -142,6 +145,7 @@ export default function App() {
       await player.applyUpscale(env, upscale);
     }
     setTarget(t);
+    setAtHome(false);
     dismissError();
     try {
       await player.load(t, env, { ...settings, maxHeight }, start ?? t.start ?? undefined);
@@ -190,7 +194,19 @@ export default function App() {
     setFullscreen(next);
   }, []);
 
-  const playing = ready && !state.idle && !warmup;
+  const playing = ready && !state.idle && !warmup && !atHome;
+
+  const goHome = useCallback(async () => {
+    setAtHome(true);
+    setShowInfo(false);
+    setOpenMenu(null);
+    if (fullscreen) toggleFullscreen(false);
+    try {
+      await player.stop();
+    } catch {
+      // mpv busy: the welcome screen is shown anyway, the next video replaces this one
+    }
+  }, [fullscreen, toggleFullscreen]);
 
   useEffect(() => {
     getCurrentWindow().setTitle(playing && state.title ? `${state.title} — NetsuCast` : "NetsuCast");
@@ -288,6 +304,7 @@ export default function App() {
         c: () => command("cycle", ["sub"]),
         i: () => setShowInfo((v) => !v),
         I: player.toggleStats,
+        h: goHome,
         u: () => changeModel(MODELS[(MODELS.indexOf(model) + 1) % MODELS.length]),
       };
       const action = actions[e.key] ?? actions[e.key.toLowerCase()];
@@ -298,7 +315,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [playing, state.volume, showSettings, openMenu, fullscreen, model, poke, toggleFullscreen, changeModel]);
+  }, [playing, state.volume, showSettings, openMenu, fullscreen, model, poke, toggleFullscreen, changeModel, goHome]);
 
   // Single click = pause, double click = fullscreen: the single click waits to be sure.
   const clickTimer = useRef<number>(undefined);
@@ -331,10 +348,22 @@ export default function App() {
 
       {playing && (
         <>
-          <div className="absolute inset-0" onClick={onSurfaceClick} onDoubleClick={onSurfaceDoubleClick} />
+          <div
+            className="absolute inset-0"
+            onClick={onSurfaceClick}
+            onDoubleClick={onSurfaceDoubleClick}
+            onWheel={(e) => player.setVolume(state.volume + (e.deltaY < 0 ? 5 : -5))}
+          />
 
-          <div className={`pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-black/80 to-transparent px-5 pt-3 pb-10 transition-opacity duration-300 ${controlsVisible ? "opacity-100" : "opacity-0"}`}>
-            <span className="block truncate text-sm font-medium text-neutral-100">{state.title}</span>
+          <div className={`absolute inset-x-0 top-0 flex items-center gap-2 bg-gradient-to-b from-black/80 to-transparent px-3 pt-2 pb-10 transition-opacity duration-300 ${controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+            <button
+              onClick={goHome}
+              title="Accueil (H)"
+              className="grid size-9 shrink-0 place-items-center rounded-lg text-neutral-100 hover:bg-white/15"
+            >
+              <House size={19} />
+            </button>
+            <span className="truncate text-sm font-medium text-neutral-100">{state.title}</span>
           </div>
 
           {(state.loading || state.buffering) && !modelLoading && (
@@ -377,7 +406,8 @@ export default function App() {
               state={state}
               upscale={upscale}
               preparing={modelLoading !== null}
-              maxHeight={target?.kind === "page" ? maxHeight : null}
+              target={target}
+              maxHeight={maxHeight}
               fullscreen={fullscreen}
               onClose={() => setShowInfo(false)}
             />

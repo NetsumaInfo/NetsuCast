@@ -9,4 +9,7 @@ body,
   background: transparent;
   color: #f5f5f5;
   font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  /* A player is not a page: nothing scrolls except inside dialogs and panels. */
+  overflow: hidden;
+  overscroll-behavior: none;
 }

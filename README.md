@@ -51,6 +51,8 @@ machine et refuse les requêtes venant de pages web.
 | J / L | −10 s / +10 s |
 | ↑ / ↓ | Volume |
 | M | Muet |
+| H | Retour à l'accueil |
+| Molette | Volume |
 | F / double-clic | Plein écran (Échap pour sortir) |
 | C | Sous-titre suivant |
 | U | Modèle d'upscale suivant |

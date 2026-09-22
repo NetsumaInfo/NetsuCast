@@ -119,6 +119,49 @@ export async function readUpscaleStatus(): Promise<UpscaleStatus | null> {
   };
 }
 
+/** Stream details for the info panel. Every field is optional: mpv omits what a source lacks. */
+export type StreamInfo = {
+  path?: string;
+  fileFormat?: string;
+  videoFormat?: string;
+  videoBitrate?: number;
+  videoParams?: { pixelformat?: string; colormatrix?: string; primaries?: string; gamma?: string; "sig-peak"?: number };
+  audioCodec?: string;
+  audioBitrate?: number;
+  audioParams?: { samplerate?: number; "channel-count"?: number; channels?: string };
+  hlsBitrate?: number;
+  cacheDuration?: number;
+  cacheSpeed?: number;
+  displayFps?: number;
+  gpuContext?: string;
+};
+
+const STREAM_PROPS: [keyof StreamInfo, string][] = [
+  ["path", "path"],
+  ["fileFormat", "file-format"],
+  ["videoFormat", "video-format"],
+  ["videoBitrate", "video-bitrate"],
+  ["videoParams", "video-params"],
+  ["audioCodec", "audio-codec-name"],
+  ["audioBitrate", "audio-bitrate"],
+  ["audioParams", "audio-params"],
+  ["hlsBitrate", "hls-bitrate"],
+  ["cacheDuration", "demuxer-cache-duration"],
+  ["cacheSpeed", "cache-speed"],
+  ["displayFps", "display-fps"],
+  ["gpuContext", "current-gpu-context"],
+];
+
+/** Polled by the info panel while it is open (too chatty to observe permanently). */
+export async function readStreamInfo(): Promise<StreamInfo> {
+  const values = await Promise.allSettled(STREAM_PROPS.map(([, prop]) => getProperty(prop)));
+  const info: Record<string, unknown> = {};
+  values.forEach((v, i) => {
+    if (v.status === "fulfilled" && v.value != null) info[STREAM_PROPS[i][0]] = v.value;
+  });
+  return info as StreamInfo;
+}
+
 /**
  * Resolves once mpv has rendered a frame through `model`. Compiling an ArtCNN shader freezes
  * the renderer (up to minutes the very first time, ~1 s once cached), so the UI waits on this.
