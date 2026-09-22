@@ -12,7 +12,16 @@ import { Welcome, type Warmup } from "./components/Welcome";
 import { usePlayer } from "./hooks/usePlayer";
 import { describeLoadError } from "./lib/errors";
 import * as player from "./lib/player";
-import { MODEL_LABELS, MODELS, type Environment, type LoadTarget, type Model, type Settings } from "./lib/types";
+import { InfoPanel } from "./components/InfoPanel";
+import {
+  MODEL_LABELS,
+  MODELS,
+  type Environment,
+  type LoadTarget,
+  type Model,
+  type Settings,
+  type UpscaleScale,
+} from "./lib/types";
 
 const HIDE_DELAY = 2500;
 const EXTENSION_SEEN_KEY = "netsucast.extensionSeen";
@@ -24,6 +33,8 @@ function readExtensionSeen(): boolean {
     return false;
   }
 }
+const upscaleOf = (s: Settings): player.Upscale => ({ model: s.model, force: s.forceUpscale, scale: s.upscaleScale });
+
 const DIRECT_MEDIA = /\.(m3u8|mpd|mp4|m4v|webm|mkv|mov|ts)(\?|#|$)/i;
 
 /** A URL typed by hand: direct media goes straight to mpv, anything else through yt-dlp. */
@@ -38,7 +49,8 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [mpvError, setMpvError] = useState<string | null>(null);
   const [target, setTarget] = useState<LoadTarget | null>(null);
-  const [model, setModel] = useState<Model>("off");
+  const [upscale, setUpscale] = useState<player.Upscale>({ model: "off", force: true, scale: "auto" });
+  const model = upscale.model;
   const [maxHeight, setMaxHeight] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -49,6 +61,7 @@ export default function App() {
   const [modelLoading, setModelLoading] = useState<Model | null>(null);
   const [extensionInstalled, setExtensionInstalled] = useState(readExtensionSeen);
   const [showInstall, setShowInstall] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const { state, dismissError } = usePlayer(ready);
 
   // Casts can arrive at any time (even before mpv is up), so the latest values live in a ref.
@@ -56,12 +69,12 @@ export default function App() {
     ready,
     env,
     settings,
-    model,
+    upscale,
     maxHeight,
     pending: null as LoadTarget | null,
     warming: false,
   });
-  live.current = { ...live.current, ready, env, settings, model, maxHeight };
+  live.current = { ...live.current, ready, env, settings, upscale, maxHeight };
 
   // --- startup -------------------------------------------------------------------------------
   const started = useRef(false);
@@ -72,7 +85,7 @@ export default function App() {
       const [s, e] = await Promise.all([invoke<Settings>("get_settings"), invoke<Environment>("get_environment")]);
       setSettings(s);
       setEnv(e);
-      setModel(s.model);
+      setUpscale(upscaleOf(s));
       setMaxHeight(s.maxHeight);
       if (!e.mpvPath) {
         setMpvError("mpv.exe introuvable.");
@@ -92,32 +105,32 @@ export default function App() {
   // once, on a hidden black clip behind the welcome screen; mpv's shader cache keeps the result.
   useEffect(() => {
     if (!ready || !env || !settings) return;
-    const force = settings.forceUpscale;
-    const todo = [settings.model, ...MODELS.filter((m) => m !== settings.model)].filter(
-      (m) => !player.isWarmed(m, force),
-    );
+    const base = upscaleOf(settings);
+    const todo = [settings.model, ...MODELS.filter((m) => m !== settings.model)]
+      .map((m) => ({ ...base, model: m }))
+      .filter((u) => !player.isWarmed(u));
     if (!todo.length || live.current.pending) return;
 
     live.current.warming = true;
     (async () => {
       await command("loadfile", [player.WARMUP_SOURCE, "replace"]);
-      for (const [i, m] of todo.entries()) {
+      for (const [i, u] of todo.entries()) {
         if (!live.current.warming) return;
-        setWarmup({ model: m, index: i + 1, total: todo.length });
-        await player.applyModel(env, m, force);
-        if (await player.waitForModel(m)) player.markWarmed(m, force);
+        setWarmup({ model: u.model, index: i + 1, total: todo.length });
+        await player.applyUpscale(env, u);
+        if (await player.waitForModel(u.model)) player.markWarmed(u);
       }
       if (!live.current.warming) return;
       live.current.warming = false;
       setWarmup(null);
       await player.stop();
-      await player.applyModel(env, live.current.model, force);
+      await player.applyUpscale(env, live.current.upscale);
     })();
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- loading -------------------------------------------------------------------------------
   const open = useCallback(async (t: LoadTarget, start?: number) => {
-    const { ready, env, settings, model, maxHeight } = live.current;
+    const { ready, env, settings, upscale, maxHeight } = live.current;
     if (!ready || !env || !settings) {
       live.current.pending = t;
       return;
@@ -126,7 +139,7 @@ export default function App() {
       // A real video wins over the warm-up; the remaining models get compiled next launch.
       live.current.warming = false;
       setWarmup(null);
-      await player.applyModel(env, model, settings.forceUpscale);
+      await player.applyUpscale(env, upscale);
     }
     setTarget(t);
     dismissError();
@@ -203,21 +216,25 @@ export default function App() {
   const controlsVisible = active || state.pause || openMenu !== null || showSettings;
 
   // --- actions -------------------------------------------------------------------------------
-  const applyModel = useCallback(async (m: Model, force: boolean) => {
+  const applyUpscale = useCallback(async (next: player.Upscale) => {
     const env = live.current.env;
     if (!env) return;
-    setModel(m);
-    live.current.model = m;
-    await player.applyModel(env, m, force);
-    if (player.isWarmed(m, force)) return;
-    setModelLoading(m);
-    if (await player.waitForModel(m)) player.markWarmed(m, force);
-    setModelLoading((current) => (current === m ? null : current));
+    setUpscale(next);
+    live.current.upscale = next;
+    await player.applyUpscale(env, next);
+    if (player.isWarmed(next)) return;
+    setModelLoading(next.model);
+    if (await player.waitForModel(next.model)) player.markWarmed(next);
+    setModelLoading((current) => (current === next.model ? null : current));
   }, []);
 
   const changeModel = useCallback(
-    (m: Model) => applyModel(m, live.current.settings?.forceUpscale ?? true),
-    [applyModel],
+    (m: Model) => applyUpscale({ ...live.current.upscale, model: m }),
+    [applyUpscale],
+  );
+  const changeScale = useCallback(
+    (scale: UpscaleScale) => applyUpscale({ ...live.current.upscale, scale }),
+    [applyUpscale],
   );
 
   const changeQuality = (h: number) => {
@@ -229,8 +246,12 @@ export default function App() {
   const saveSettings = async (next: Settings) => {
     await invoke("save_settings", { settings: next });
     if (ready) {
-      if (next.model !== settings?.model || next.forceUpscale !== settings?.forceUpscale) {
-        applyModel(next.model, next.forceUpscale);
+      if (
+        next.model !== settings?.model ||
+        next.forceUpscale !== settings?.forceUpscale ||
+        next.upscaleScale !== settings?.upscaleScale
+      ) {
+        applyUpscale(upscaleOf(next));
       }
       if (next.deband !== settings?.deband) player.setDeband(next.deband);
       if (next.hwdec !== settings?.hwdec) player.setHwdec(next.hwdec);
@@ -265,7 +286,8 @@ export default function App() {
         ArrowDown: () => player.setVolume(state.volume - 5),
         m: player.toggleMute,
         c: () => command("cycle", ["sub"]),
-        i: player.toggleStats,
+        i: () => setShowInfo((v) => !v),
+        I: player.toggleStats,
         u: () => changeModel(MODELS[(MODELS.indexOf(model) + 1) % MODELS.length]),
       };
       const action = actions[e.key] ?? actions[e.key.toLowerCase()];
@@ -288,14 +310,6 @@ export default function App() {
     clearTimeout(clickTimer.current);
     toggleFullscreen();
   };
-
-  // Without forcing, ArtCNN only runs when the picture is drawn at least 1.3× larger than the source.
-  const forced = settings?.forceUpscale ?? true;
-  const enlarged =
-    state.videoHeight > 0 &&
-    state.displayHeight > state.videoHeight * 1.3 &&
-    state.displayWidth > state.videoWidth * 1.3;
-  const upscaling = model !== "off" && (forced || enlarged);
 
   return (
     <div
@@ -341,20 +355,33 @@ export default function App() {
           <div className={`absolute inset-x-0 bottom-0 transition-opacity duration-300 ${controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"}`}>
             <Controls
               state={state}
-              model={model}
+              upscale={upscale}
+              preparing={modelLoading !== null}
               maxHeight={maxHeight}
               canChangeQuality={target?.kind === "page"}
-              upscaling={upscaling}
-              refining={upscaling && !enlarged}
               fullscreen={fullscreen}
+              infoOpen={showInfo}
               openMenu={openMenu}
               setOpenMenu={setOpenMenu}
               onModel={changeModel}
+              onScale={changeScale}
               onQuality={changeQuality}
+              onInfo={() => setShowInfo((v) => !v)}
               onFullscreen={() => toggleFullscreen()}
               onSettings={() => setShowSettings(true)}
             />
           </div>
+
+          {showInfo && (
+            <InfoPanel
+              state={state}
+              upscale={upscale}
+              preparing={modelLoading !== null}
+              maxHeight={target?.kind === "page" ? maxHeight : null}
+              fullscreen={fullscreen}
+              onClose={() => setShowInfo(false)}
+            />
+          )}
         </>
       )}
 

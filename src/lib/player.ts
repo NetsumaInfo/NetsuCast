@@ -1,5 +1,5 @@
 import { command, getProperty, init, setProperty } from "tauri-plugin-mpv-api";
-import type { Environment, LoadTarget, Model, Settings } from "./types";
+import type { Environment, LoadTarget, Model, Settings, UpscaleScale } from "./types";
 
 export const OBSERVED = [
   "pause",
@@ -17,6 +17,10 @@ export const OBSERVED = [
   "height",
   "osd-dimensions",
   "user-data/netsucast/ytdl-error",
+  "video-codec",
+  "estimated-vf-fps",
+  "hwdec-current",
+  "frame-drop-count",
 ] as const;
 
 // mpv's own default ("libmpv") gets refused by some CDNs. Replaced by the browser's own
@@ -52,14 +56,27 @@ function mpvArgs(env: Environment, s: Settings): string[] {
   if (env.scriptPath) args.push(`--scripts=${env.scriptPath}`);
   if (env.mpvLog) args.push(`--log-file=${env.mpvLog}`);
   if (s.subLangs.trim()) args.push(`--slang=${s.subLangs.trim()}`);
-  const shader = shaderPath(env, s.model, s.forceUpscale);
-  if (shader) args.push(`--glsl-shaders=${shader}`);
+  const shaders = shaderList(env, { model: s.model, force: s.forceUpscale, scale: s.upscaleScale });
+  // Path lists are separated by ";" on Windows.
+  if (shaders.length) args.push(`--glsl-shaders=${shaders.join(";")}`);
   return args;
 }
 
-function shaderPath(env: Environment, model: Model, force: boolean): string | null {
-  const dir = force ? (env.forcedShadersDir ?? env.shadersDir) : env.shadersDir;
-  return model === "off" || !dir ? null : `${dir}\\ArtCNN_${model}.glsl`;
+/** What drives the ArtCNN shader stack. */
+export type Upscale = { model: Model; force: boolean; scale: UpscaleScale };
+
+/**
+ * The shader stack for an upscale config:
+ * - first pass: the "forced" copy (runs on every frame) or the original (runs only when the
+ *   picture is enlarged at least 1.3×);
+ * - with scale "auto", a second original copy: it only runs when the window is still 1.3×
+ *   bigger than the ×2 result, turning 540p on a 4K screen into a ×4.
+ */
+function shaderList(env: Environment, { model, force, scale }: Upscale): string[] {
+  if (model === "off" || !env.shadersDir) return [];
+  const file = `ArtCNN_${model}.glsl`;
+  const first = `${force ? (env.forcedShadersDir ?? env.shadersDir) : env.shadersDir}\\${file}`;
+  return scale === "auto" ? [first, `${env.shadersDir}\\${file}`] : [first];
 }
 
 export async function startMpv(env: Environment, settings: Settings) {
@@ -71,13 +88,36 @@ export async function startMpv(env: Environment, settings: Settings) {
   });
 }
 
-export async function applyModel(env: Environment, model: Model, force: boolean) {
-  const shader = shaderPath(env, model, force);
-  if (shader) await command("change-list", ["glsl-shaders", "set", shader]);
-  else await command("change-list", ["glsl-shaders", "clr", ""]);
+export async function applyUpscale(env: Environment, upscale: Upscale) {
+  await setProperty("glsl-shaders", shaderList(env, upscale));
 }
 
-type Pass = { desc?: string };
+type Pass = { desc?: string; avg?: number };
+type Passes = { fresh?: Pass[]; redraw?: Pass[] } | null;
+
+/** What the GPU actually ran on the last frames, read from mpv's render pass statistics. */
+export type UpscaleStatus = {
+  /** ArtCNN passes run per frame: 1 = ×2, 2 = ×4, 0 = not running. */
+  passes: number;
+  /** GPU time spent in ArtCNN per frame, ms. */
+  artcnnMs: number;
+  /** GPU time for the whole frame, ms. */
+  frameMs: number;
+};
+
+export async function readUpscaleStatus(): Promise<UpscaleStatus | null> {
+  const passes = (await getProperty("vo-passes")) as Passes;
+  const fresh = passes?.fresh ?? [];
+  if (!fresh.length) return null; // paused: nothing rendered lately
+  const artcnn = fresh.filter((p) => p.desc?.startsWith("ArtCNN"));
+  const ms = (list: Pass[]) => list.reduce((sum, p) => sum + (p.avg ?? 0), 0) / 1e6;
+  return {
+    // Every ArtCNN shader starts with exactly one "(Conv2D)" pass.
+    passes: artcnn.filter((p) => p.desc?.endsWith("(Conv2D)")).length,
+    artcnnMs: ms(artcnn),
+    frameMs: ms(fresh),
+  };
+}
 
 /**
  * Resolves once mpv has rendered a frame through `model`. Compiling an ArtCNN shader freezes
@@ -90,7 +130,7 @@ export async function waitForModel(model: Model, timeoutMs = 600_000): Promise<b
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
-      const passes = (await getProperty("vo-passes")) as { fresh?: Pass[]; redraw?: Pass[] } | null;
+      const passes = (await getProperty("vo-passes")) as Passes;
       const all = [...(passes?.fresh ?? []), ...(passes?.redraw ?? [])];
       if (all.some((p) => p.desc?.startsWith(prefix))) return true;
     } catch {
@@ -105,21 +145,21 @@ export async function waitForModel(model: Model, timeoutMs = 600_000): Promise<b
 export const WARMUP_SOURCE = "av://lavfi:color=c=black:s=320x180:r=24:d=36000";
 
 const WARMED_KEY = "netsucast.warmedModels.v1";
-const warmKey = (model: Model, force: boolean) => `${model}:${force ? "forced" : "normal"}`;
+const warmKey = ({ model, force, scale }: Upscale) => `${model}:${force ? "forced" : "normal"}:${scale}`;
 
-export function isWarmed(model: Model, force: boolean): boolean {
-  if (model === "off") return true;
+export function isWarmed(upscale: Upscale): boolean {
+  if (upscale.model === "off") return true;
   try {
-    return (JSON.parse(localStorage.getItem(WARMED_KEY) ?? "[]") as string[]).includes(warmKey(model, force));
+    return (JSON.parse(localStorage.getItem(WARMED_KEY) ?? "[]") as string[]).includes(warmKey(upscale));
   } catch {
     return false;
   }
 }
 
-export function markWarmed(model: Model, force: boolean) {
+export function markWarmed(upscale: Upscale) {
   try {
     const list = new Set(JSON.parse(localStorage.getItem(WARMED_KEY) ?? "[]") as string[]);
-    list.add(warmKey(model, force));
+    list.add(warmKey(upscale));
     localStorage.setItem(WARMED_KEY, JSON.stringify([...list]));
   } catch {
     // storage unavailable: models will just be re-checked next time
@@ -156,6 +196,8 @@ export async function load(target: LoadTarget, env: Environment, s: Settings, st
 
   // `ytdl://` sends page URLs straight to yt-dlp instead of first letting ffmpeg fail on HTML.
   const url = target.kind === "page" ? `ytdl://${target.url}` : target.url;
+  // pause persists across files: a cast must start playing even if the last video was paused.
+  await setProperty("pause", false);
   const args: unknown[] = [url, "replace"];
   if (start && start > 1) args.push(-1, `start=${Math.floor(start)}`);
   await command("loadfile", args);

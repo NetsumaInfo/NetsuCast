@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { RefreshCw, X } from "lucide-react";
-import { MODEL_LABELS, MODELS, QUALITIES, qualityLabel, type Environment, type Settings } from "../lib/types";
+import { MODEL_LABELS, MODELS, QUALITIES, SCALE_LABELS, qualityLabel, type Environment, type Settings } from "../lib/types";
 
 type Props = {
   settings: Settings;
@@ -50,6 +50,10 @@ export function SettingsDialog({ settings, env, onClose, onSave }: Props) {
             </Field>
             <Toggle label="Toujours upscaler" hint="Même quand la vidéo a déjà la taille de la fenêtre : ArtCNN double la résolution puis l'image est ramenée à l'écran, plus nette et moins bruitée."
               checked={draft.forceUpscale} onChange={(v) => set("forceUpscale", v)} />
+            <Field label="Échelle" hint="Auto : une seconde passe ArtCNN (×4) quand l'écran est bien plus grand que le ×2, par exemple une vidéo 540p en plein écran 4K.">
+              <Select value={draft.upscaleScale} onChange={(v) => set("upscaleScale", v as Settings["upscaleScale"])}
+                options={(["auto", "x2"] as const).map((s) => [s, SCALE_LABELS[s]])} />
+            </Field>
             <Field label="Qualité source max" hint="Pour YouTube, X et les sites gérés par yt-dlp.">
               <Select value={String(draft.maxHeight)} onChange={(v) => set("maxHeight", Number(v))}
                 options={QUALITIES.map((h) => [String(h), qualityLabel(h)])} />

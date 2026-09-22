@@ -19,6 +19,9 @@ pub struct Settings {
     /// Run ArtCNN even when the window is not bigger than the video: the 2x result is then
     /// scaled back down, which still denoises and sharpens.
     pub force_upscale: bool,
+    /// "auto": a second ArtCNN pass (x4) when the window is still much bigger than the x2
+    /// result; "x2": one pass only.
+    pub upscale_scale: String,
     /// Upper bound on the source height requested from yt-dlp. 0 = best available.
     pub max_height: u32,
     /// "auto-safe" or "no".
@@ -42,6 +45,7 @@ impl Default for Settings {
             defaults_version: DEFAULTS_VERSION,
             model: "C4F32_DS".into(),
             force_upscale: true,
+            upscale_scale: "auto".into(),
             max_height: 1080,
             hwdec: "auto-safe".into(),
             deband: true,

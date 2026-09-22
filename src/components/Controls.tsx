@@ -1,5 +1,5 @@
 import {
-  Activity,
+  Info,
   AudioLines,
   Captions,
   Gauge,
@@ -18,7 +18,19 @@ import {
 } from "lucide-react";
 import type { PlayerState } from "../hooks/usePlayer";
 import * as player from "../lib/player";
-import { MODEL_LABELS, MODELS, QUALITIES, formatTime, qualityLabel, trackLabel, type Model } from "../lib/types";
+import type { Upscale } from "../lib/player";
+import {
+  MODEL_LABELS,
+  MODELS,
+  QUALITIES,
+  SCALE_LABELS,
+  formatTime,
+  qualityLabel,
+  trackLabel,
+  type Model,
+  type UpscaleScale,
+} from "../lib/types";
+import { modelName, summarize } from "../lib/upscaleInfo";
 import { IconButton, Menu } from "./Menu";
 import { SeekBar } from "./SeekBar";
 
@@ -26,16 +38,18 @@ const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 type Props = {
   state: PlayerState;
-  model: Model;
+  upscale: Upscale;
+  /** A model is being compiled: the picture is frozen until it is ready. */
+  preparing: boolean;
   maxHeight: number;
   canChangeQuality: boolean;
-  upscaling: boolean;
-  /** Forced run on a picture that is not enlarged: denoise/sharpen pass only. */
-  refining: boolean;
   fullscreen: boolean;
+  infoOpen: boolean;
   openMenu: string | null;
   setOpenMenu: (id: string | null) => void;
   onModel: (m: Model) => void;
+  onScale: (s: UpscaleScale) => void;
+  onInfo: () => void;
   onQuality: (h: number) => void;
   onFullscreen: () => void;
   onSettings: () => void;
@@ -46,6 +60,7 @@ export function Controls(p: Props) {
   const subs = state.tracks.filter((t) => t.type === "sub");
   const audios = state.tracks.filter((t) => t.type === "audio");
   const activeSub = subs.find((t) => t.selected);
+  const up = summarize(state, p.upscale, p.preparing);
   const VolumeIcon = state.mute || state.volume === 0 ? VolumeX : state.volume < 50 ? Volume1 : Volume2;
 
   return (
@@ -84,21 +99,19 @@ export function Controls(p: Props) {
 
         <div className="flex-1" />
 
-        {p.model !== "off" && (
-          <span
-            title={
-              !p.upscaling
-                ? "Inactif : la vidéo est déjà aussi grande que la fenêtre (active « Toujours upscaler » dans les paramètres)"
-                : p.refining
-                  ? "ArtCNN double la résolution puis l'image est ramenée à la taille de la fenêtre : plus nette et moins de bruit"
-                  : "L'upscale ArtCNN est appliqué"
-            }
-            className={`mr-1 rounded-md px-2 py-1 text-xs font-medium ${p.upscaling ? "bg-violet-500/25 text-violet-200" : "bg-white/10 text-neutral-400"}`}
+        {p.upscale.model !== "off" && (
+          <button
+            onClick={p.onInfo}
+            title="Détails entrée → upscale → sortie (I)"
+            className={`mr-1 rounded-md px-2 py-1 text-xs font-medium tabular-nums ${
+              up.status === "active" ? "bg-violet-500/25 text-violet-200" : up.status === "preparing" ? "bg-amber-500/20 text-amber-200" : "bg-white/10 text-neutral-400"
+            }`}
           >
-            {p.model.replace("_", " ")}
-            {state.videoHeight > 0 &&
-              ` · ${state.videoHeight}p ${!p.upscaling ? "· inactif" : p.refining ? "· affiné" : `→ ${state.displayHeight}p`}`}
-          </span>
+            {modelName(p.upscale.model)}
+            {up.status === "preparing" && " · préparation…"}
+            {up.status === "inactive" && " · inactif"}
+            {up.status === "active" && ` · ${state.videoHeight}p → ${up.upscaledHeight}p ×${up.factor}`}
+          </button>
         )}
 
         <Menu
@@ -140,7 +153,15 @@ export function Controls(p: Props) {
           setOpen={p.setOpenMenu}
           title="Upscale ArtCNN"
           icon={<Sparkles size={20} />}
-          items={MODELS.map((m) => ({ key: m, label: MODEL_LABELS[m], active: p.model === m, onSelect: () => p.onModel(m) }))}
+          items={[
+            ...MODELS.map((m) => ({ key: m, label: MODEL_LABELS[m], active: p.upscale.model === m, onSelect: () => p.onModel(m) })),
+            ...(["auto", "x2"] as const).map((s) => ({
+              key: `scale-${s}`,
+              label: `Échelle : ${SCALE_LABELS[s]}`,
+              active: p.upscale.scale === s,
+              onSelect: () => p.onScale(s),
+            })),
+          ]}
         />
         {p.canChangeQuality && (
           <Menu
@@ -171,8 +192,8 @@ export function Controls(p: Props) {
             onSelect: () => player.setSpeed(s),
           }))}
         />
-        <IconButton title="Statistiques (I)" onClick={player.toggleStats}>
-          <Activity size={19} />
+        <IconButton title="Entrée → upscale → sortie (I)" active={p.infoOpen} onClick={p.onInfo}>
+          <Info size={19} />
         </IconButton>
         <IconButton title="Paramètres" onClick={p.onSettings}>
           <SettingsIcon size={19} />

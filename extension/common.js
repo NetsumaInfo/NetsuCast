@@ -84,6 +84,20 @@ export async function cast({ url, kind, title, referer, start }) {
   if (!res.ok) throw new Error(`NetsuCast a répondu ${res.status}`);
 }
 
+/** On sites handled by yt-dlp, whether the URL is one video rather than a feed or a channel. */
+export function isVideoPage(url) {
+  try {
+    const u = new URL(url);
+    if (/(^|\.)youtube\.com$/i.test(u.hostname)) return /^\/(watch|shorts\/|live\/|embed\/)/.test(u.pathname);
+    if (/(^|\.)youtu\.be$/i.test(u.hostname)) return u.pathname.length > 1;
+    if (/(^|\.)(x|twitter)\.com$/i.test(u.hostname)) return /\/status(es)?\/\d/.test(u.pathname);
+    if (/(^|\.)twitch\.tv$/i.test(u.hostname)) return u.pathname.split("/").filter(Boolean).length >= 1;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function isPageSite(url) {
   try {
     return PAGE_SITES.test(new URL(url).hostname);

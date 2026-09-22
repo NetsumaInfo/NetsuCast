@@ -1,4 +1,4 @@
-import { cast, getPort, isPageSite } from "./common.js";
+import { cast, getPort, isPageSite, isVideoPage } from "./common.js";
 
 // Detected streams per tab, kept in session storage because the service worker is short-lived.
 // Entry: { url, type: "HLS" | "DASH" | "MP4" | "WEBM", referer, at }
@@ -104,9 +104,13 @@ chrome.tabs.onRemoved.addListener((tabId) => chrome.storage.session.remove(key(t
  * 3. a progressive file the <video> loaded directly;
  * 4. otherwise the page, and yt-dlp's generic extractor tries its luck.
  */
-async function pickSource(tab, { frameUrl, src } = {}) {
-  const pageUrl = tab.url;
-  if (isPageSite(pageUrl)) return { url: pageUrl, kind: "page" };
+async function pickSource(tab, { frameUrl, src, pageUrl: videoPage } = {}) {
+  const pageUrl = videoPage ?? tab.url;
+  if (isPageSite(pageUrl)) {
+    // A feed, channel or home page is a list: yt-dlp would play its first entry.
+    if (!isVideoPage(pageUrl)) throw new Error("Vidéo introuvable : survole-la et clique sur son bouton NetsuCast");
+    return { url: pageUrl, kind: "page" };
+  }
 
   if (src && /^https?:/i.test(src) && (FILE_URL.test(src) || PLAYLIST_URL.test(src))) {
     return { url: src, kind: "stream", referer: frameUrl ?? pageUrl };
@@ -135,29 +139,9 @@ async function castTab(tab, info = {}) {
   await cast({ ...source, title: tab.title, start: info.start ?? null });
 }
 
-/** Runs in every frame: finds the main video (playing first, then biggest). */
-function grabVideo() {
-  const videos = [...document.querySelectorAll("video")].filter((v) => {
-    const r = v.getBoundingClientRect();
-    return r.width >= 240 && r.height >= 135;
-  });
-  if (!videos.length) return null;
-  const area = (v) => v.getBoundingClientRect().width * v.getBoundingClientRect().height;
-  videos.sort((a, b) => Number(a.paused) - Number(b.paused) || area(b) - area(a));
-  const v = videos[0];
-  return {
-    start: Number.isFinite(v.duration) ? v.currentTime : null,
-    frameUrl: location.href,
-    src: v.currentSrc,
-    playing: !v.paused,
-    area: area(v),
-  };
-}
-
-function pauseVideos() {
-  for (const v of document.querySelectorAll("video")) v.pause();
-  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-}
+// Both run in the content scripts' isolated world, where content.js defines the helpers.
+const grabVideo = () => window.__netsucastGrab?.() ?? null;
+const pauseVideos = () => window.__netsucastPause?.();
 
 async function flash(tabId, ok, title) {
   await chrome.action.setBadgeBackgroundColor({ tabId, color: ok ? "#7c3aed" : "#dc2626" });
@@ -187,8 +171,9 @@ chrome.action.onClicked.addListener(async (tab) => {
     if (found) {
       chrome.scripting.executeScript({ target: { tabId: tab.id, frameIds: [found.frameId] }, func: pauseVideos }).catch(() => {});
     }
-  } catch {
-    await flash(tab.id, false, "NetsuCast ne répond pas : lance l'application.");
+  } catch (e) {
+    const text = String(e?.message ?? e);
+    await flash(tab.id, false, text.startsWith("Vidéo") ? text : "NetsuCast ne répond pas : lance l'application.");
   }
 });
 

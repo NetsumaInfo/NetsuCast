@@ -54,9 +54,10 @@ machine et refuse les requêtes venant de pages web.
 | F / double-clic | Plein écran (Échap pour sortir) |
 | C | Sous-titre suivant |
 | U | Modèle d'upscale suivant |
-| I | Statistiques mpv |
+| I | Panneau Entrée → Upscale → Sortie |
+| Maj+I | Statistiques mpv |
 
-Menus : sous-titres, piste audio, modèle ArtCNN (C4F16, C4F16 DS, C4F32, C4F32 DS), qualité source max
+Menus : sous-titres, piste audio, modèle ArtCNN (C4F16, C4F16 DS, C4F32, C4F32 DS) et échelle, qualité source max
 (jusqu'à 4K, pour les sites yt-dlp), vitesse, paramètres.
 
 Par défaut : source 1080p max, modèle **C4F32 DS** et **upscale forcé**. Même quand la vidéo a déjà
@@ -66,6 +67,10 @@ moins de bruit). Désactivable dans les paramètres (« Toujours upscaler »).
 mpv tourne en **Vulkan** : en Direct3D 11, compiler un modèle ArtCNN prenait plus de 5 minutes (et
 tombait sur la puce AMD des portables hybrides). Au premier lancement, les 4 modèles sont préparés
 derrière l'écran d'accueil (~1 à 2 min) ; le cache de shaders rend ensuite les changements rapides.
+
+Échelle **Auto** : une seconde passe ArtCNN s'ajoute quand l'écran reste 1,3× plus grand que le
+résultat ×2 (ex. 540p en plein écran 4K → ×4). Le badge et le panneau ⓘ affichent ce que la carte
+graphique exécute réellement (passes ArtCNN mesurées, coût en ms par image, images perdues).
 
 ## Architecture
 

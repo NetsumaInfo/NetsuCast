@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { listenEvents, observeProperties } from "tauri-plugin-mpv-api";
-import { OBSERVED } from "../lib/player";
+import { OBSERVED, readUpscaleStatus, type UpscaleStatus } from "../lib/player";
 import type { Track } from "../lib/types";
 
 export type PlayerState = {
@@ -24,6 +24,13 @@ export type PlayerState = {
   error: string | null;
   /** Last yt-dlp error, kept by the netsucast.lua mpv script. */
   ytdlError: string;
+  codec: string;
+  fps: number;
+  /** Hardware decoder in use, "" when decoding on the CPU. */
+  hwdec: string;
+  droppedFrames: number;
+  /** Measured on the GPU; null until a frame has been rendered. */
+  upscale: UpscaleStatus | null;
 };
 
 const INITIAL: PlayerState = {
@@ -45,6 +52,11 @@ const INITIAL: PlayerState = {
   displayHeight: 0,
   error: null,
   ytdlError: "",
+  codec: "",
+  fps: 0,
+  hwdec: "",
+  droppedFrames: 0,
+  upscale: null,
 };
 
 type OsdDimensions = { w: number; h: number; ml: number; mr: number; mt: number; mb: number };
@@ -73,6 +85,10 @@ export function usePlayer(ready: boolean) {
         case "demuxer-cache-time": return patch({ cacheTime: (d as number) ?? 0 });
         case "width": return patch({ videoWidth: (d as number) ?? 0 });
         case "height": return patch({ videoHeight: (d as number) ?? 0 });
+        case "video-codec": return patch({ codec: (d as string) ?? "" });
+        case "estimated-vf-fps": return patch({ fps: (d as number) ?? 0 });
+        case "hwdec-current": return patch({ hwdec: d && d !== "no" ? (d as string) : "" });
+        case "frame-drop-count": return patch({ droppedFrames: (d as number) ?? 0 });
         case "user-data/netsucast/ytdl-error": return patch({ ytdlError: (d as string) ?? "" });
         case "osd-dimensions": {
           const o = d as OsdDimensions | null;
@@ -84,7 +100,7 @@ export function usePlayer(ready: boolean) {
 
     const events = listenEvents((e) => {
       const ev = e as { event?: string; reason?: string; file_error?: string };
-      if (ev.event === "start-file") patch({ loading: true, error: null });
+      if (ev.event === "start-file") patch({ loading: true, error: null, upscale: null });
       if (ev.event === "file-loaded" || ev.event === "playback-restart") patch({ loading: false });
       if (ev.event === "end-file") {
         patch({ loading: false });
@@ -92,7 +108,18 @@ export function usePlayer(ready: boolean) {
       }
     });
 
+    // The badge and the info panel show what the GPU really ran, not what was asked for.
+    const poll = window.setInterval(async () => {
+      try {
+        const status = await readUpscaleStatus();
+        if (status) patch({ upscale: status });
+      } catch {
+        // renderer busy (compiling a shader): keep the last value
+      }
+    }, 1000);
+
     return () => {
+      window.clearInterval(poll);
       props.then((u) => u());
       events.then((u) => u());
     };

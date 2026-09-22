@@ -9,6 +9,13 @@ export const MODEL_LABELS: Record<Model, string> = {
   C4F32_DS: "C4F32 DS · qualité, débruité",
 };
 
+export type UpscaleScale = "auto" | "x2";
+
+export const SCALE_LABELS: Record<UpscaleScale, string> = {
+  auto: "Auto (×2, ou ×4 si la fenêtre est bien plus grande)",
+  x2: "×2 uniquement",
+};
+
 /** Max source height requested from yt-dlp. 0 = best available. */
 export const QUALITIES = [0, 2160, 1440, 1080, 720, 480] as const;
 
@@ -16,6 +23,7 @@ export type Settings = {
   defaultsVersion: number;
   model: Model;
   forceUpscale: boolean;
+  upscaleScale: UpscaleScale;
   maxHeight: number;
   hwdec: "auto-safe" | "no";
   deband: boolean;
