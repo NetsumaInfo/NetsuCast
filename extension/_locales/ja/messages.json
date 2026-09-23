@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "NetsuCastで再生中 ✓"
   },
-  "castButtonTitle": {
-    "message": "この動画の続きをNetsuCastで再生（ArtCNNでアップスケール）"
-  },
   "errNoVideo": {
     "message": "動画が見つかりません。動画にカーソルを合わせて、NetsuCastボタンをクリックしてください"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "ページをキャスト"
-  },
-  "popupHintPageSite": {
-    "message": "このサイトにおすすめです。yt-dlpが最高画質と字幕を取得します。"
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlpがページ内の動画を探します。見つからない場合は、下のストリームを選んでください。"
   },
   "popupNoPage": {
     "message": "このタブにはWebページがありません。"

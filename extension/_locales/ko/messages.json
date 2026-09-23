@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "NetsuCast에서 재생 중 ✓"
   },
-  "castButtonTitle": {
-    "message": "이 동영상을 NetsuCast에서 이어 보기(ArtCNN 업스케일)"
-  },
   "errNoVideo": {
     "message": "동영상을 찾을 수 없어요. 동영상에 마우스를 올리고 NetsuCast 버튼을 클릭해 주세요"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "페이지 전송"
-  },
-  "popupHintPageSite": {
-    "message": "이 사이트에 추천해요. yt-dlp가 최고 화질과 자막을 가져와요."
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlp가 페이지에서 동영상을 찾아요. 찾지 못하면 아래에서 스트림을 선택해 주세요."
   },
   "popupNoPage": {
     "message": "이 탭에는 웹페이지가 없어요."

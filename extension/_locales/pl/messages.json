@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "Odtwarzanie w NetsuCast ✓"
   },
-  "castButtonTitle": {
-    "message": "Oglądaj dalej ten film w NetsuCast (upscaling ArtCNN)"
-  },
   "errNoVideo": {
     "message": "Nie znaleziono filmu: najedź na niego kursorem i kliknij jego przycisk NetsuCast"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "Prześlij stronę"
-  },
-  "popupHintPageSite": {
-    "message": "Zalecane dla tej witryny: yt-dlp pobiera najlepszą jakość i napisy."
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlp próbuje znaleźć film na stronie. Jeśli się nie uda, wybierz strumień poniżej."
   },
   "popupNoPage": {
     "message": "Brak strony internetowej w tej karcie."

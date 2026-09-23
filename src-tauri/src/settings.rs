@@ -6,7 +6,7 @@ use tauri::{AppHandle, Manager, State};
 
 pub const DEFAULT_RECEIVER_PORT: u16 = 47800;
 /// Bumped when a default changes in a way existing settings files must pick up.
-const DEFAULTS_VERSION: u32 = 2;
+const DEFAULTS_VERSION: u32 = 3;
 
 /// Everything the settings window edits. Stored as JSON in the app config dir; a missing or
 /// partial file falls back field by field to the defaults below.
@@ -14,7 +14,8 @@ const DEFAULTS_VERSION: u32 = 2;
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     pub defaults_version: u32,
-    /// "off" or an ArtCNN shader name without prefix/extension ("C4F32_DS"…).
+    /// "auto" (from the graphics card), "off" or an ArtCNN shader name without prefix/extension
+    /// ("C4F32_DS"…).
     pub model: String,
     /// Run ArtCNN even when the window is not bigger than the video: the 2x result is then
     /// scaled back down, which still denoises and sharpens.
@@ -35,6 +36,8 @@ pub struct Settings {
     pub volume: f64,
     /// "auto" follows the system language, otherwise a code from src/locales.
     pub language: String,
+    /// Colour theme id (src/lib/theme.ts), "dark" by default.
+    pub theme: String,
     /// Seconds jumped by the back and forward buttons (J, L).
     pub seek_step: u32,
     /// Start where the browser was when the video was cast.
@@ -55,7 +58,7 @@ impl Default for Settings {
     fn default() -> Self {
         Self {
             defaults_version: DEFAULTS_VERSION,
-            model: "C4F32_DS".into(),
+            model: "auto".into(),
             force_upscale: true,
             upscale_scale: "auto".into(),
             max_height: 1080,
@@ -65,6 +68,7 @@ impl Default for Settings {
             auto_subs: false,
             volume: 100.0,
             language: "auto".into(),
+            theme: "dark".into(),
             seek_step: 10,
             resume_position: true,
             fullscreen_on_cast: false,
@@ -90,13 +94,17 @@ pub fn load(app: &AppHandle) -> Settings {
         .and_then(|text| serde_json::from_str(&text).ok())
         .unwrap_or_default();
     // Files written before v2 predate the 1080p source + DS model + forced upscale defaults.
-    if settings.defaults_version < DEFAULTS_VERSION {
+    if settings.defaults_version < 2 {
         let fresh = Settings::default();
         settings.model = fresh.model;
         settings.force_upscale = fresh.force_upscale;
         settings.max_height = fresh.max_height;
-        settings.defaults_version = DEFAULTS_VERSION;
     }
+    // v3: the model follows the graphics card, unless it was changed from the old default.
+    if settings.defaults_version < 3 && settings.model == "C4F32_DS" {
+        settings.model = "auto".into();
+    }
+    settings.defaults_version = DEFAULTS_VERSION;
     settings
 }
 

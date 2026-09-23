@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "Відтворюється в NetsuCast ✓"
   },
-  "castButtonTitle": {
-    "message": "Дивитися це відео далі в NetsuCast (апскейл ArtCNN)"
-  },
   "errNoVideo": {
     "message": "Відео не знайдено: наведи на нього курсор і натисни його кнопку NetsuCast"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "Транслювати сторінку"
-  },
-  "popupHintPageSite": {
-    "message": "Рекомендовано для цього сайту: yt-dlp отримає найкращу якість і субтитри."
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlp спробує знайти відео на сторінці. Якщо не вийде, вибери потік нижче."
   },
   "popupNoPage": {
     "message": "У цій вкладці немає вебсторінки."

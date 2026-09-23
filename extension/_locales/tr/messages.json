@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "NetsuCast'ta oynatılıyor ✓"
   },
-  "castButtonTitle": {
-    "message": "Bu videoyu NetsuCast'ta izlemeye devam et (ArtCNN ile çözünürlük yükseltme)"
-  },
   "errNoVideo": {
     "message": "Video bulunamadı: imleci videonun üzerine getir ve NetsuCast düğmesine tıkla"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "Sayfayı yayınla"
-  },
-  "popupHintPageSite": {
-    "message": "Bu site için önerilir: yt-dlp en iyi kaliteyi ve altyazıları alır."
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlp sayfadaki videoyu bulmaya çalışır. Bulamazsa aşağıdan bir akış seç."
   },
   "popupNoPage": {
     "message": "Bu sekmede web sayfası yok."

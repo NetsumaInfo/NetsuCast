@@ -27,6 +27,16 @@
   --shadow-overlay: 0 8px 24px rgb(0 0 0 / 45%);
 
   --animate-fade-in: fade-in 140ms ease-out;
+  /* Tooltip: fade, slight zoom and a short slide from the arrow side (--tip-from), as Base UI in
+     NetsuBoard and NetsuRush. */
+  --animate-tip-in: tip-in 150ms ease-out;
+  @keyframes tip-in {
+    from {
+      opacity: 0;
+      scale: 0.98;
+      translate: var(--tip-from);
+    }
+  }
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -123,4 +133,289 @@
       transition-duration: 1ms !important;
     }
   }
+}
+
+/* Themes, from NetsuRush's palettes (the user's choice, 2026-09-23). "dark" is the @theme above;
+   the others are written by scripts/make-themes.mjs, which converts each palette to hex and moves
+   the lightness of every text role until it passes on the surfaces it sits on. The player chrome
+   over the video (.on-video) stays dark in the light themes: it sits on a black gradient. */
+/* Same values as @theme, so a swatch or a scope can ask for "dark" inside another theme. */
+[data-theme="dark"] {
+  --color-page: #0a0d13;
+  --color-surface: #11151d;
+  --color-raised: #181d27;
+  --color-overlay: #1d2330;
+  --color-ink: #e7eaf0;
+  --color-ink-muted: #9aa4b5;
+  --color-ink-faint: #7d889c;
+  --color-line: #222836;
+  --color-line-strong: #5e6a80;
+  --color-accent: #2f6fe0;
+  --color-accent-hover: #3b7bf0;
+  --color-accent-ink: #ffffff;
+  --color-accent-text: #4c8dff;
+  --color-danger: #f2767a;
+  --color-warning: #e8b452;
+  --color-success: #4fc98e;
+  color-scheme: dark;
+}
+
+[data-theme="midnight"] {
+  --color-page: #000000;
+  --color-surface: #07080a;
+  --color-raised: #101216;
+  --color-overlay: #17191d;
+  --color-line: #22262d;
+  --color-ink: #f1f3f5;
+  --color-ink-muted: #9ba2ad;
+  --color-ink-faint: #797e87;
+  --color-line-strong: #5a5f67;
+  --color-accent: #4172d8;
+  --color-accent-ink: #ffffff;
+  --color-accent-hover: #3c69c7;
+  --color-accent-text: #5b8ef7;
+  --color-danger: #f05252;
+  --color-warning: #e2a849;
+  --color-success: #18b982;
+  color-scheme: dark;
+}
+
+[data-theme="blue"] {
+  --color-page: #0e141e;
+  --color-surface: #090f16;
+  --color-raised: #181f28;
+  --color-overlay: #1f262f;
+  --color-line: #242b33;
+  --color-ink: #dbdfe2;
+  --color-ink-muted: #858f99;
+  --color-ink-faint: #7e8690;
+  --color-line-strong: #5c646e;
+  --color-accent: #5e98c9;
+  --color-accent-ink: #090f16;
+  --color-accent-hover: #6ba0cd;
+  --color-accent-text: #5e98c9;
+  --color-danger: #fb7185;
+  --color-warning: #e4a74a;
+  --color-success: #3db871;
+  color-scheme: dark;
+}
+
+[data-theme="graphite"] {
+  --color-page: #101010;
+  --color-surface: #191919;
+  --color-raised: #252525;
+  --color-overlay: #2c2c2c;
+  --color-line: #343434;
+  --color-ink: #e6e6e6;
+  --color-ink-muted: #9e9e9e;
+  --color-ink-faint: #8c8c8c;
+  --color-line-strong: #666666;
+  --color-accent: #79abcf;
+  --color-accent-ink: #101010;
+  --color-accent-hover: #84b2d3;
+  --color-accent-text: #79abcf;
+  --color-danger: #ee5d58;
+  --color-warning: #dca744;
+  --color-success: #47b777;
+  color-scheme: dark;
+}
+
+[data-theme="forest"] {
+  --color-page: #0b1710;
+  --color-surface: #121f18;
+  --color-raised: #1c2c23;
+  --color-overlay: #23342a;
+  --color-line: #2b3d33;
+  --color-ink: #e3eae5;
+  --color-ink-muted: #95a29a;
+  --color-ink-faint: #86938c;
+  --color-line-strong: #5a6d62;
+  --color-accent: #4dc588;
+  --color-accent-ink: #07180f;
+  --color-accent-hover: #5bca92;
+  --color-accent-text: #4dc588;
+  --color-danger: #f3625d;
+  --color-warning: #dfaa47;
+  --color-success: #4dc588;
+  color-scheme: dark;
+}
+
+[data-theme="ember"] {
+  --color-page: #17100c;
+  --color-surface: #211814;
+  --color-raised: #2e231f;
+  --color-overlay: #362a26;
+  --color-line: #40332f;
+  --color-ink: #ede6e1;
+  --color-ink-muted: #aa9d96;
+  --color-ink-faint: #968983;
+  --color-line-strong: #72645f;
+  --color-accent: #f09b48;
+  --color-accent-ink: #190f0a;
+  --color-accent-hover: #f1a357;
+  --color-accent-text: #f09b48;
+  --color-danger: #f05b57;
+  --color-warning: #e3ad4b;
+  --color-success: #4ebe7d;
+  color-scheme: dark;
+}
+
+[data-theme="plum"] {
+  --color-page: #160f1d;
+  --color-surface: #1e1727;
+  --color-raised: #2a2336;
+  --color-overlay: #312a3e;
+  --color-line: #3b3349;
+  --color-ink: #e9e6ef;
+  --color-ink-muted: #a29dad;
+  --color-ink-faint: #908b9a;
+  --color-line-strong: #6c647c;
+  --color-accent: #be95ec;
+  --color-accent-ink: #160f1d;
+  --color-accent-hover: #c39dee;
+  --color-accent-text: #be95ec;
+  --color-danger: #ef5f5a;
+  --color-warning: #e3ad4b;
+  --color-success: #4ebe7d;
+  color-scheme: dark;
+}
+
+[data-theme="contrast"] {
+  --color-page: #000000;
+  --color-surface: #0a0a0a;
+  --color-raised: #191919;
+  --color-overlay: #202020;
+  --color-line: #747474;
+  --color-ink: #ffffff;
+  --color-ink-muted: #bebebe;
+  --color-ink-faint: #919191;
+  --color-line-strong: #747474;
+  --color-accent: #7ac8f5;
+  --color-accent-ink: #000000;
+  --color-accent-hover: #85ccf6;
+  --color-accent-text: #7ac8f5;
+  --color-danger: #f66d67;
+  --color-warning: #fdc436;
+  --color-success: #5edb81;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --color-page: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-raised: #e9edf3;
+  --color-overlay: #ffffff;
+  --color-line: #ccd3dd;
+  --color-ink: #171a20;
+  --color-ink-muted: #5e6673;
+  --color-ink-faint: #666c75;
+  --color-line-strong: #868d96;
+  --color-accent: #2f65c8;
+  --color-accent-ink: #ffffff;
+  --color-accent-hover: #2b5db8;
+  --color-accent-text: #2f65c8;
+  --color-danger: #c5303f;
+  --color-warning: #925f00;
+  --color-success: #047954;
+  color-scheme: light;
+}
+
+[data-theme="light"] .on-video {
+  --color-page: #0a0d13;
+  --color-surface: #11151d;
+  --color-raised: #181d27;
+  --color-overlay: #1d2330;
+  --color-ink: #e7eaf0;
+  --color-ink-muted: #9aa4b5;
+  --color-ink-faint: #7d889c;
+  --color-line: #222836;
+  --color-line-strong: #5e6a80;
+  --color-danger: #f2767a;
+  --color-warning: #e8b452;
+  --color-success: #4fc98e;
+  --color-accent-text: #5089ef;
+  color-scheme: dark;
+}
+
+[data-theme="soft-light"] {
+  --color-page: #e8edf3;
+  --color-surface: #f7f9fc;
+  --color-raised: #dde4ec;
+  --color-overlay: #f7f9fc;
+  --color-line: #bdc8d4;
+  --color-ink: #20252c;
+  --color-ink-muted: #5a6573;
+  --color-ink-faint: #5e6671;
+  --color-line-strong: #7e8893;
+  --color-accent: #356aa9;
+  --color-accent-ink: #ffffff;
+  --color-accent-hover: #31629b;
+  --color-accent-text: #2f64a3;
+  --color-danger: #b63140;
+  --color-warning: #895900;
+  --color-success: #0a7253;
+  color-scheme: light;
+}
+
+[data-theme="soft-light"] .on-video {
+  --color-page: #0a0d13;
+  --color-surface: #11151d;
+  --color-raised: #181d27;
+  --color-overlay: #1d2330;
+  --color-ink: #e7eaf0;
+  --color-ink-muted: #9aa4b5;
+  --color-ink-faint: #7d889c;
+  --color-line: #222836;
+  --color-line-strong: #5e6a80;
+  --color-danger: #f2767a;
+  --color-warning: #e8b452;
+  --color-success: #4fc98e;
+  --color-accent-text: #588ed0;
+  color-scheme: dark;
+}
+
+[data-theme="paper"] {
+  --color-page: #f0e6d8;
+  --color-surface: #f8f2e7;
+  --color-raised: #e3d7c7;
+  --color-overlay: #f8f2e7;
+  --color-line: #cec0ae;
+  --color-ink: #2a2119;
+  --color-ink-muted: #65584d;
+  --color-ink-faint: #685d52;
+  --color-line-strong: #8e8170;
+  --color-accent: #9c522e;
+  --color-accent-ink: #fcfaf6;
+  --color-accent-hover: #904b2a;
+  --color-accent-text: #924925;
+  --color-danger: #af2a2b;
+  --color-warning: #825400;
+  --color-success: #1d6a40;
+  color-scheme: light;
+}
+
+[data-theme="paper"] .on-video {
+  --color-page: #0a0d13;
+  --color-surface: #11151d;
+  --color-raised: #181d27;
+  --color-overlay: #1d2330;
+  --color-ink: #e7eaf0;
+  --color-ink-muted: #9aa4b5;
+  --color-ink-faint: #7d889c;
+  --color-line: #222836;
+  --color-line-strong: #5e6a80;
+  --color-danger: #f2767a;
+  --color-warning: #e8b452;
+  --color-success: #4fc98e;
+  --color-accent-text: #c77954;
+  color-scheme: dark;
+}
+
+
+/* Set while the theme switches: nothing animates from the old colours to the new ones. */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
 }

@@ -2,18 +2,17 @@
   "welcome": {
     "tagline": "AI即時升頻的影片播放器。",
     "castTitle": "從瀏覽器投放",
-    "castBody": "在瀏覽器中將滑鼠游標移到影片上並按一下NetsuCast，或使用擴充功能圖示（Alt+Shift+C）。影片會在瀏覽器中暫停，並在這裡接著播放。",
+    "castBody": "在瀏覽器中將滑鼠游標移到影片上並按一下NetsuCast。",
     "installExtension": "安裝擴充功能",
     "extensionInstalled": "已安裝擴充功能",
     "installOtherBrowser": "安裝到其他瀏覽器",
     "openLink": "開啟連結",
     "play": "播放",
-    "dropHint": "也可以把影片檔拖曳到視窗中。",
+    "dropHint": "或者把影片檔拖曳到視窗中。",
     "mpvErrorTitle": "播放器無法啟動",
     "mpvErrorHint": "執行run.bat，然後選擇「Install / update player tools」，或在設定中指定mpv的路徑。",
     "mpvMissing": "找不到mpv.exe。",
-    "warmupTitle": "正在準備升頻模型（{{index}}/{{total}}）：{{model}}",
-    "warmupBody": "只需準備一次，之後切換模型幾乎瞬間完成。你現在就可以開始播放影片。"
+    "warmupTitle": "正在準備{{model}}（{{index}}/{{total}}）…"
   },
   "player": {
     "home": "首頁",
@@ -41,10 +40,12 @@
     "badgePreparing": "準備中…",
     "badgeInactive": "未生效",
     "badgeTip": "查看輸入、升頻和輸出",
-    "preparingModel": "正在準備{{model}}…（僅限第一次）",
-    "dismiss": "關閉"
+    "preparingModel": "正在準備{{model}}…",
+    "dismiss": "關閉",
+    "autoStepDown": "顯示卡跟不上，已從{{from}}切換到{{to}}。"
   },
   "models": {
+    "auto": "自動 · {{model}}",
     "off": "關閉",
     "C4F16": "C4F16 · 快速",
     "C4F16_DS": "C4F16 DS · 快速，降噪",
@@ -66,7 +67,7 @@
     "title": "詳細資訊",
     "source": "來源",
     "type": "類型",
-    "kindPage": "網頁，由yt-dlp讀取",
+    "kindPage": "網頁",
     "kindStream": "直接串流",
     "kindFile": "本機檔案",
     "origin": "出處",
@@ -115,7 +116,8 @@
     "kbps": "{{value}} kb/s",
     "seconds": "{{value}}秒",
     "khz": "{{value}} kHz",
-    "hz": "{{value}} Hz"
+    "hz": "{{value}} Hz",
+    "gpu": "顯示卡"
   },
   "settings": {
     "title": "設定",
@@ -130,45 +132,34 @@
     "seekStep": "快轉與倒轉",
     "seekStepValue": "{{seconds}}秒",
     "resume": "從相同位置繼續播放",
-    "resumeHint": "影片會從瀏覽器中播放到的位置接著播。",
     "fullscreenOnCast": "每次投放時全螢幕",
-    "fullscreenOnCastHint": "影片一送達，視窗就會切換成全螢幕。",
     "alwaysOnTop": "視窗保持在最上層",
-    "alwaysOnTopHint": "方便在螢幕角落觀看。",
     "model": "預設模型",
     "force": "一律升頻",
-    "forceHint": "即使影片已經和視窗一樣大也會套用：ArtCNN先將解析度加倍，再縮回螢幕大小，畫面更銳利、雜訊更少。",
     "scale": "倍率",
-    "scaleHint": "「自動」會在螢幕仍然大很多時再加一次處理（×4），例如以4K全螢幕播放540p影片。",
     "maxHeight": "來源畫質上限",
-    "maxHeightHint": "適用於YouTube、X，以及由yt-dlp讀取的網站。",
     "deband": "平滑漸層",
-    "debandHint": "去除高度壓縮串流中的色帶。",
     "subLangs": "字幕語言",
     "subLangsHint": "以逗號分隔的語言代碼，例如zh,en。留空：一律不自動開啟。",
     "autoSubs": "加入自動產生的字幕",
-    "autoSubsHint": "YouTube：平台自動產生的字幕。",
     "subScale": "字幕大小",
     "audioLangs": "偏好的音訊語言",
     "audioLangsHint": "以逗號分隔的語言代碼，例如ja,zh。",
     "hwdec": "使用顯示卡解碼",
-    "hwdecHint": "如果畫面出現破圖，請關閉此選項。",
     "port": "擴充功能連接埠",
-    "portHint": "擴充功能和這裡須設為相同的值。",
     "mpvPath": "mpv路徑",
     "ytdlpPath": "yt-dlp路徑",
-    "pathAuto": "留空：自動",
-    "pathAutoFound": "留空：自動（{{path}}）",
+    "pathAuto": "自動",
     "updateYtdlp": "更新yt-dlp",
     "updating": "正在更新…",
-    "resetModels": "重新準備模型",
-    "resetModelsHint": "如果切換模型時畫面長時間停住，請執行這個動作。",
-    "resetModelsDone": "下次啟動時會重新準備模型。",
     "error": "錯誤：{{message}}",
     "restartNote": "部分變更會在下次啟動時生效。",
     "cancel": "取消",
     "save": "儲存",
-    "portBusy": "連接埠 {{port}} 已被其他程式使用：在這裡和擴充功能中改用其他連接埠。"
+    "portBusy": "連接埠 {{port}} 已被其他程式使用：在這裡和擴充功能中改用其他連接埠。",
+    "theme": "主題",
+    "sectionUpdates": "更新",
+    "sectionAbout": "關於"
   },
   "errors": {
     "generic": "無法播放：{{reason}}",
@@ -182,20 +173,17 @@
     "private": "私人影片或會員專屬影片。"
   },
   "install": {
-    "title": "安裝NetsuCast擴充功能",
     "close": "關閉",
     "browser": "瀏覽器",
     "searching": "正在尋找瀏覽器…",
     "noBrowser": "找不到相容的瀏覽器。",
-    "notSupported": "尚未支援",
     "open": "開啟{{browser}}",
     "reopen": "重新開啟{{browser}}",
     "step1": "開啟「{{dev}}」（{{where}}）。",
     "step2": "按一下「{{load}}」。",
-    "step3": "在開啟的視窗中，將路徑貼到上方的網址列（Ctrl+V），按下Enter，然後按一下「{{select}}」。",
+    "step3": "將路徑貼到網址列（Ctrl+V），然後按一下「{{select}}」。",
     "waiting": "NetsuCast正在等待擴充功能…",
     "done": "完成",
-    "installed": "擴充功能已安裝。影片上現在會顯示NetsuCast按鈕。",
     "copy": "複製路徑",
     "copied": "已複製",
     "devMode": "開發人員模式",
@@ -204,7 +192,6 @@
     "whereTopRight": "右上角",
     "whereLeftBottom": "左側選單底部",
     "selectFolder": "選擇資料夾",
-    "whyManual": "瀏覽器不允許擴充功能自行安裝：這三個步驟只需做一次。",
     "devModeEdge": "開發人員模式"
   },
   "keys": {
@@ -212,9 +199,63 @@
     "escape": "Esc"
   },
   "update": {
-    "available": "NetsuCast {{version}} 已推出。",
-    "install": "安裝更新",
-    "installing": "正在安裝… {{percent}}%",
-    "failed": "無法安裝更新，稍後再試。"
+    "action": "更新",
+    "auto": "自動檢查",
+    "autoInstall": "啟動時自動更新",
+    "idle": "版本{{version}}",
+    "checking": "正在檢查更新…",
+    "available": "版本{{version}}已推出",
+    "downloading": "正在下載並驗證…",
+    "downloaded": "更新已準備好安裝",
+    "installing": "正在安裝…",
+    "failed": "檢查失敗",
+    "current": "NetsuCast已是最新版本",
+    "check": "檢查",
+    "download": "下載",
+    "restart": "重新啟動並安裝",
+    "history": "各版本新功能",
+    "whatsNew": "{{version}}版本的新功能",
+    "gotIt": "開始吧",
+    "kind": {
+      "feature": "新功能",
+      "improvement": "改進",
+      "performance": "效能",
+      "fix": "修正"
+    },
+    "staged": "版本{{version}}已就緒，將在下次啟動時安裝"
+  },
+  "themes": {
+    "dark": "深色",
+    "midnight": "午夜",
+    "blue": "夜藍",
+    "graphite": "石墨",
+    "forest": "森林",
+    "ember": "餘燼",
+    "plum": "梅紫",
+    "contrast": "高對比",
+    "light": "淺色",
+    "softLight": "柔和淺色",
+    "paper": "紙張"
+  },
+  "compare": {
+    "toggle": "比較前後效果",
+    "needsUpscale": "升頻運作時可用",
+    "before": "之前",
+    "after": "之後 · {{model}}",
+    "handle": "比較線",
+    "handleValue": "之前：{{percent}}%"
+  },
+  "header": {
+    "discord": "Discord伺服器",
+    "support": "支持NetsuCast"
+  },
+  "about": {
+    "communityTitle": "社群",
+    "discord": "加入伺服器",
+    "supportTitle": "支持",
+    "sponsors": "成為GitHub贊助者",
+    "coffee": "請作者喝杯咖啡",
+    "legal": "© 2026 Haim Faraj · NetsuCast依據GNU AGPL v3.0-only發布 · 不提供任何擔保。",
+    "source": "原始碼"
   }
 }

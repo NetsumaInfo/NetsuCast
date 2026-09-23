@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Cast, Check, Download, FileVideo, Play, Settings as SettingsIcon, TriangleAlert } from "lucide-react";
+import { Cast, Check, Download, FileVideo, Link2, Play, Plus, Settings as SettingsIcon, TriangleAlert } from "lucide-react";
 import { modelName } from "../lib/upscaleInfo";
 import type { Model } from "../lib/types";
 import { IconButton, TextInput } from "./ui";
-import { UpdateBanner } from "./UpdateBanner";
+import { HeaderLinks } from "./HeaderLinks";
+import { UpdateButton } from "./UpdateButton";
 
 export type Warmup = { model: Model; index: number; total: number };
 
@@ -13,32 +14,34 @@ type Props = {
   warmup: Warmup | null;
   onOpen: (url: string) => void;
   onSettings?: () => void;
+  /** Opens Settings ▸ About (donation pages). */
+  onSupport?: () => void;
   extensionInstalled: boolean;
   onInstallExtension?: () => void;
 };
 
-export function Welcome({ mpvError, warmup, onOpen, onSettings, extensionInstalled, onInstallExtension }: Props) {
+export function Welcome({ mpvError, warmup, onOpen, onSettings, onSupport, extensionInstalled, onInstallExtension }: Props) {
   const { t } = useTranslation();
   const [url, setUrl] = useState("");
   const submit = () => url.trim() && onOpen(url.trim());
 
   return (
     <div className="relative flex h-full items-center justify-center p-8">
-      {onSettings && (
-        <div className="absolute top-3 end-3">
+      <div className="absolute top-3 end-3 flex items-center gap-0.5">
+        <UpdateButton />
+        {onSupport && <HeaderLinks onSupport={onSupport} />}
+        {onSettings && (
           <IconButton aria-label={t("player.settings")} onClick={onSettings}>
             <SettingsIcon size={18} strokeWidth={1.75} className="text-ink-muted" />
           </IconButton>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="w-full max-w-lg">
         <h1 className="text-3xl font-semibold tracking-tight" translate="no">
           Netsu<span className="text-accent-text">Cast</span>
         </h1>
         <p className="mt-1.5 text-sm text-ink-muted">{t("welcome.tagline")}</p>
-
-        <UpdateBanner />
 
         {mpvError && (
           <div role="alert" className="mt-6 flex gap-3 rounded-panel border border-danger/30 bg-danger/10 p-4 text-sm">
@@ -56,7 +59,6 @@ export function Welcome({ mpvError, warmup, onOpen, onSettings, extensionInstall
             <div className="text-ink">
               {t("welcome.warmupTitle", { index: warmup.index, total: warmup.total, model: modelName(warmup.model) })}
             </div>
-            <div className="mt-1 text-ink-muted">{t("welcome.warmupBody")}</div>
             <div className="mt-3 h-1 overflow-hidden rounded-full bg-line">
               <div
                 className="h-full bg-accent-text transition-[width] duration-300"
@@ -73,17 +75,13 @@ export function Welcome({ mpvError, warmup, onOpen, onSettings, extensionInstall
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t("welcome.castBody")}</p>
           {onInstallExtension &&
             (extensionInstalled ? (
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <div className="mt-2 flex items-center gap-1 text-sm">
                 <span className="flex items-center gap-1.5 text-success">
                   <Check size={15} strokeWidth={2} /> {t("welcome.extensionInstalled")}
                 </span>
-                <button
-                  type="button"
-                  onClick={onInstallExtension}
-                  className="text-ink-muted underline-offset-4 transition-colors hover:text-ink hover:underline"
-                >
-                  {t("welcome.installOtherBrowser")}
-                </button>
+                <IconButton aria-label={t("welcome.installOtherBrowser")} onClick={onInstallExtension}>
+                  <Plus size={16} strokeWidth={1.75} className="text-ink-muted" />
+                </IconButton>
               </div>
             ) : (
               <button
@@ -103,24 +101,27 @@ export function Welcome({ mpvError, warmup, onOpen, onSettings, extensionInstall
             submit();
           }}
         >
-          <label htmlFor="nc-url" className="text-sm font-medium text-ink">
-            {t("welcome.openLink")}
-          </label>
-          <div className="mt-2 flex gap-2">
-            <TextInput
-              id="nc-url"
-              dir="ltr"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://…"
-              className="flex-1"
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Link2 size={16} strokeWidth={1.75} className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+              <TextInput
+                id="nc-url"
+                dir="ltr"
+                aria-label={t("welcome.openLink")}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder={t("welcome.openLink")}
+                className="ps-9"
+              />
+            </div>
             <button
               type="submit"
+              aria-label={t("welcome.play")}
+              data-tip={t("welcome.play")}
               disabled={!url.trim() || !!mpvError}
-              className="flex h-9 shrink-0 items-center gap-1.5 rounded-control border border-line-strong/70 px-3.5 text-sm text-ink transition-colors hover:bg-white/8 disabled:opacity-40"
+              className="grid size-9 shrink-0 place-items-center rounded-control bg-accent text-accent-ink transition-colors hover:bg-accent-hover disabled:bg-ink/10 disabled:text-ink-faint"
             >
-              <Play size={14} fill="currentColor" strokeWidth={0} /> {t("welcome.play")}
+              <Play size={15} fill="currentColor" strokeWidth={0} />
             </button>
           </div>
           <p className="mt-3 flex items-center gap-2 text-xs text-ink-faint">

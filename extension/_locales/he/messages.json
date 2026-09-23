@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "מופעל ב-NetsuCast ✓"
   },
-  "castButtonTitle": {
-    "message": "המשך הצפייה בסרטון ב-NetsuCast (הגדלת רזולוציה עם ArtCNN)"
-  },
   "errNoVideo": {
     "message": "הסרטון לא נמצא: יש להעביר את העכבר מעליו וללחוץ על כפתור NetsuCast שלו"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "הפעלת Cast לדף"
-  },
-  "popupHintPageSite": {
-    "message": "מומלץ לאתר הזה: yt-dlp משיג את האיכות הטובה ביותר ואת הכתוביות."
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlp מנסה למצוא את הסרטון בדף. אם זה לא מצליח, אפשר לבחור זרם למטה."
   },
   "popupNoPage": {
     "message": "אין דף אינטרנט בכרטיסייה הזו."

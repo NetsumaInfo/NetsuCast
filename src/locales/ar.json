@@ -2,18 +2,17 @@
   "welcome": {
     "tagline": "مشغّل فيديو يرفع الدقة بالذكاء الاصطناعي في الوقت الفعلي.",
     "castTitle": "البث من متصفحك",
-    "castBody": "مرّر المؤشر فوق فيديو في متصفحك وانقر على NetsuCast، أو استخدم رمز الإضافة (Alt+Shift+C). يتوقف الفيديو مؤقتًا هناك ويكمل هنا.",
+    "castBody": "مرّر المؤشر فوق فيديو في متصفحك وانقر على NetsuCast.",
     "installExtension": "تثبيت الإضافة",
     "extensionInstalled": "الإضافة مثبّتة",
     "installOtherBrowser": "التثبيت في متصفح آخر",
     "openLink": "فتح رابط",
     "play": "تشغيل",
-    "dropHint": "يمكنك أيضًا سحب ملف فيديو إلى النافذة.",
+    "dropHint": "أو اسحب ملف فيديو إلى النافذة.",
     "mpvErrorTitle": "لم يبدأ المشغّل",
     "mpvErrorHint": "شغّل run.bat ثم اختر «Install / update player tools»، أو حدّد مسار mpv في الإعدادات.",
     "mpvMissing": "تعذّر العثور على mpv.exe.",
-    "warmupTitle": "جارٍ تجهيز نماذج رفع الدقة ({{index}}/{{total}}): {{model}}",
-    "warmupBody": "مرة واحدة فقط: بعدها يصبح تبديل النموذج شبه فوري. يمكنك تشغيل فيديو من الآن."
+    "warmupTitle": "جارٍ تجهيز {{model}} ({{index}}/{{total}})…"
   },
   "player": {
     "home": "الرئيسية",
@@ -41,10 +40,12 @@
     "badgePreparing": "جارٍ التجهيز…",
     "badgeInactive": "غير نشط",
     "badgeTip": "عرض المدخل ورفع الدقة والمخرج",
-    "preparingModel": "جارٍ تجهيز {{model}}… (في المرة الأولى فقط)",
-    "dismiss": "إغلاق"
+    "preparingModel": "جارٍ تجهيز {{model}}…",
+    "dismiss": "إغلاق",
+    "autoStepDown": "لم تتمكن بطاقة الرسومات من المواكبة: تم التبديل من {{from}} إلى {{to}}."
   },
   "models": {
+    "auto": "تلقائي · {{model}}",
     "off": "إيقاف",
     "C4F16": "C4F16 · سريع",
     "C4F16_DS": "C4F16 DS · سريع، مع إزالة التشويش",
@@ -66,7 +67,7 @@
     "title": "المعلومات",
     "source": "المصدر",
     "type": "النوع",
-    "kindPage": "صفحة ويب، يقرؤها yt-dlp",
+    "kindPage": "صفحة ويب",
     "kindStream": "تدفق مباشر",
     "kindFile": "ملف محلي",
     "origin": "الأصل",
@@ -115,7 +116,8 @@
     "kbps": "{{value}} كيلوبت/ث",
     "seconds": "{{value}} ث",
     "khz": "{{value}} كيلوهرتز",
-    "hz": "{{value}} هرتز"
+    "hz": "{{value}} هرتز",
+    "gpu": "بطاقة الرسومات"
   },
   "settings": {
     "title": "الإعدادات",
@@ -130,45 +132,34 @@
     "seekStep": "التقديم والرجوع",
     "seekStepValue": "{{seconds}} ث",
     "resume": "الاستئناف من اللحظة نفسها",
-    "resumeHint": "يكمل الفيديو من حيث توقف في المتصفح.",
     "fullscreenOnCast": "ملء الشاشة مع كل بث",
-    "fullscreenOnCastHint": "تنتقل النافذة إلى ملء الشاشة فور وصول فيديو.",
     "alwaysOnTop": "إبقاء النافذة في المقدمة",
-    "alwaysOnTopHint": "مفيد للمشاهدة في زاوية من الشاشة.",
     "model": "النموذج الافتراضي",
     "force": "رفع الدقة دائمًا",
-    "forceHint": "حتى عندما يكون الفيديو بحجم النافذة: يضاعف ArtCNN الدقة، ثم تُعاد الصورة إلى حجم الشاشة أوضح وبتشويش أقل.",
     "scale": "المقياس",
-    "scaleHint": "يضيف «تلقائي» تمريرة ثانية (×4) عندما تبقى الشاشة أكبر بكثير، مثل فيديو 540p في وضع ملء الشاشة على شاشة 4K.",
     "maxHeight": "أقصى جودة للمصدر",
-    "maxHeightHint": "يُطبَّق على YouTube وX والمواقع التي يقرؤها yt-dlp.",
     "deband": "تنعيم التدرجات",
-    "debandHint": "يزيل أشرطة الألوان من البث شديد الضغط.",
     "subLangs": "لغات الترجمة",
     "subLangsHint": "رموز مفصولة بفواصل، مثل ar,en. فارغ: لا تُفعَّل تلقائيًا أبدًا.",
     "autoSubs": "إضافة الترجمة التلقائية",
-    "autoSubsHint": "YouTube: ترجمة تنشئها المنصة.",
     "subScale": "حجم الترجمة",
     "audioLangs": "لغات الصوت المفضلة",
     "audioLangsHint": "رموز مفصولة بفواصل، مثل ja,ar.",
     "hwdec": "فك الترميز ببطاقة الرسومات",
-    "hwdecHint": "أوقفه إذا ظهرت تشوهات في الصورة.",
     "port": "منفذ الإضافة",
-    "portHint": "المنفذ نفسه في الإضافة وهنا.",
     "mpvPath": "مسار mpv",
     "ytdlpPath": "مسار yt-dlp",
-    "pathAuto": "فارغ: تلقائي",
-    "pathAutoFound": "فارغ: تلقائي ({{path}})",
+    "pathAuto": "تلقائي",
     "updateYtdlp": "تحديث yt-dlp",
     "updating": "جارٍ التحديث…",
-    "resetModels": "تجهيز النماذج من جديد",
-    "resetModelsHint": "افعل ذلك إذا تجمّدت الصورة طويلًا عند تبديل النموذج.",
-    "resetModelsDone": "ستُجهَّز النماذج عند التشغيل التالي.",
     "error": "خطأ: {{message}}",
     "restartNote": "تُطبَّق بعض التغييرات عند التشغيل التالي.",
     "cancel": "إلغاء",
     "save": "حفظ",
-    "portBusy": "المنفذ {{port}} يستخدمه برنامج آخر: اختر منفذًا آخر هنا وفي الإضافة."
+    "portBusy": "المنفذ {{port}} يستخدمه برنامج آخر: اختر منفذًا آخر هنا وفي الإضافة.",
+    "theme": "السمة",
+    "sectionUpdates": "التحديثات",
+    "sectionAbout": "حول"
   },
   "errors": {
     "generic": "تعذّر التشغيل: {{reason}}",
@@ -182,20 +173,17 @@
     "private": "فيديو خاص أو مخصص للأعضاء فقط."
   },
   "install": {
-    "title": "تثبيت إضافة NetsuCast",
     "close": "إغلاق",
     "browser": "المتصفح",
     "searching": "جارٍ البحث عن المتصفحات…",
     "noBrowser": "لم يُعثر على متصفح متوافق.",
-    "notSupported": "غير مدعوم بعد",
     "open": "فتح {{browser}}",
     "reopen": "إعادة فتح {{browser}}",
     "step1": "فعّل «{{dev}}» ({{where}}).",
     "step2": "انقر على «{{load}}».",
-    "step3": "في النافذة التي تُفتح، الصق المسار (Ctrl+V) في شريط العنوان بالأعلى، واضغط Enter، ثم انقر على «{{select}}».",
+    "step3": "الصق المسار (Ctrl+V) في شريط العنوان، ثم انقر على «{{select}}».",
     "waiting": "NetsuCast في انتظار الإضافة…",
     "done": "تم",
-    "installed": "تم تثبيت الإضافة. يظهر زر NetsuCast الآن على الفيديوهات.",
     "copy": "نسخ المسار",
     "copied": "تم النسخ",
     "devMode": "وضع مطوّر البرامج",
@@ -204,7 +192,6 @@
     "whereTopRight": "في الأعلى على اليسار",
     "whereLeftBottom": "في القائمة اليمنى، في الأسفل",
     "selectFolder": "تحديد مجلد",
-    "whyManual": "لا تسمح المتصفحات للإضافة بتثبيت نفسها: هذه النقرات الثلاث مطلوبة مرة واحدة فقط.",
     "devModeEdge": "وضع المطوّر"
   },
   "keys": {
@@ -212,9 +199,63 @@
     "escape": "Esc"
   },
   "update": {
-    "available": "يتوفر NetsuCast {{version}}.",
-    "install": "تثبيت التحديث",
-    "installing": "جارٍ التثبيت… {{percent}}%",
-    "failed": "تعذّر تثبيت التحديث. حاول مرة أخرى لاحقًا."
+    "action": "تحديث",
+    "auto": "التحقق التلقائي",
+    "autoInstall": "التحديث التلقائي عند التشغيل",
+    "idle": "الإصدار {{version}}",
+    "checking": "جارٍ البحث عن تحديث…",
+    "available": "الإصدار {{version}} متاح",
+    "downloading": "جارٍ التنزيل والتحقق…",
+    "downloaded": "التحديث جاهز للتثبيت",
+    "installing": "جارٍ التثبيت…",
+    "failed": "فشل التحقق",
+    "current": "NetsuCast محدَّث",
+    "check": "التحقق",
+    "download": "تنزيل",
+    "restart": "إعادة التشغيل والتثبيت",
+    "history": "الجديد في كل إصدار",
+    "whatsNew": "الجديد في الإصدار {{version}}",
+    "gotIt": "لنبدأ",
+    "kind": {
+      "feature": "الجديد",
+      "improvement": "التحسينات",
+      "performance": "الأداء",
+      "fix": "الإصلاحات"
+    },
+    "staged": "الإصدار {{version}} جاهز: سيُثبَّت عند التشغيل التالي"
+  },
+  "themes": {
+    "dark": "داكن",
+    "midnight": "منتصف الليل",
+    "blue": "أزرق ليلي",
+    "graphite": "جرافيت",
+    "forest": "غابة",
+    "ember": "جمر",
+    "plum": "برقوقي",
+    "contrast": "تباين عالٍ",
+    "light": "فاتح",
+    "softLight": "فاتح هادئ",
+    "paper": "ورقي"
+  },
+  "compare": {
+    "toggle": "المقارنة قبل وبعد",
+    "needsUpscale": "متاح عندما يكون رفع الدقة نشطًا",
+    "before": "قبل",
+    "after": "بعد · {{model}}",
+    "handle": "خط المقارنة",
+    "handleValue": "قبل: {{percent}}%"
+  },
+  "header": {
+    "discord": "خادم Discord",
+    "support": "دعم NetsuCast"
+  },
+  "about": {
+    "communityTitle": "المجتمع",
+    "discord": "الانضمام إلى الخادم",
+    "supportTitle": "الدعم",
+    "sponsors": "الرعاية عبر GitHub",
+    "coffee": "إهداء فنجان قهوة",
+    "legal": "© 2026 Haim Faraj · يُوزَّع NetsuCast بموجب GNU AGPL v3.0-only · بلا أي ضمان.",
+    "source": "الشيفرة المصدرية"
   }
 }

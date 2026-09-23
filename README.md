@@ -25,7 +25,7 @@ services stay in the browser.
 
 | From | What happens |
 |---|---|
-| The **NetsuCast** button shown over any video on hover (iframes included) | Casts that video and pauses it in the page |
+| The cast icon shown in the top-left corner of any video on hover (iframes included); it opens into a **NetsuCast** button | Casts that video and pauses it in the page |
 | The extension icon, or <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> | Casts the main video of the tab |
 | Right-click on the icon, *Choose the stream to cast…* | Lists the streams the extension saw in the tab |
 | A link pasted on the home screen, or a file dropped on the window | Plays it directly |
@@ -48,7 +48,10 @@ it open something.
 ## Upscaling
 
 Four ArtCNN models ship with the app: **C4F16**, **C4F16 DS**, **C4F32** and **C4F32 DS** (the
-DS variants also denoise and sharpen). C4F32 DS is the default.
+DS variants also denoise and sharpen). The default, **Auto**, reads the graphics card: C4F32 DS on
+a discrete card, C4F16 DS on an integrated one. While a video plays, if the GPU spends more than
+90 % of each frame on rendering for five seconds, or frames drop, Auto steps down to C4F16 DS and
+says so.
 
 - **Always upscale** (on by default): ArtCNN runs even when the video already fills the window;
   the ×2 picture is then scaled back to the screen, which cleans up compression.
@@ -57,11 +60,14 @@ DS variants also denoise and sharpen). C4F32 DS is the default.
 - The **Details** panel (<kbd>I</kbd>) shows what the GPU actually ran, read from mpv's render
   pass statistics: source, codec, bitrate, buffer, the ArtCNN factor, its cost in ms per frame,
   the frame budget and dropped frames.
+- Its **Compare** button (<kbd>B</kbd>) splits the picture: the source on the left, enlarged with
+  a bicubic filter, ArtCNN on the right. Drag the line, or move it with the arrow keys.
 
 mpv renders through Vulkan. Direct3D 11 took several minutes to compile one ArtCNN model and
 could land on the integrated GPU of a hybrid laptop; Vulkan picks the discrete GPU and compiles in
-seconds. The first launch still prepares each model once behind the home screen, and mpv's shader
-cache keeps the result.
+seconds. The first launch still prepares the model in use once behind the home screen (with Auto,
+its lighter fallback too); the other models are prepared the first time they are picked. mpv's
+shader cache keeps the result, and the models are prepared again after a new card or driver.
 
 ## Player
 
@@ -76,6 +82,7 @@ cache keeps the result.
 | <kbd>C</kbd> | Next subtitle track |
 | <kbd>U</kbd> | Next upscale model |
 | <kbd>I</kbd> | Details panel |
+| <kbd>B</kbd> | Compare before and after (while ArtCNN runs) |
 | <kbd>Shift</kbd>+<kbd>I</kbd> | mpv statistics overlay |
 | <kbd>H</kbd> | Back to the home screen |
 
@@ -88,10 +95,12 @@ for yt-dlp sources) and speed from 0.5× to 2×.
 | Section | Settings |
 |---|---|
 | Playback | Skip length (5, 10, 15, 30 s) · resume at the browser's position · full screen on every cast · keep the window on top · decode with the graphics card |
-| Upscale | Default model · always upscale · scale · maximum source quality · smooth gradients (debanding) |
+| Upscale | Default model (Auto or one of the four) · always upscale · scale · maximum source quality · smooth gradients (debanding) |
 | Subtitles and audio | Subtitle languages · YouTube's automatic subtitles · subtitle size · preferred audio languages |
-| Interface | Language, or the system's |
-| Advanced | Extension port · mpv and yt-dlp paths · update yt-dlp · prepare the models again |
+| Interface | Theme (dark, midnight, navy, graphite, forest, ember, plum, high contrast, light, soft light, paper) · language, or the system's |
+| Advanced | Extension port · mpv and yt-dlp paths |
+| Updates | Check automatically · update automatically at launch · update yt-dlp · what's new, by version |
+| About | Version · Discord server · GitHub Sponsors · Buy Me a Coffee · licence and source |
 
 </details>
 
@@ -100,13 +109,22 @@ Spanish, German, Italian, Brazilian Portuguese, Dutch, Polish, Russian, Ukrainia
 Japanese, Korean, Simplified and Traditional Chinese, Arabic and Hebrew. Arabic and Hebrew
 render right to left, except the seek bar and times.
 
+## Updates
+
+A few seconds after launch, NetsuCast looks for a newer release on GitHub. By default it
+downloads it in the background and installs it at the next launch, before anything plays; the
+update icon in the corner installs it right away instead. The installer is checked against the
+updater's signing key when it downloads and again right before it runs. Settings ▸ Updates can
+turn the automatic install off (then one click downloads, a second one restarts) or the check
+itself. After an update, the new version's changes show once.
+
 ## Installing the extension
 
 Chromium browsers only: Chrome, Edge, Brave, Opera, Opera GX, Vivaldi and Chromium. Firefox is
-listed but not supported, since it installs signed add-ons only.
+left out: it installs signed add-ons only.
 
 The home screen has an **Install the extension** button. It opens the chosen browser's extensions
-page and copies the folder path; three clicks remain (developer mode, *Load unpacked*, paste the
+page (the browser list shows when several are installed) and copies the folder path; three clicks remain (developer mode, *Load unpacked*, paste the
 path), because browsers do not let an extension install itself. The player notices when the
 extension is in.
 
@@ -129,6 +147,10 @@ versioning, updater signing and the release workflow, and
 text changes follow [DESIGN.md](DESIGN.md).
 
 ## Contributing
+
+Questions and help: the [Discord server](https://discord.gg/Vq7K6mWNX5), shared with NetsuRush and
+NetsuBoard. Support: [GitHub Sponsors](https://github.com/sponsors/NetsumaInfo) or
+[Buy Me a Coffee](https://buymeacoffee.com/netsuma).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md). Security
 issues: [SECURITY.md](SECURITY.md).

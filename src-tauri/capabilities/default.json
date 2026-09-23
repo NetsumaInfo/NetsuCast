@@ -13,7 +13,6 @@
     "mpv:default",
     "opener:allow-reveal-item-in-dir",
     "core:window:allow-set-always-on-top",
-    "updater:default",
-    "process:allow-restart"
+    "updater:default"
   ]
 }

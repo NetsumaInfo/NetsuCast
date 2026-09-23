@@ -27,13 +27,13 @@
   "dependencies": {
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
-    "@tauri-apps/plugin-process": "^2",
     "@tauri-apps/plugin-updater": "^2",
     "i18next": "^26.4.2",
     "lucide-react": "^1.47.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-i18next": "^17.0.15",
+    "simple-icons": "^16.32.0",
     "tauri-plugin-mpv-api": "0.5.2"
   },
   "devDependencies": {

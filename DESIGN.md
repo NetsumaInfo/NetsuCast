@@ -50,7 +50,12 @@ user will see. Keep it short: a rule nobody follows is noise. -->
   demand and disappear. Minimal: one accent, no decoration.
 - Looks like: mpv, IINA, the YouTube player chrome. Does not look like: a dashboard, a gaming
   overlay, glowing neon.
-- Density: compact. Theme: dark only (reason: video in a dim room; the picture must dominate).
+- Density: compact. Themes: "Dark" by default (reason: video in a dim room; the picture must
+  dominate), plus the ten other palettes of NetsuRush (the user's choice, 2026-09-23): midnight,
+  navy, graphite, forest, ember, plum, high contrast, light, soft light, paper. Switched with
+  `data-theme` on `<html>`; `scripts/make-themes.mjs` derives each palette's tokens and tunes them
+  until every pair passes. The player chrome over the video (`.on-video`) stays dark in the
+  light themes.
 - Fonts: Segoe UI Variable, then the system stack (reason: native Windows app, nothing to load).
 - Colors: tokens in `src/index.css` `@theme`. Accent blue (the user's choice, 2026-09-23):
   `accent` #2F6FE0 for fills with white ink (4.70), `accent-text` #4C8DFF for text, icons and
@@ -62,8 +67,9 @@ user will see. Keep it short: a rule nobody follows is noise. -->
 - Icons: lucide-react, 1.75 stroke, 16 to 20 px. One library only.
 - Motion: minimal. 120 to 180 ms on opacity, colour and transform. Reduced motion keeps the
   feedback and drops the movement.
-- Custom tooltips (dark raised chip, shortcut in muted text) and thin scrollbars; never the
-  native ones.
+- Custom tooltips (raised chip, shortcut in muted text), selects (`SelectInput`, a listbox) and
+  thin scrollbars; never the native ones. The extension's cast button has its own tooltip in the
+  same style.
 
 ## Components
 

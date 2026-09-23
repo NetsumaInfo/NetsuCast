@@ -52,6 +52,10 @@ type Props = {
   openMenu: string | null;
   setOpenMenu: (id: string | null) => void;
   onModel: (m: Model) => void;
+  /** Auto model on, and the model it resolves to on this card. */
+  auto: boolean;
+  autoTarget: Model;
+  onAuto: () => void;
   onScale: (s: UpscaleScale) => void;
   onQuality: (h: number) => void;
   onInfo: () => void;
@@ -118,7 +122,7 @@ export function Controls(p: Props) {
                 ? "bg-accent/20 text-accent-text hover:bg-accent/30"
                 : up.status === "preparing"
                   ? "bg-warning/15 text-warning"
-                  : "bg-white/8 text-ink-muted hover:bg-white/12"
+                  : "bg-ink/8 text-ink-muted hover:bg-ink/12"
             }`}
           >
             {modelName(p.upscale.model)}
@@ -175,10 +179,16 @@ export function Controls(p: Props) {
           emptyText={t("player.nothing")}
           icon={<Sparkles {...ICON} />}
           items={[
+            {
+              key: "auto",
+              label: t("models.auto", { model: modelName(p.autoTarget) }),
+              active: p.auto,
+              onSelect: p.onAuto,
+            },
             ...MODELS.map((m) => ({
               key: m,
               label: modelLabel(t, m),
-              active: p.upscale.model === m,
+              active: !p.auto && p.upscale.model === m,
               onSelect: () => p.onModel(m),
             })),
             ...(["auto", "x2"] as const).map((s) => ({

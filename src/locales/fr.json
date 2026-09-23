@@ -2,18 +2,17 @@
   "welcome": {
     "tagline": "Lecteur vidéo avec upscale IA en temps réel.",
     "castTitle": "Caster depuis ton navigateur",
-    "castBody": "Survole une vidéo dans ton navigateur et clique sur NetsuCast, ou utilise l'icône de l'extension (Alt+Maj+C). La vidéo se met en pause là-bas et continue ici.",
+    "castBody": "Survole une vidéo dans ton navigateur et clique sur NetsuCast.",
     "installExtension": "Installer l'extension",
     "extensionInstalled": "Extension installée",
     "installOtherBrowser": "Installer dans un autre navigateur",
     "openLink": "Ouvrir un lien",
     "play": "Lire",
-    "dropHint": "Tu peux aussi glisser un fichier vidéo dans la fenêtre.",
+    "dropHint": "Ou glisse un fichier vidéo dans la fenêtre.",
     "mpvErrorTitle": "Le lecteur n'a pas démarré",
     "mpvErrorHint": "Lance run.bat puis « Install / update player tools », ou indique le chemin de mpv dans les paramètres.",
     "mpvMissing": "mpv.exe introuvable.",
-    "warmupTitle": "Préparation des modèles d'upscale ({{index}}/{{total}}) : {{model}}",
-    "warmupBody": "Une seule fois : ensuite, changer de modèle est quasi instantané. Tu peux déjà lancer une vidéo."
+    "warmupTitle": "Préparation de {{model}} ({{index}}/{{total}})…"
   },
   "player": {
     "home": "Accueil",
@@ -41,10 +40,12 @@
     "badgePreparing": "préparation…",
     "badgeInactive": "inactif",
     "badgeTip": "Voir l'entrée, l'upscale et la sortie",
-    "preparingModel": "Préparation de {{model}}… (première fois seulement)",
-    "dismiss": "Fermer"
+    "preparingModel": "Préparation de {{model}}…",
+    "dismiss": "Fermer",
+    "autoStepDown": "La carte graphique ne suivait pas : passage de {{from}} à {{to}}."
   },
   "models": {
+    "auto": "Auto · {{model}}",
     "off": "Désactivé",
     "C4F16": "C4F16 · rapide",
     "C4F16_DS": "C4F16 DS · rapide, débruité",
@@ -66,7 +67,7 @@
     "title": "Informations",
     "source": "Source",
     "type": "Type",
-    "kindPage": "page web, lue par yt-dlp",
+    "kindPage": "page web",
     "kindStream": "flux direct",
     "kindFile": "fichier local",
     "origin": "Origine",
@@ -115,7 +116,8 @@
     "kbps": "{{value}} kb/s",
     "seconds": "{{value}} s",
     "khz": "{{value}} kHz",
-    "hz": "{{value}} Hz"
+    "hz": "{{value}} Hz",
+    "gpu": "Carte graphique"
   },
   "settings": {
     "title": "Paramètres",
@@ -130,45 +132,34 @@
     "seekStep": "Saut avant et arrière",
     "seekStepValue": "{{seconds}} s",
     "resume": "Reprendre au même moment",
-    "resumeHint": "La vidéo continue là où elle en était dans le navigateur.",
     "fullscreenOnCast": "Plein écran à chaque cast",
-    "fullscreenOnCastHint": "La fenêtre passe en plein écran dès qu'une vidéo arrive.",
     "alwaysOnTop": "Garder la fenêtre au premier plan",
-    "alwaysOnTopHint": "Utile pour regarder dans un coin de l'écran.",
     "model": "Modèle par défaut",
     "force": "Toujours upscaler",
-    "forceHint": "Même quand la vidéo a déjà la taille de la fenêtre : ArtCNN double la résolution puis l'image est ramenée à l'écran, plus nette et moins bruitée.",
     "scale": "Échelle",
-    "scaleHint": "Auto ajoute une seconde passe (×4) quand l'écran reste bien plus grand, par exemple une vidéo 540p en plein écran 4K.",
     "maxHeight": "Qualité source max",
-    "maxHeightHint": "Pour YouTube, X et les sites lus par yt-dlp.",
     "deband": "Lisser les dégradés",
-    "debandHint": "Retire les bandes de couleur des flux très compressés.",
     "subLangs": "Langues des sous-titres",
     "subLangsHint": "Codes séparés par des virgules, par exemple fr,en. Vide : jamais activés d'office.",
     "autoSubs": "Ajouter les sous-titres automatiques",
-    "autoSubsHint": "YouTube : sous-titres générés par la plateforme.",
     "subScale": "Taille des sous-titres",
     "audioLangs": "Langues audio préférées",
     "audioLangsHint": "Codes séparés par des virgules, par exemple ja,fr.",
     "hwdec": "Décoder avec la carte graphique",
-    "hwdecHint": "Désactive si l'image montre des artefacts.",
     "port": "Port de l'extension",
-    "portHint": "Le même dans l'extension et ici.",
     "mpvPath": "Chemin de mpv",
     "ytdlpPath": "Chemin de yt-dlp",
-    "pathAuto": "Vide : automatique",
-    "pathAutoFound": "Vide : automatique ({{path}})",
+    "pathAuto": "Automatique",
     "updateYtdlp": "Mettre à jour yt-dlp",
     "updating": "Mise à jour…",
-    "resetModels": "Préparer à nouveau les modèles",
-    "resetModelsHint": "À faire si l'image se fige longtemps au changement de modèle.",
-    "resetModelsDone": "Les modèles seront préparés au prochain lancement.",
     "error": "Erreur : {{message}}",
     "restartNote": "Certains changements s'appliquent au prochain lancement.",
     "cancel": "Annuler",
     "save": "Enregistrer",
-    "portBusy": "Le port {{port}} est déjà pris par un autre programme : choisis-en un autre, ici et dans l'extension."
+    "portBusy": "Le port {{port}} est déjà pris par un autre programme : choisis-en un autre, ici et dans l'extension.",
+    "theme": "Thème",
+    "sectionUpdates": "Mises à jour",
+    "sectionAbout": "À propos"
   },
   "errors": {
     "generic": "Lecture impossible : {{reason}}",
@@ -182,20 +173,17 @@
     "private": "Vidéo privée ou réservée aux membres."
   },
   "install": {
-    "title": "Installer l'extension NetsuCast",
     "close": "Fermer",
     "browser": "Navigateur",
     "searching": "Recherche des navigateurs…",
     "noBrowser": "Aucun navigateur compatible trouvé.",
-    "notSupported": "pas encore pris en charge",
     "open": "Ouvrir {{browser}}",
     "reopen": "Rouvrir {{browser}}",
     "step1": "Active « {{dev}} » ({{where}}).",
     "step2": "Clique sur « {{load}} ».",
-    "step3": "Dans la fenêtre qui s'ouvre, colle le chemin (Ctrl+V) dans la barre d'adresse en haut, appuie sur Entrée, puis clique sur « {{select}} ».",
+    "step3": "Colle le chemin (Ctrl+V) dans la barre d'adresse, puis clique sur « {{select}} ».",
     "waiting": "NetsuCast attend l'extension…",
     "done": "Terminé",
-    "installed": "Extension installée. Le bouton NetsuCast apparaît maintenant sur les vidéos.",
     "copy": "Copier le chemin",
     "copied": "Copié",
     "devMode": "Mode développeur",
@@ -204,7 +192,6 @@
     "whereTopRight": "en haut à droite",
     "whereLeftBottom": "dans le menu de gauche, en bas",
     "selectFolder": "Sélectionner un dossier",
-    "whyManual": "Les navigateurs interdisent d'installer une extension toute seule : ces trois clics sont à faire une fois.",
     "devModeEdge": "Mode développeur"
   },
   "keys": {
@@ -212,9 +199,63 @@
     "escape": "Échap"
   },
   "update": {
-    "available": "NetsuCast {{version}} est disponible.",
-    "install": "Installer la mise à jour",
-    "installing": "Installation… {{percent}} %",
-    "failed": "Impossible d'installer la mise à jour. Réessaie plus tard."
+    "action": "Mettre à jour",
+    "auto": "Vérification automatique",
+    "autoInstall": "Mise à jour automatique au lancement",
+    "idle": "Version {{version}}",
+    "checking": "Recherche d'une mise à jour…",
+    "available": "Version {{version}} disponible",
+    "downloading": "Téléchargement et vérification…",
+    "downloaded": "Mise à jour prête à installer",
+    "installing": "Installation…",
+    "failed": "La vérification a échoué",
+    "current": "NetsuCast est à jour",
+    "check": "Vérifier",
+    "download": "Télécharger",
+    "restart": "Redémarrer et installer",
+    "history": "Nouveautés par version",
+    "whatsNew": "Nouveautés de la version {{version}}",
+    "gotIt": "C'est parti",
+    "kind": {
+      "feature": "Nouveautés",
+      "improvement": "Améliorations",
+      "performance": "Performances",
+      "fix": "Corrections"
+    },
+    "staged": "Version {{version}} prête : elle s'installe au prochain lancement"
+  },
+  "themes": {
+    "dark": "Sombre",
+    "midnight": "Minuit",
+    "blue": "Bleu nuit",
+    "graphite": "Graphite",
+    "forest": "Forêt",
+    "ember": "Braise",
+    "plum": "Prune",
+    "contrast": "Contraste élevé",
+    "light": "Clair",
+    "softLight": "Clair doux",
+    "paper": "Papier"
+  },
+  "compare": {
+    "toggle": "Comparer avant et après",
+    "needsUpscale": "Disponible quand l'upscale est actif",
+    "before": "Avant",
+    "after": "Après · {{model}}",
+    "handle": "Ligne de comparaison",
+    "handleValue": "Avant : {{percent}} %"
+  },
+  "header": {
+    "discord": "Serveur Discord",
+    "support": "Soutenir NetsuCast"
+  },
+  "about": {
+    "communityTitle": "Communauté",
+    "discord": "Rejoindre le serveur",
+    "supportTitle": "Soutenir",
+    "sponsors": "Devenir sponsor GitHub",
+    "coffee": "Offrir un café",
+    "legal": "© 2026 Haim Faraj · NetsuCast est distribué sous GNU AGPL v3.0-only · Sans garantie.",
+    "source": "Code source"
   }
 }

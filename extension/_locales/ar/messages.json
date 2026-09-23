@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "قيد التشغيل في NetsuCast ✓"
   },
-  "castButtonTitle": {
-    "message": "متابعة هذا الفيديو في NetsuCast (رفع الدقة باستخدام ArtCNN)"
-  },
   "errNoVideo": {
     "message": "تعذّر العثور على الفيديو: مرّر المؤشر فوقه وانقر على زر NetsuCast الخاص به"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "بث الصفحة"
-  },
-  "popupHintPageSite": {
-    "message": "موصى به لهذا الموقع: يجلب yt-dlp أفضل جودة والترجمات."
-  },
-  "popupHintGeneric": {
-    "message": "يحاول yt-dlp العثور على الفيديو في الصفحة. إن لم ينجح، اختر بثًا من القائمة أدناه."
   },
   "popupNoPage": {
     "message": "لا توجد صفحة ويب في علامة التبويب هذه."

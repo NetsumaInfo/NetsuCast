@@ -1,0 +1,33 @@
+[
+  {
+    "id": "0.1.0",
+    "version": "0.1.0",
+    "date": "2026-09-24",
+    "title": {
+      "fr": "Première version",
+      "en": "First release"
+    },
+    "changes": [
+      {
+        "kind": "feature",
+        "fr": "Caste une vidéo du navigateur dans NetsuCast depuis le bouton posé sur chaque vidéo, et reprend au même moment.",
+        "en": "Cast a browser video to NetsuCast from the button on every video, and pick up at the same second."
+      },
+      {
+        "kind": "feature",
+        "fr": "Upscale ArtCNN en direct sur la carte graphique, avec quatre modèles et un choix automatique selon la carte.",
+        "en": "Live ArtCNN upscaling on the graphics card, with four models and an automatic choice based on the card."
+      },
+      {
+        "kind": "feature",
+        "fr": "Comparaison avant et après sur l'image, avec une ligne à déplacer.",
+        "en": "Before and after comparison on the picture, with a line to drag."
+      },
+      {
+        "kind": "feature",
+        "fr": "Onze thèmes, dix-sept langues, et des mises à jour signées qui se téléchargent seules et s'installent au lancement suivant.",
+        "en": "Eleven themes, seventeen languages, and signed updates that download on their own and install at the next launch."
+      }
+    ]
+  }
+]

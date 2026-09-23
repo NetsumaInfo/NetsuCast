@@ -23,8 +23,10 @@ export function InstallDialog({ extensionDir, installed, onClose }: Props) {
 
   useEffect(() => {
     invoke<Browser[]>("list_browsers").then((list) => {
-      setBrowsers(list);
-      setSelected(list.find((b) => b.supported)?.id ?? null);
+      // Browsers NetsuCast cannot install into (Firefox) are left out rather than shown greyed.
+      const supported = list.filter((b) => b.supported);
+      setBrowsers(supported);
+      setSelected(supported[0]?.id ?? null);
     });
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -75,7 +77,7 @@ export function InstallDialog({ extensionDir, installed, onClose }: Props) {
       >
         <div className="flex items-center justify-between ps-5 pe-2 pt-2">
           <h2 id="nc-install-title" className="text-base font-semibold text-ink">
-            {t("install.title")}
+            {t("welcome.installExtension")}
           </h2>
           <IconButton aria-label={t("install.close")} shortcut={t("keys.escape")} onClick={onClose}>
             <X size={17} strokeWidth={1.75} className="text-ink-muted" />
@@ -85,43 +87,44 @@ export function InstallDialog({ extensionDir, installed, onClose }: Props) {
         <div className="grid gap-5 px-5 pt-2 pb-5 text-sm">
           {installed && (
             <div role="status" className="flex items-center gap-2 rounded-control bg-success/10 px-3 py-2.5 text-success">
-              <Check size={16} strokeWidth={2} /> {t("install.installed")}
+              <Check size={16} strokeWidth={2} /> {t("welcome.extensionInstalled")}
             </div>
           )}
 
-          <fieldset>
-            <legend className="mb-2 text-xs font-medium text-ink-muted">{t("install.browser")}</legend>
-            {!browsers && (
-              <div className="flex items-center gap-2 text-ink-muted">
-                <LoaderCircle className="animate-spin" size={15} /> {t("install.searching")}
+          {/* One browser: the button names it, a list of one says nothing more. */}
+          {browsers?.length !== 1 && (
+            <fieldset>
+              <legend className="sr-only">{t("install.browser")}</legend>
+              {!browsers && (
+                <div className="flex items-center gap-2 text-ink-muted">
+                  <LoaderCircle className="animate-spin" size={15} /> {t("install.searching")}
+                </div>
+              )}
+              {browsers?.length === 0 && <div className="text-ink-muted">{t("install.noBrowser")}</div>}
+              <div className="grid gap-1.5">
+                {browsers?.map((b) => (
+                  <label
+                    key={b.id}
+                    className={`flex items-center gap-3 rounded-control border px-3 py-2 transition-colors ${
+                      selected === b.id ? "border-accent-text/70 bg-accent/10" : "border-line hover:bg-ink/5"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="browser"
+                      checked={selected === b.id}
+                      onChange={() => {
+                        setSelected(b.id);
+                        setOpened(false);
+                      }}
+                      className="accent-accent"
+                    />
+                    <span className="flex-1 text-ink">{b.name}</span>
+                  </label>
+                ))}
               </div>
-            )}
-            {browsers?.length === 0 && <div className="text-ink-muted">{t("install.noBrowser")}</div>}
-            <div className="grid gap-1.5">
-              {browsers?.map((b) => (
-                <label
-                  key={b.id}
-                  className={`flex items-center gap-3 rounded-control border px-3 py-2 transition-colors ${
-                    !b.supported ? "border-line opacity-50" : selected === b.id ? "border-accent-text/70 bg-accent/10" : "border-line hover:bg-white/5"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="browser"
-                    disabled={!b.supported}
-                    checked={selected === b.id}
-                    onChange={() => {
-                      setSelected(b.id);
-                      setOpened(false);
-                    }}
-                    className="accent-accent"
-                  />
-                  <span className="flex-1 text-ink">{b.name}</span>
-                  {!b.supported && <span className="text-xs text-ink-faint">{t("install.notSupported")}</span>}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+            </fieldset>
+          )}
 
           <button
             type="button"
@@ -153,19 +156,14 @@ export function InstallDialog({ extensionDir, installed, onClose }: Props) {
             </ol>
           )}
 
-          <div className="flex items-center gap-2 border-t border-line pt-4 text-xs">
+          <div className="flex items-center gap-2 border-t border-line pt-3 text-xs">
             <code dir="ltr" className="min-w-0 flex-1 truncate text-ink-faint" data-tip={extensionDir}>
               {extensionDir}
             </code>
-            <button
-              type="button"
-              onClick={copyPath}
-              className="flex shrink-0 items-center gap-1.5 rounded-control px-2 py-1 text-ink-muted transition-colors hover:bg-white/8 hover:text-ink"
-            >
-              {copied ? <Check size={14} /> : <ClipboardCopy size={14} strokeWidth={1.75} />} {copied ? t("install.copied") : t("install.copy")}
-            </button>
+            <IconButton aria-label={copied ? t("install.copied") : t("install.copy")} onClick={copyPath}>
+              {copied ? <Check size={15} className="text-success" /> : <ClipboardCopy size={15} strokeWidth={1.75} className="text-ink-muted" />}
+            </IconButton>
           </div>
-          <p className="text-xs text-ink-faint">{t("install.whyManual")}</p>
         </div>
       </div>
     </div>

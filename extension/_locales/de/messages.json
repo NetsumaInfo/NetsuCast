@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "Läuft in NetsuCast ✓"
   },
-  "castButtonTitle": {
-    "message": "Dieses Video in NetsuCast weiterschauen (Upscaling mit ArtCNN)"
-  },
   "errNoVideo": {
     "message": "Video nicht gefunden: Zeig mit der Maus auf das Video und klick auf den NetsuCast-Button"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "Seite streamen"
-  },
-  "popupHintPageSite": {
-    "message": "Empfohlen für diese Website: yt-dlp holt die beste Qualität und die Untertitel."
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlp sucht das Video auf der Seite. Klappt das nicht, wähl unten einen Stream aus."
   },
   "popupNoPage": {
     "message": "Keine Webseite in diesem Tab."

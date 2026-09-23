@@ -1,4 +1,4 @@
-import { cast, DEFAULT_PORT, getPort, isPageSite, ping } from "./common.js";
+import { cast, DEFAULT_PORT, getPort, ping } from "./common.js";
 
 const $ = (id) => document.getElementById(id);
 const t = (key, subs) => chrome.i18n.getMessage(key, subs);
@@ -44,7 +44,6 @@ if (!/^https?:/i.test(pageUrl)) {
   pageButton.disabled = true;
   $("page-hint").textContent = t("popupNoPage");
 } else {
-  $("page-hint").textContent = isPageSite(pageUrl) ? t("popupHintPageSite") : t("popupHintGeneric");
   pageButton.addEventListener("click", () => send({ url: pageUrl, kind: "page" }, pageButton));
 }
 

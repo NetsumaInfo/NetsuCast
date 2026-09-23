@@ -2,18 +2,17 @@
   "welcome": {
     "tagline": "AIがリアルタイムでアップスケールする動画プレーヤー。",
     "castTitle": "ブラウザーからキャスト",
-    "castBody": "ブラウザーで動画にカーソルを合わせてNetsuCastをクリックするか、拡張機能のアイコン（Alt+Shift+C）を使います。動画はブラウザーで一時停止し、ここで続きから再生されます。",
+    "castBody": "ブラウザーで動画にカーソルを合わせてNetsuCastをクリックします。",
     "installExtension": "拡張機能をインストール",
     "extensionInstalled": "拡張機能はインストール済み",
     "installOtherBrowser": "別のブラウザーにインストール",
     "openLink": "リンクを開く",
     "play": "再生",
-    "dropHint": "動画ファイルをウィンドウにドロップして開くこともできます。",
+    "dropHint": "または動画ファイルをウィンドウにドロップします。",
     "mpvErrorTitle": "プレーヤーを起動できませんでした",
     "mpvErrorHint": "run.batを実行して「Install / update player tools」を選ぶか、設定でmpvのパスを指定してください。",
     "mpvMissing": "mpv.exeが見つかりません。",
-    "warmupTitle": "アップスケールモデルを準備中（{{index}}/{{total}}）：{{model}}",
-    "warmupBody": "準備は最初の1回だけで、その後はモデルをほぼ瞬時に切り替えられます。動画はもう再生できます。"
+    "warmupTitle": "{{model}}を準備中（{{index}}/{{total}}）…"
   },
   "player": {
     "home": "ホーム",
@@ -41,10 +40,12 @@
     "badgePreparing": "準備中…",
     "badgeInactive": "未適用",
     "badgeTip": "入力・アップスケール・出力を表示",
-    "preparingModel": "{{model}}を準備中…（初回のみ）",
-    "dismiss": "閉じる"
+    "preparingModel": "{{model}}を準備中…",
+    "dismiss": "閉じる",
+    "autoStepDown": "グラフィックカードの処理が追いつかないため、{{from}}から{{to}}に切り替えました。"
   },
   "models": {
+    "auto": "自動 · {{model}}",
     "off": "オフ",
     "C4F16": "C4F16 · 高速",
     "C4F16_DS": "C4F16 DS · 高速、ノイズ除去",
@@ -66,7 +67,7 @@
     "title": "情報",
     "source": "ソース",
     "type": "種類",
-    "kindPage": "Webページ（yt-dlpで読み込み）",
+    "kindPage": "Webページ",
     "kindStream": "直接ストリーム",
     "kindFile": "ローカルファイル",
     "origin": "配信元",
@@ -115,7 +116,8 @@
     "kbps": "{{value}} kb/s",
     "seconds": "{{value}}秒",
     "khz": "{{value}} kHz",
-    "hz": "{{value}} Hz"
+    "hz": "{{value}} Hz",
+    "gpu": "グラフィックカード"
   },
   "settings": {
     "title": "設定",
@@ -130,45 +132,34 @@
     "seekStep": "スキップ間隔",
     "seekStepValue": "{{seconds}}秒",
     "resume": "同じ位置から再生する",
-    "resumeHint": "ブラウザーで見ていた位置から続けて再生します。",
     "fullscreenOnCast": "キャストのたびに全画面にする",
-    "fullscreenOnCastHint": "動画が届くとすぐにウィンドウが全画面になります。",
     "alwaysOnTop": "ウィンドウを常に手前に表示する",
-    "alwaysOnTopHint": "画面の隅で視聴するときに便利です。",
     "model": "既定のモデル",
     "force": "常にアップスケールする",
-    "forceHint": "動画がすでにウィンドウと同じサイズでも適用します。ArtCNNで解像度を2倍にしてから画面サイズに戻すので、よりくっきりしてノイズも減ります。",
     "scale": "倍率",
-    "scaleHint": "自動では、画面の方がまだずっと大きいときに2回目の処理（×4）を加えます。たとえば540pの動画を4Kの全画面で見る場合です。",
     "maxHeight": "ソース画質の上限",
-    "maxHeightHint": "YouTube、X、およびyt-dlpで読み込むサイトが対象です。",
     "deband": "グラデーションをなめらかにする",
-    "debandHint": "強く圧縮された映像に出る色の縞を取り除きます。",
     "subLangs": "字幕の言語",
     "subLangsHint": "言語コードをカンマ区切りで入力します（例：ja,en）。空欄の場合、字幕は自動でオンになりません。",
     "autoSubs": "自動生成の字幕も追加する",
-    "autoSubsHint": "YouTubeが自動で生成した字幕です。",
     "subScale": "字幕のサイズ",
     "audioLangs": "優先する音声の言語",
     "audioLangsHint": "言語コードをカンマ区切りで入力します（例：ja,en）。",
     "hwdec": "GPUでデコードする",
-    "hwdecHint": "映像にブロックノイズや乱れが出る場合はオフにしてください。",
     "port": "拡張機能のポート",
-    "portHint": "拡張機能とここで同じ番号にしてください。",
     "mpvPath": "mpvのパス",
     "ytdlpPath": "yt-dlpのパス",
-    "pathAuto": "空欄：自動",
-    "pathAutoFound": "空欄：自動（{{path}}）",
+    "pathAuto": "自動",
     "updateYtdlp": "yt-dlpを更新",
     "updating": "更新中…",
-    "resetModels": "モデルを準備し直す",
-    "resetModelsHint": "モデルの切り替え時に映像が長く止まる場合に実行してください。",
-    "resetModelsDone": "次回の起動時にモデルを準備します。",
     "error": "エラー：{{message}}",
     "restartNote": "一部の変更は次回の起動時に反映されます。",
     "cancel": "キャンセル",
     "save": "保存",
-    "portBusy": "ポート {{port}} は別のプログラムが使用しています。ここと拡張機能の両方で別のポートを選んでください。"
+    "portBusy": "ポート {{port}} は別のプログラムが使用しています。ここと拡張機能の両方で別のポートを選んでください。",
+    "theme": "テーマ",
+    "sectionUpdates": "アップデート",
+    "sectionAbout": "このアプリについて"
   },
   "errors": {
     "generic": "再生できません：{{reason}}",
@@ -182,20 +173,17 @@
     "private": "非公開またはメンバー限定の動画です。"
   },
   "install": {
-    "title": "NetsuCast拡張機能をインストール",
     "close": "閉じる",
     "browser": "ブラウザー",
     "searching": "ブラウザーを検索中…",
     "noBrowser": "対応するブラウザーが見つかりません。",
-    "notSupported": "未対応",
     "open": "{{browser}}を開く",
     "reopen": "{{browser}}をもう一度開く",
     "step1": "「{{dev}}」をオンにしてください（{{where}}）。",
     "step2": "「{{load}}」をクリックしてください。",
-    "step3": "開いたウィンドウで、上部のアドレスバーにパスを貼り付け（Ctrl+V）、Enterキーを押してから「{{select}}」をクリックしてください。",
+    "step3": "アドレスバーにパスを貼り付け（Ctrl+V）、「{{select}}」をクリックしてください。",
     "waiting": "NetsuCastが拡張機能を待っています…",
     "done": "完了",
-    "installed": "拡張機能をインストールしました。動画にNetsuCastボタンが表示されるようになりました。",
     "copy": "パスをコピー",
     "copied": "コピーしました",
     "devMode": "デベロッパー モード",
@@ -204,7 +192,6 @@
     "whereTopRight": "右上",
     "whereLeftBottom": "左側のメニューの一番下",
     "selectFolder": "フォルダーの選択",
-    "whyManual": "ブラウザーは拡張機能の自動インストールを許可していません。この3つの操作は最初の1回だけ必要です。",
     "devModeEdge": "開発者モード"
   },
   "keys": {
@@ -212,9 +199,63 @@
     "escape": "Esc"
   },
   "update": {
-    "available": "NetsuCast {{version}} を利用できます。",
-    "install": "アップデートをインストール",
-    "installing": "インストール中… {{percent}}%",
-    "failed": "アップデートをインストールできませんでした。後でもう一度お試しください。"
+    "action": "更新",
+    "auto": "自動確認",
+    "autoInstall": "起動時に自動でアップデート",
+    "idle": "バージョン{{version}}",
+    "checking": "アップデートを確認中…",
+    "available": "バージョン{{version}}を利用できます",
+    "downloading": "ダウンロードして検証中…",
+    "downloaded": "アップデートをインストールできます",
+    "installing": "インストール中…",
+    "failed": "確認できませんでした",
+    "current": "NetsuCastは最新です",
+    "check": "確認",
+    "download": "ダウンロード",
+    "restart": "再起動してインストール",
+    "history": "バージョンごとの新機能",
+    "whatsNew": "バージョン{{version}}の新機能",
+    "gotIt": "はじめる",
+    "kind": {
+      "feature": "新機能",
+      "improvement": "改善",
+      "performance": "パフォーマンス",
+      "fix": "修正"
+    },
+    "staged": "バージョン{{version}}の準備ができました。次回の起動時にインストールされます"
+  },
+  "themes": {
+    "dark": "ダーク",
+    "midnight": "ミッドナイト",
+    "blue": "ナイトブルー",
+    "graphite": "グラファイト",
+    "forest": "フォレスト",
+    "ember": "エンバー",
+    "plum": "プラム",
+    "contrast": "ハイコントラスト",
+    "light": "ライト",
+    "softLight": "ソフトライト",
+    "paper": "ペーパー"
+  },
+  "compare": {
+    "toggle": "ビフォー・アフターを比較",
+    "needsUpscale": "アップスケールの動作中に使えます",
+    "before": "ビフォー",
+    "after": "アフター · {{model}}",
+    "handle": "比較ライン",
+    "handleValue": "ビフォー：{{percent}}%"
+  },
+  "header": {
+    "discord": "Discordサーバー",
+    "support": "NetsuCastを支援"
+  },
+  "about": {
+    "communityTitle": "コミュニティ",
+    "discord": "サーバーに参加",
+    "supportTitle": "支援",
+    "sponsors": "GitHubでスポンサーになる",
+    "coffee": "コーヒーをおごる",
+    "legal": "© 2026 Haim Faraj · NetsuCastはGNU AGPL v3.0-onlyのもとで配布されています · 保証はありません。",
+    "source": "ソースコード"
   }
 }

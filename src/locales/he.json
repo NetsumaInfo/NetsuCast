@@ -2,18 +2,17 @@
   "welcome": {
     "tagline": "נגן וידאו עם אפסקיילינג בבינה מלאכותית בזמן אמת.",
     "castTitle": "הפעלת Cast מהדפדפן",
-    "castBody": "העבר את העכבר מעל סרטון בדפדפן ולחץ על NetsuCast, או השתמש בסמל התוסף (Alt+Shift+C). הסרטון נעצר שם וממשיך כאן.",
+    "castBody": "העבר את העכבר מעל סרטון בדפדפן ולחץ על NetsuCast.",
     "installExtension": "התקנת התוסף",
     "extensionInstalled": "התוסף מותקן",
     "installOtherBrowser": "התקנה בדפדפן אחר",
     "openLink": "פתיחת קישור",
     "play": "הפעלה",
-    "dropHint": "אפשר גם לגרור קובץ וידאו לחלון.",
+    "dropHint": "או גרור קובץ וידאו לחלון.",
     "mpvErrorTitle": "הנגן לא הופעל",
     "mpvErrorHint": "הפעל את run.bat ובחר \"Install / update player tools\", או הגדר את הנתיב של mpv בהגדרות.",
     "mpvMissing": "הקובץ mpv.exe לא נמצא.",
-    "warmupTitle": "הכנת מודלי אפסקיילינג ({{index}}/{{total}}): {{model}}",
-    "warmupBody": "רק פעם אחת: אחר כך החלפת מודל כמעט מיידית. אפשר כבר להפעיל סרטון."
+    "warmupTitle": "מכין את {{model}} ({{index}}/{{total}})…"
   },
   "player": {
     "home": "מסך הבית",
@@ -41,10 +40,12 @@
     "badgePreparing": "בהכנה…",
     "badgeInactive": "לא פעיל",
     "badgeTip": "הצגת קלט, אפסקיילינג ופלט",
-    "preparingModel": "מכין את {{model}}… (רק בפעם הראשונה)",
-    "dismiss": "סגירה"
+    "preparingModel": "מכין את {{model}}…",
+    "dismiss": "סגירה",
+    "autoStepDown": "כרטיס המסך לא עמד בקצב: בוצע מעבר מ-{{from}} ל-{{to}}."
   },
   "models": {
+    "auto": "אוטומטי · {{model}}",
     "off": "כבוי",
     "C4F16": "C4F16 · מהיר",
     "C4F16_DS": "C4F16 DS · מהיר, עם הפחתת רעש",
@@ -66,7 +67,7 @@
     "title": "פרטים",
     "source": "מקור",
     "type": "סוג",
-    "kindPage": "דף אינטרנט, נקרא על ידי yt-dlp",
+    "kindPage": "דף אינטרנט",
     "kindStream": "זרם ישיר",
     "kindFile": "קובץ מקומי",
     "origin": "מוצא",
@@ -115,7 +116,8 @@
     "kbps": "{{value}} kb/s",
     "seconds": "{{value}} שנ׳",
     "khz": "{{value}} kHz",
-    "hz": "{{value}} Hz"
+    "hz": "{{value}} Hz",
+    "gpu": "כרטיס מסך"
   },
   "settings": {
     "title": "הגדרות",
@@ -130,45 +132,34 @@
     "seekStep": "דילוג קדימה ואחורה",
     "seekStepValue": "{{seconds}} שנ׳",
     "resume": "המשך מאותו רגע",
-    "resumeHint": "הסרטון ממשיך מהמקום שבו עצר בדפדפן.",
     "fullscreenOnCast": "מסך מלא בכל הפעלת Cast",
-    "fullscreenOnCastHint": "החלון עובר למסך מלא ברגע שמגיע סרטון.",
     "alwaysOnTop": "החלון תמיד מעל",
-    "alwaysOnTopHint": "נוח לצפייה בפינת המסך.",
     "model": "מודל ברירת מחדל",
     "force": "אפסקיילינג תמיד",
-    "forceHint": "גם כשהסרטון כבר בגודל החלון: ArtCNN מכפיל את הרזולוציה, ואז התמונה מוקטנת חזרה לגודל המסך, חדה יותר ועם פחות רעש.",
     "scale": "קנה מידה",
-    "scaleHint": "\"אוטומטי\" מוסיף מעבר שני (×4) כשהמסך עדיין גדול בהרבה, למשל סרטון 540p במסך מלא 4K.",
     "maxHeight": "איכות מקור מקסימלית",
-    "maxHeightHint": "ל-YouTube, ל-X ולאתרים ש-yt-dlp קורא.",
     "deband": "החלקת מעברי צבע",
-    "debandHint": "מסיר פסי צבע בזרמים דחוסים מאוד.",
     "subLangs": "שפות כתוביות",
     "subLangsHint": "קודים מופרדים בפסיקים, למשל he,en. ריק: אף פעם לא מופעלות אוטומטית.",
     "autoSubs": "הוספת כתוביות אוטומטיות",
-    "autoSubsHint": "YouTube: כתוביות שהפלטפורמה יוצרת.",
     "subScale": "גודל הכתוביות",
     "audioLangs": "שפות שמע מועדפות",
     "audioLangsHint": "קודים מופרדים בפסיקים, למשל ja,he.",
     "hwdec": "פענוח בכרטיס המסך",
-    "hwdecHint": "כבה את האפשרות אם מופיעים עיוותים בתמונה.",
     "port": "יציאת התוסף",
-    "portHint": "אותה יציאה בתוסף וכאן.",
     "mpvPath": "הנתיב של mpv",
     "ytdlpPath": "הנתיב של yt-dlp",
-    "pathAuto": "ריק: אוטומטי",
-    "pathAutoFound": "ריק: אוטומטי ({{path}})",
+    "pathAuto": "אוטומטי",
     "updateYtdlp": "עדכון yt-dlp",
     "updating": "מעדכן…",
-    "resetModels": "הכנת המודלים מחדש",
-    "resetModelsHint": "כדאי לעשות זאת אם התמונה קופאת לזמן רב בהחלפת מודל.",
-    "resetModelsDone": "המודלים יוכנו בהפעלה הבאה.",
     "error": "שגיאה: {{message}}",
     "restartNote": "חלק מהשינויים ייכנסו לתוקף בהפעלה הבאה.",
     "cancel": "ביטול",
     "save": "שמירה",
-    "portBusy": "תוכנה אחרת כבר משתמשת בפורט {{port}}: יש לבחור פורט אחר, כאן ובתוסף."
+    "portBusy": "תוכנה אחרת כבר משתמשת בפורט {{port}}: יש לבחור פורט אחר, כאן ובתוסף.",
+    "theme": "ערכת נושא",
+    "sectionUpdates": "עדכונים",
+    "sectionAbout": "אודות"
   },
   "errors": {
     "generic": "לא ניתן להפעיל: {{reason}}",
@@ -182,20 +173,17 @@
     "private": "סרטון פרטי או לחברי ערוץ בלבד."
   },
   "install": {
-    "title": "התקנת התוסף NetsuCast",
     "close": "סגירה",
     "browser": "דפדפן",
     "searching": "מחפש דפדפנים…",
     "noBrowser": "לא נמצא דפדפן תואם.",
-    "notSupported": "עדיין לא נתמך",
     "open": "פתיחת {{browser}}",
     "reopen": "פתיחה מחדש של {{browser}}",
     "step1": "הפעל את \"{{dev}}\" ({{where}}).",
     "step2": "לחץ על \"{{load}}\".",
-    "step3": "בחלון שנפתח, הדבק את הנתיב (Ctrl+V) בשורת הכתובת למעלה, הקש Enter ואז לחץ על \"{{select}}\".",
+    "step3": "הדבק את הנתיב (Ctrl+V) בשורת הכתובת ואז לחץ על \"{{select}}\".",
     "waiting": "NetsuCast ממתין לתוסף…",
     "done": "סיום",
-    "installed": "התוסף מותקן. הלחצן NetsuCast מופיע עכשיו על סרטונים.",
     "copy": "העתקת הנתיב",
     "copied": "הועתק",
     "devMode": "מצב פיתוח",
@@ -204,7 +192,6 @@
     "whereTopRight": "למעלה משמאל",
     "whereLeftBottom": "בתפריט הימני, למטה",
     "selectFolder": "בחר תיקיה",
-    "whyManual": "דפדפנים לא מאפשרים לתוסף להתקין את עצמו: צריך לבצע את שלוש הלחיצות האלה פעם אחת בלבד.",
     "devModeEdge": "מצב מפתח"
   },
   "keys": {
@@ -212,9 +199,63 @@
     "escape": "Esc"
   },
   "update": {
-    "available": "NetsuCast {{version}} זמין.",
-    "install": "התקנת העדכון",
-    "installing": "מתקין… {{percent}}%",
-    "failed": "לא ניתן להתקין את העדכון. אפשר לנסות שוב מאוחר יותר."
+    "action": "עדכון",
+    "auto": "בדיקה אוטומטית",
+    "autoInstall": "עדכון אוטומטי בהפעלה",
+    "idle": "גרסה {{version}}",
+    "checking": "מחפש עדכון…",
+    "available": "גרסה {{version}} זמינה",
+    "downloading": "מוריד ומאמת…",
+    "downloaded": "העדכון מוכן להתקנה",
+    "installing": "מתקין…",
+    "failed": "הבדיקה נכשלה",
+    "current": "NetsuCast מעודכן",
+    "check": "בדיקה",
+    "download": "הורדה",
+    "restart": "הפעלה מחדש והתקנה",
+    "history": "מה חדש בכל גרסה",
+    "whatsNew": "מה חדש בגרסה {{version}}",
+    "gotIt": "מתחילים",
+    "kind": {
+      "feature": "חדש",
+      "improvement": "שיפורים",
+      "performance": "ביצועים",
+      "fix": "תיקונים"
+    },
+    "staged": "גרסה {{version}} מוכנה: היא תותקן בהפעלה הבאה"
+  },
+  "themes": {
+    "dark": "כהה",
+    "midnight": "חצות",
+    "blue": "כחול לילה",
+    "graphite": "גרפיט",
+    "forest": "יער",
+    "ember": "גחלים",
+    "plum": "שזיף",
+    "contrast": "ניגודיות גבוהה",
+    "light": "בהיר",
+    "softLight": "בהיר רך",
+    "paper": "נייר"
+  },
+  "compare": {
+    "toggle": "השוואה לפני ואחרי",
+    "needsUpscale": "זמין כשהאפסקיילינג פעיל",
+    "before": "לפני",
+    "after": "אחרי · {{model}}",
+    "handle": "קו ההשוואה",
+    "handleValue": "לפני: {{percent}}%"
+  },
+  "header": {
+    "discord": "שרת Discord",
+    "support": "תמיכה ב-NetsuCast"
+  },
+  "about": {
+    "communityTitle": "קהילה",
+    "discord": "הצטרפות לשרת",
+    "supportTitle": "תמיכה",
+    "sponsors": "מתן חסות ב-GitHub",
+    "coffee": "הזמנה לקפה",
+    "legal": "© 2026 Haim Faraj · NetsuCast מופץ תחת GNU AGPL v3.0-only · ללא אחריות.",
+    "source": "קוד מקור"
   }
 }

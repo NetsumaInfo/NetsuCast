@@ -2,18 +2,17 @@
   "welcome": {
     "tagline": "Videospeler met realtime AI-upscaling.",
     "castTitle": "Casten vanuit je browser",
-    "castBody": "Ga in je browser met de muis over een video en klik op NetsuCast, of gebruik het icoon van de extensie (Alt+Shift+C). De video pauzeert daar en speelt hier verder.",
+    "castBody": "Ga in je browser met de muis over een video en klik op NetsuCast.",
     "installExtension": "Extensie installeren",
     "extensionInstalled": "Extensie geïnstalleerd",
     "installOtherBrowser": "In een andere browser installeren",
     "openLink": "Link openen",
     "play": "Afspelen",
-    "dropHint": "Je kunt ook een videobestand naar het venster slepen.",
+    "dropHint": "Of sleep een videobestand naar het venster.",
     "mpvErrorTitle": "De speler is niet gestart",
     "mpvErrorHint": "Start run.bat en kies ‘Install / update player tools’, of geef het pad naar mpv op in de instellingen.",
     "mpvMissing": "mpv.exe niet gevonden.",
-    "warmupTitle": "Upscalemodellen voorbereiden ({{index}}/{{total}}): {{model}}",
-    "warmupBody": "Eenmalig: daarna wissel je bijna meteen van model. Je kunt al een video starten."
+    "warmupTitle": "{{model}} voorbereiden ({{index}}/{{total}})…"
   },
   "player": {
     "home": "Start",
@@ -41,10 +40,12 @@
     "badgePreparing": "voorbereiden…",
     "badgeInactive": "inactief",
     "badgeTip": "Invoer, upscaling en uitvoer bekijken",
-    "preparingModel": "{{model}} voorbereiden… (alleen de eerste keer)",
-    "dismiss": "Sluiten"
+    "preparingModel": "{{model}} voorbereiden…",
+    "dismiss": "Sluiten",
+    "autoStepDown": "De videokaart kon het niet bijhouden: overgeschakeld van {{from}} naar {{to}}."
   },
   "models": {
+    "auto": "Automatisch · {{model}}",
     "off": "Uit",
     "C4F16": "C4F16 · snel",
     "C4F16_DS": "C4F16 DS · snel, ontruist",
@@ -66,7 +67,7 @@
     "title": "Informatie",
     "source": "Bron",
     "type": "Type",
-    "kindPage": "webpagina, gelezen door yt-dlp",
+    "kindPage": "webpagina",
     "kindStream": "directe stream",
     "kindFile": "lokaal bestand",
     "origin": "Herkomst",
@@ -115,7 +116,8 @@
     "kbps": "{{value}} kbit/s",
     "seconds": "{{value}} s",
     "khz": "{{value}} kHz",
-    "hz": "{{value}} Hz"
+    "hz": "{{value}} Hz",
+    "gpu": "Videokaart"
   },
   "settings": {
     "title": "Instellingen",
@@ -130,45 +132,34 @@
     "seekStep": "Sprong vooruit en terug",
     "seekStepValue": "{{seconds}} s",
     "resume": "Verdergaan op hetzelfde moment",
-    "resumeHint": "De video gaat verder waar hij in de browser was.",
     "fullscreenOnCast": "Volledig scherm bij elke cast",
-    "fullscreenOnCastHint": "Het venster gaat naar volledig scherm zodra er een video binnenkomt.",
     "alwaysOnTop": "Venster altijd bovenaan houden",
-    "alwaysOnTopHint": "Handig om in een hoek van het scherm te kijken.",
     "model": "Standaardmodel",
     "force": "Altijd upscalen",
-    "forceHint": "Ook als de video al zo groot is als het venster: ArtCNN verdubbelt de resolutie en daarna wordt het beeld teruggeschaald naar het scherm, scherper en met minder ruis.",
     "scale": "Schaal",
-    "scaleHint": "Auto voegt een tweede ronde (×4) toe als het scherm nog steeds veel groter is, bijvoorbeeld een 540p-video op volledig scherm in 4K.",
     "maxHeight": "Maximale bronkwaliteit",
-    "maxHeightHint": "Voor YouTube, X en de sites die yt-dlp leest.",
     "deband": "Kleurverlopen gladstrijken",
-    "debandHint": "Haalt kleurbanden weg uit sterk gecomprimeerde streams.",
     "subLangs": "Talen van de ondertiteling",
     "subLangsHint": "Codes gescheiden door komma's, bijvoorbeeld nl,en. Leeg: nooit vanzelf aan.",
     "autoSubs": "Automatische ondertiteling toevoegen",
-    "autoSubsHint": "YouTube: ondertiteling gemaakt door het platform.",
     "subScale": "Grootte van de ondertiteling",
     "audioLangs": "Voorkeurstalen voor audio",
     "audioLangsHint": "Codes gescheiden door komma's, bijvoorbeeld ja,nl.",
     "hwdec": "Decoderen met de videokaart",
-    "hwdecHint": "Zet dit uit als het beeld artefacten toont.",
     "port": "Poort van de extensie",
-    "portHint": "Dezelfde in de extensie en hier.",
     "mpvPath": "Pad naar mpv",
     "ytdlpPath": "Pad naar yt-dlp",
-    "pathAuto": "Leeg: automatisch",
-    "pathAutoFound": "Leeg: automatisch ({{path}})",
+    "pathAuto": "Automatisch",
     "updateYtdlp": "yt-dlp bijwerken",
     "updating": "Bijwerken…",
-    "resetModels": "Modellen opnieuw voorbereiden",
-    "resetModelsHint": "Doe dit als het beeld lang bevriest bij het wisselen van model.",
-    "resetModelsDone": "De modellen worden bij de volgende start voorbereid.",
     "error": "Fout: {{message}}",
     "restartNote": "Sommige wijzigingen gelden pas bij de volgende start.",
     "cancel": "Annuleren",
     "save": "Opslaan",
-    "portBusy": "Poort {{port}} wordt al door een ander programma gebruikt: kies een andere, hier en in de extensie."
+    "portBusy": "Poort {{port}} wordt al door een ander programma gebruikt: kies een andere, hier en in de extensie.",
+    "theme": "Thema",
+    "sectionUpdates": "Updates",
+    "sectionAbout": "Over"
   },
   "errors": {
     "generic": "Kan niet afspelen: {{reason}}",
@@ -182,20 +173,17 @@
     "private": "Privévideo of alleen voor leden."
   },
   "install": {
-    "title": "NetsuCast-extensie installeren",
     "close": "Sluiten",
     "browser": "Browser",
     "searching": "Browsers zoeken…",
     "noBrowser": "Geen compatibele browser gevonden.",
-    "notSupported": "nog niet ondersteund",
     "open": "{{browser}} openen",
     "reopen": "{{browser}} opnieuw openen",
     "step1": "Zet ‘{{dev}}’ aan ({{where}}).",
     "step2": "Klik op ‘{{load}}’.",
-    "step3": "Plak in het venster dat opent het pad (Ctrl+V) in de adresbalk bovenaan, druk op Enter en klik dan op ‘{{select}}’.",
+    "step3": "Plak het pad (Ctrl+V) in de adresbalk en klik dan op ‘{{select}}’.",
     "waiting": "NetsuCast wacht op de extensie…",
     "done": "Klaar",
-    "installed": "Extensie geïnstalleerd. De NetsuCast-knop staat nu op video's.",
     "copy": "Pad kopiëren",
     "copied": "Gekopieerd",
     "devMode": "Ontwikkelaarsmodus",
@@ -204,7 +192,6 @@
     "whereTopRight": "rechtsboven",
     "whereLeftBottom": "in het menu links, onderaan",
     "selectFolder": "Map selecteren",
-    "whyManual": "Browsers laten een extensie zichzelf niet installeren: deze drie klikken zijn eenmalig.",
     "devModeEdge": "Ontwikkelaarsmodus"
   },
   "keys": {
@@ -212,9 +199,63 @@
     "escape": "Esc"
   },
   "update": {
-    "available": "NetsuCast {{version}} is beschikbaar.",
-    "install": "Update installeren",
-    "installing": "Installeren… {{percent}}%",
-    "failed": "De update kan niet worden geïnstalleerd. Probeer het later opnieuw."
+    "action": "Bijwerken",
+    "auto": "Automatische controle",
+    "autoInstall": "Automatisch bijwerken bij het starten",
+    "idle": "Versie {{version}}",
+    "checking": "Zoeken naar een update…",
+    "available": "Versie {{version}} beschikbaar",
+    "downloading": "Downloaden en controleren…",
+    "downloaded": "Update klaar om te installeren",
+    "installing": "Installeren…",
+    "failed": "De controle is mislukt",
+    "current": "NetsuCast is up-to-date",
+    "check": "Controleren",
+    "download": "Downloaden",
+    "restart": "Herstarten en installeren",
+    "history": "Nieuw per versie",
+    "whatsNew": "Nieuw in versie {{version}}",
+    "gotIt": "Aan de slag",
+    "kind": {
+      "feature": "Nieuw",
+      "improvement": "Verbeteringen",
+      "performance": "Prestaties",
+      "fix": "Oplossingen"
+    },
+    "staged": "Versie {{version}} staat klaar: die wordt bij de volgende start geïnstalleerd"
+  },
+  "themes": {
+    "dark": "Donker",
+    "midnight": "Middernacht",
+    "blue": "Nachtblauw",
+    "graphite": "Grafiet",
+    "forest": "Bos",
+    "ember": "Gloed",
+    "plum": "Pruim",
+    "contrast": "Hoog contrast",
+    "light": "Licht",
+    "softLight": "Zacht licht",
+    "paper": "Papier"
+  },
+  "compare": {
+    "toggle": "Voor en na vergelijken",
+    "needsUpscale": "Beschikbaar als upscaling actief is",
+    "before": "Voor",
+    "after": "Na · {{model}}",
+    "handle": "Vergelijkingslijn",
+    "handleValue": "Voor: {{percent}}%"
+  },
+  "header": {
+    "discord": "Discord-server",
+    "support": "NetsuCast steunen"
+  },
+  "about": {
+    "communityTitle": "Community",
+    "discord": "Lid worden van de server",
+    "supportTitle": "Steunen",
+    "sponsors": "GitHub-sponsor worden",
+    "coffee": "Op een koffie trakteren",
+    "legal": "© 2026 Haim Faraj · NetsuCast wordt verspreid onder GNU AGPL v3.0-only · Geen garantie.",
+    "source": "Broncode"
   }
 }

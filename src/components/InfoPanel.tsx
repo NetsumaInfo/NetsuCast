@@ -1,9 +1,9 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { X } from "lucide-react";
+import { SquareSplitHorizontal, X } from "lucide-react";
 import type { PlayerState } from "../hooks/usePlayer";
-import { readStreamInfo, type StreamInfo, type Upscale } from "../lib/player";
-import { qualityLabel, scaleLabel, type LoadTarget } from "../lib/types";
+import { setWantInfo, type Upscale } from "../lib/player";
+import { qualityLabel, scaleLabel, type Environment, type LoadTarget } from "../lib/types";
 import { modelName, summarize } from "../lib/upscaleInfo";
 import { IconButton } from "./ui";
 
@@ -15,10 +15,15 @@ type Props = {
   /** Source height cap requested from yt-dlp. */
   maxHeight: number;
   fullscreen: boolean;
+  env: Environment | null;
+  /** Before/after split on the picture. */
+  compare: boolean;
+  canCompare: boolean;
+  onCompare: () => void;
   onClose: () => void;
 };
 
-const res = (w: number, h: number) => (w && h ? `${w}×${h}` : "—");
+const res = (w: number, h: number) => `${w}×${h}`;
 
 function hostOf(url?: string) {
   if (!url) return "—";
@@ -30,19 +35,14 @@ function hostOf(url?: string) {
 }
 
 /** Source → input → ArtCNN → output, as mpv and the GPU report it. Toggled with ⓘ or I. */
-export function InfoPanel({ state, upscale, preparing, target, maxHeight, fullscreen, onClose }: Props) {
+export function InfoPanel({ state, upscale, preparing, target, maxHeight, fullscreen, env, compare, canCompare, onCompare, onClose }: Props) {
   const { t, i18n } = useTranslation();
-  const [info, setInfo] = useState<StreamInfo>({});
+  const info = state.info;
 
+  // netsucast.lua publishes the stream details only while the panel is open.
   useEffect(() => {
-    let alive = true;
-    const refresh = () => readStreamInfo().then((i) => alive && setInfo(i)).catch(() => {});
-    refresh();
-    const id = window.setInterval(refresh, 1000);
-    return () => {
-      alive = false;
-      window.clearInterval(id);
-    };
+    setWantInfo(true).catch(() => {});
+    return () => void setWantInfo(false).catch(() => {});
   }, []);
 
   const num = (value: number, digits = 0) =>
@@ -66,101 +66,124 @@ export function InfoPanel({ state, upscale, preparing, target, maxHeight, fullsc
     active: <span className="text-success">✓ {t("info.statusActive", { factor: s.factor })}</span>,
   }[s.status];
 
-  const kind = target ? { page: t("info.kindPage"), stream: t("info.kindStream"), file: t("info.kindFile") }[target.kind] : "—";
+  const kind = target ? { page: t("info.kindPage"), stream: t("info.kindStream"), file: t("info.kindFile") }[target.kind] : null;
+  // mpv's video-codec is a long description ("Alliance for Open Media AV1"): the track's short
+  // name reads better when the stream details have not arrived yet.
+  const codec = info.videoFormat ?? state.tracks.find((tr) => tr.type === "video" && tr.selected)?.codec ?? null;
+  const has = (v: unknown) => v !== undefined && v !== null && v !== "" && v !== 0;
+
+  // Rows with nothing to show are left out, and a block with no row at all goes with them:
+  // a column of dashes says nothing.
+  const blocks: { title: string; rows: [string, ReactNode | null, string?][] }[] = [
+    {
+      title: t("info.source"),
+      rows: [
+        [t("info.type"), kind],
+        [t("info.origin"), target?.url || info.path ? <bdi dir="ltr">{hostOf(target?.url ?? info.path)}</bdi> : null, target?.url ?? info.path],
+        [t("info.container"), info.fileFormat ?? null],
+        [t("info.hlsVariant"), has(info.hlsBitrate) ? rate(info.hlsBitrate) : null],
+        [t("info.requestedQuality"), target?.kind === "page" ? t("info.requestedQualityValue", { quality: qualityLabel(t, maxHeight) }) : null],
+        [t("info.buffer"), has(info.cacheDuration) ? t("info.seconds", { value: num(info.cacheDuration!) }) : null],
+        [t("info.network"), has(info.cacheSpeed) ? rate(info.cacheSpeed! * 8) : null],
+      ],
+    },
+    {
+      title: t("info.video"),
+      rows: [
+        [t("info.resolution"), state.videoWidth ? res(state.videoWidth, state.videoHeight) : null],
+        [t("info.codec"), codec],
+        [t("info.fps"), state.fps ? num(state.fps, state.fps % 1 ? 2 : 0) : null],
+        [t("info.bitrate"), has(info.videoBitrate) ? rate(info.videoBitrate) : null],
+        [t("info.pixelFormat"), vp.pixelformat ?? null],
+        [t("info.colors"), vp.primaries ? `${vp.primaries} · ${vp.gamma ?? "?"} · ${hdr ? "HDR" : "SDR"}` : null],
+        [t("info.decoding"), state.videoWidth ? (state.hwdec ? t("info.decodingGpu", { name: state.hwdec }) : t("info.decodingCpu")) : null],
+      ],
+    },
+    {
+      title: t("info.audio"),
+      rows: [
+        [t("info.codec"), info.audioCodec ?? null],
+        [t("info.channels"), ap["channel-count"] ? `${ap["channel-count"]} (${ap.channels ?? ""})` : null],
+        [t("info.sampleRate"), ap.samplerate ? t("info.khz", { value: num(ap.samplerate / 1000, 1) }) : null],
+        [t("info.bitrate"), has(info.audioBitrate) ? rate(info.audioBitrate) : null],
+        [t("info.language"), audioTrack?.lang ? audioTrack.lang.toUpperCase() : null],
+      ],
+    },
+    {
+      title: `${t("info.upscaleTitle")} ${upscale.model === "off" ? "" : modelName(upscale.model)}`,
+      rows: [
+        [t("info.state"), status],
+        [t("info.upscaled"), s.status === "active" ? res(s.upscaledWidth, s.upscaledHeight) : null],
+        [t("info.scale"), `${scaleLabel(t, upscale.scale, true)}${upscale.force ? ` · ${t("info.always")}` : ""}`],
+        [t("info.gpuCost"), gpu && s.status === "active" ? t("info.perFrame", { ms: num(gpu.artcnnMs, 1) }) : null],
+      ],
+    },
+    {
+      title: t("info.output"),
+      rows: [
+        [t("info.display"), state.displayWidth ? `${res(state.displayWidth, state.displayHeight)} (${fullscreen ? t("info.fullscreen") : t("info.window")})` : null],
+        [t("info.screen"), has(info.displayFps) ? t("info.hz", { value: num(info.displayFps!) }) : null],
+        [t("info.gpu"), env?.gpu?.name ?? null, env?.gpu?.name],
+        [t("info.renderer"), info.gpuContext ? (info.gpuContext.includes("vk") ? "Vulkan" : info.gpuContext) : null],
+        [
+          t("info.gpuTime"),
+          gpu ? (
+            <span className={frameBudget && gpu.frameMs > frameBudget * 0.8 ? "text-warning" : ""}>
+              {frameBudget
+                ? t("info.gpuTimeOf", { ms: num(gpu.frameMs, 1), budget: num(frameBudget) })
+                : t("info.perFrame", { ms: num(gpu.frameMs, 1) })}
+            </span>
+          ) : null,
+        ],
+        [t("info.dropped"), <span className={state.droppedFrames > 0 ? "text-warning" : ""}>{num(state.droppedFrames)}</span>],
+      ],
+    },
+  ];
 
   return (
     <aside
       aria-label={t("info.title")}
-      className="absolute top-14 end-4 bottom-24 z-30 flex w-80 animate-fade-in flex-col rounded-panel border border-line bg-page/92 text-xs shadow-overlay"
+      className="absolute top-14 end-4 z-30 flex max-h-[calc(100%-9.5rem)] w-80 animate-fade-in flex-col rounded-panel border border-line bg-page/92 text-xs shadow-overlay"
     >
-      <div className="flex items-center justify-between ps-4 pe-1.5 pt-1.5">
-        <span className="text-sm font-medium text-ink">{t("info.title")}</span>
+      <div className="flex items-center gap-0.5 ps-4 pe-1.5 pt-1.5">
+        <span className="flex-1 text-sm font-medium text-ink">{t("info.title")}</span>
+        <IconButton
+          aria-label={t("compare.toggle")}
+          shortcut="B"
+          active={compare}
+          disabled={!canCompare}
+          disabledReason={t("compare.needsUpscale")}
+          onClick={onCompare}
+        >
+          <SquareSplitHorizontal size={17} strokeWidth={1.75} />
+        </IconButton>
         <IconButton aria-label={t("player.dismiss")} onClick={onClose}>
           <X size={15} strokeWidth={1.75} className="text-ink-muted" />
         </IconButton>
       </div>
 
-      <div className="grid gap-4 overflow-y-auto px-4 pt-1 pb-4">
-        <Block title={t("info.source")}>
-          <Row label={t("info.type")}>{kind}</Row>
-          <Row label={t("info.origin")}>
-            <bdi dir="ltr">{hostOf(target?.url ?? info.path)}</bdi>
-          </Row>
-          <Row label={t("info.container")}>{info.fileFormat ?? "—"}</Row>
-          {info.hlsBitrate ? <Row label={t("info.hlsVariant")}>{rate(info.hlsBitrate)}</Row> : null}
-          {target?.kind === "page" && (
-            <Row label={t("info.requestedQuality")}>{t("info.requestedQualityValue", { quality: qualityLabel(t, maxHeight) })}</Row>
-          )}
-          <Row label={t("info.buffer")}>{info.cacheDuration != null ? t("info.seconds", { value: num(info.cacheDuration) }) : "—"}</Row>
-          <Row label={t("info.network")}>{rate(info.cacheSpeed ? info.cacheSpeed * 8 : undefined)}</Row>
-        </Block>
-
-        <Block title={t("info.video")}>
-          <Row label={t("info.resolution")}>{res(state.videoWidth, state.videoHeight)}</Row>
-          <Row label={t("info.codec")}>{info.videoFormat ?? (state.codec.split(" ")[0] || "—")}</Row>
-          <Row label={t("info.fps")}>{state.fps ? num(state.fps, state.fps % 1 ? 2 : 0) : "—"}</Row>
-          <Row label={t("info.bitrate")}>{rate(info.videoBitrate)}</Row>
-          <Row label={t("info.pixelFormat")}>{vp.pixelformat ?? "—"}</Row>
-          <Row label={t("info.colors")}>{vp.primaries ? `${vp.primaries} · ${vp.gamma ?? "?"} · ${hdr ? "HDR" : "SDR"}` : "—"}</Row>
-          <Row label={t("info.decoding")}>{state.hwdec ? t("info.decodingGpu", { name: state.hwdec }) : t("info.decodingCpu")}</Row>
-        </Block>
-
-        <Block title={t("info.audio")}>
-          <Row label={t("info.codec")}>{info.audioCodec ?? "—"}</Row>
-          <Row label={t("info.channels")}>{ap["channel-count"] ? `${ap["channel-count"]} (${ap.channels ?? ""})` : "—"}</Row>
-          <Row label={t("info.sampleRate")}>{ap.samplerate ? t("info.khz", { value: num(ap.samplerate / 1000, 1) }) : "—"}</Row>
-          <Row label={t("info.bitrate")}>{rate(info.audioBitrate)}</Row>
-          {audioTrack?.lang && <Row label={t("info.language")}>{audioTrack.lang.toUpperCase()}</Row>}
-        </Block>
-
-        <Block title={`${t("info.upscaleTitle")} ${upscale.model === "off" ? "" : modelName(upscale.model)}`}>
-          <Row label={t("info.state")}>{status}</Row>
-          <Row label={t("info.upscaled")}>{s.status === "active" ? res(s.upscaledWidth, s.upscaledHeight) : "—"}</Row>
-          <Row label={t("info.scale")}>
-            {scaleLabel(t, upscale.scale, true)}
-            {upscale.force ? ` · ${t("info.always")}` : ""}
-          </Row>
-          {gpu && s.status === "active" && <Row label={t("info.gpuCost")}>{t("info.perFrame", { ms: num(gpu.artcnnMs, 1) })}</Row>}
-        </Block>
-
-        <Block title={t("info.output")}>
-          <Row label={t("info.display")}>
-            {res(state.displayWidth, state.displayHeight)} ({fullscreen ? t("info.fullscreen") : t("info.window")})
-          </Row>
-          <Row label={t("info.screen")}>{info.displayFps ? t("info.hz", { value: num(info.displayFps) }) : "—"}</Row>
-          <Row label={t("info.renderer")}>{info.gpuContext?.includes("vk") ? "Vulkan" : (info.gpuContext ?? "—")}</Row>
-          {gpu && (
-            <Row label={t("info.gpuTime")}>
-              <span className={frameBudget && gpu.frameMs > frameBudget * 0.8 ? "text-warning" : ""}>
-                {frameBudget
-                  ? t("info.gpuTimeOf", { ms: num(gpu.frameMs, 1), budget: num(frameBudget) })
-                  : t("info.perFrame", { ms: num(gpu.frameMs, 1) })}
-              </span>
-            </Row>
-          )}
-          <Row label={t("info.dropped")}>
-            <span className={state.droppedFrames > 0 ? "text-warning" : ""}>{num(state.droppedFrames)}</span>
-          </Row>
-        </Block>
+      <div className="grid gap-4 overflow-x-hidden overflow-y-auto px-4 pt-1 pb-4">
+        {blocks.map((block) => {
+          const rows = block.rows.filter(([, value]) => value !== null);
+          if (!rows.length) return null;
+          return (
+            <section key={block.title}>
+              <h3 className="mb-1.5 text-xs font-medium text-ink-muted">{block.title}</h3>
+              <div className="grid gap-1 border-s border-line ps-3">
+                {rows.map(([label, value, full]) => (
+                  <div key={label} className="flex min-w-0 justify-between gap-3">
+                    <span className="shrink-0 text-ink-muted">{label}</span>
+                    {/* A value too long for the panel is cut, and readable whole in its tooltip. */}
+                    <span className="min-w-0 truncate text-end text-ink tabular-nums" data-tip={full}>
+                      {value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
     </aside>
-  );
-}
-
-function Block({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section>
-      <h3 className="mb-1.5 text-xs font-medium text-accent-text">{title}</h3>
-      <div className="grid gap-1 border-s border-line ps-3">{children}</div>
-    </section>
-  );
-}
-
-function Row({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex justify-between gap-3">
-      <span className="shrink-0 text-ink-muted">{label}</span>
-      <span className="truncate text-end text-ink tabular-nums">{children}</span>
-    </div>
   );
 }

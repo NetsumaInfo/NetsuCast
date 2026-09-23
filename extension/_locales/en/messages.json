@@ -35,10 +35,6 @@
     "message": "Playing in NetsuCast ✓",
     "description": "In-page cast button label after a successful cast. Short."
   },
-  "castButtonTitle": {
-    "message": "Continue this video in NetsuCast (ArtCNN upscale)",
-    "description": "Tooltip of the in-page cast button drawn over videos."
-  },
   "errNoVideo": {
     "message": "Video not found: hover it and click its NetsuCast button",
     "description": "Error: the page is a feed/channel, not one video. Shown in the in-page button and the icon tooltip."
@@ -72,14 +68,6 @@
   "popupSendPage": {
     "message": "Cast page",
     "description": "Popup primary button: cast the page URL (resolved by yt-dlp)."
-  },
-  "popupHintPageSite": {
-    "message": "Recommended for this site: yt-dlp gets the best quality and the subtitles.",
-    "description": "Popup hint under the button, on sites yt-dlp handles well."
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlp tries to find the video on the page. If it can't, pick a stream below.",
-    "description": "Popup hint under the button, on other sites."
   },
   "popupNoPage": {
     "message": "No web page in this tab.",

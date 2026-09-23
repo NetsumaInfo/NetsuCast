@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "正在NetsuCast中播放 ✓"
   },
-  "castButtonTitle": {
-    "message": "在NetsuCast中繼續觀看這部影片（ArtCNN畫質放大）"
-  },
   "errNoVideo": {
     "message": "找不到影片：將滑鼠游標移到影片上，然後點選它的NetsuCast按鈕"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "投放這個網頁"
-  },
-  "popupHintPageSite": {
-    "message": "建議用於這個網站：yt-dlp會取得最佳畫質和字幕。"
-  },
-  "popupHintGeneric": {
-    "message": "yt-dlp會嘗試找出網頁中的影片。如果找不到，你可以在下方選擇串流。"
   },
   "popupNoPage": {
     "message": "這個分頁中沒有網頁。"

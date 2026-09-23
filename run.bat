@@ -10,7 +10,7 @@ set "LOCK_STAMP=%ROOT%node_modules\.netsucast-pnpm-lock.hash"
 set "MPV_EXE=%ROOT%tools\mpv\mpv.exe"
 set "YTDLP_EXE=%ROOT%tools\mpv\yt-dlp.exe"
 rem Must match `server.port` in vite.config.ts and `devUrl` in src-tauri\tauri.conf.json.
-set "VITE_PORT=1420"
+set "VITE_PORT=47821"
 
 cd /d "%ROOT%" || goto :fatal_root
 title NetsuCast - Development launcher

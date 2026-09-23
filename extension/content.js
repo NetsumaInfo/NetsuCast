@@ -110,33 +110,90 @@
     return t("errNotRunningShort");
   }
 
+  // A round cast icon in the video's top-left corner (the right side holds the players' own
+  // buttons: mute, captions, settings). It opens into a "NetsuCast" pill on hover and while it
+  // reports progress. Colours follow the app's default theme.
   const host = document.createElement("netsucast-cast");
   const root = host.attachShadow({ mode: "closed" });
   root.innerHTML = `
     <style>
+      :host { all: initial; }
       button {
-        position: fixed; z-index: 2147483647; display: none; align-items: center; gap: 6px;
-        max-width: 360px; margin: 0; padding: 6px 10px; border: 0; border-radius: 6px; cursor: pointer;
-        background: #2F6FE0; color: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
-        font: 600 12px/1.25 "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
-        text-align: start; transition: background-color .15s;
+        position: fixed; z-index: 2147483647; display: none; align-items: center;
+        height: 36px; min-width: 36px; max-width: 360px; margin: 0; padding: 0 9px; border: 0;
+        border-radius: 18px; cursor: pointer; box-sizing: border-box;
+        background: rgba(10, 13, 19, .72); color: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+        font: 600 13px/1.25 "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+        text-align: start; transition: background-color .15s ease-out;
       }
-      button:hover { background: #3B7BF0; }
-      button:focus-visible { outline: 2px solid #4C8DFF; outline-offset: 2px; }
       button.show { display: inline-flex; }
-      button.err { background: #dc2626; }
-      svg { flex: none; width: 16px; height: 16px; }
+      button:hover, button:focus-visible, button.open { background: #2F6FE0; }
+      button:focus-visible { outline: 2px solid #4C8DFF; outline-offset: 2px; }
+      button.err { background: #C93442; }
+      svg { flex: none; width: 18px; height: 18px; }
+      span {
+        overflow: hidden; white-space: nowrap; max-width: 0; opacity: 0;
+        transition: max-width .18s ease-out, opacity .12s ease-out, margin .18s ease-out;
+      }
+      button:hover span, button:focus-visible span, button.open span {
+        max-width: 300px; opacity: 1; margin-inline: 7px 3px;
+      }
+      /* Same bubble as the app's: bordered arrow pointing at the icon, fade, slight zoom, short
+         slide from the arrow side. */
+      [role="tooltip"] {
+        position: fixed; z-index: 2147483647; display: none; max-width: 208px; padding: 6px 10px;
+        border: 1px solid #222836; border-radius: 6px; background: #1D2330; color: #E7EAF0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1);
+        font: 400 12px/1.35 "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+        overflow-wrap: break-word; pointer-events: none; transform-origin: 18px top;
+      }
+      [role="tooltip"].show { display: block; animation: tip-in .15s ease-out; }
+      [role="tooltip"] svg { position: absolute; top: -8px; left: 8px; width: 20px; height: 10px; }
+      @keyframes tip-in { from { opacity: 0; scale: .98; translate: 0 -6px; } }
+      @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
     </style>
-    <button type="button" translate="no">
+    <button type="button" translate="no" aria-describedby="tip">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 12a9 9 0 0 1 8 8"/><path d="M2 16a5 5 0 0 1 4 4"/><line x1="2" x2="2.01" y1="20" y2="20"/>
       </svg>
       <span>NetsuCast</span>
-    </button>`;
+    </button>
+    <div id="tip" role="tooltip"><span></span><svg viewBox="0 0 20 10" fill="none" aria-hidden="true">
+      <path fill="#1D2330" d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V10H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"/>
+      <path fill="#222836" d="M8.99542 1.85876C9.75604 1.17425 10.9106 1.17422 11.6713 1.85878L16.5281 6.22989C17.0789 6.72568 17.7938 7.00001 18.5349 7.00001L15.89 7L11.0023 2.60207C10.622 2.2598 10.0447 2.2598 9.66437 2.60207L4.77907 7L2.13172 7.00001C2.87268 7.00001 3.58761 6.72568 4.13844 6.22989L8.99542 1.85876Z"/>
+    </svg></div>`;
   const button = root.querySelector("button");
   const label = root.querySelector("span");
-  button.title = t("castButtonTitle");
+  const tip = root.querySelector("[role=tooltip]");
+  tip.querySelector("span").textContent = t("menuPlay");
+  tip.dir = t("@@bidi_dir");
   button.dir = t("@@bidi_dir");
+
+  // Opens at once, like the app's, below the button with its arrow on the cast icon; never while
+  // a status is displayed.
+  function showTip() {
+    if (button.classList.contains("open")) return;
+    const r = button.getBoundingClientRect();
+    tip.style.left = `${r.left}px`;
+    tip.style.top = `${r.bottom + 8}px`;
+    tip.classList.add("show");
+  }
+  function hideTip() {
+    tip.classList.remove("show");
+  }
+  button.addEventListener("pointerenter", showTip);
+  button.addEventListener("pointerleave", hideTip);
+  button.addEventListener("focus", () => button.matches(":focus-visible") && showTip());
+  button.addEventListener("blur", hideTip);
+  button.addEventListener("keydown", (e) => e.key === "Escape" && hideTip());
+
+  /** Shows a status in the pill (sending, playing, error) or goes back to the icon. */
+  function status(text, kind) {
+    label.textContent = text ?? "NetsuCast";
+    button.classList.toggle("open", text != null);
+    button.classList.toggle("err", kind === "err");
+    if (text != null) hideTip();
+  }
 
   let target = null; // video the button currently belongs to
   let hideTimer = 0;
@@ -163,14 +220,11 @@
     if (!target) return;
     const r = target.getBoundingClientRect();
     button.style.top = `${Math.max(r.top, 0) + 10}px`;
-    button.style.left = `${Math.min(r.right, window.innerWidth) - 10 - button.offsetWidth}px`;
+    button.style.left = `${Math.max(r.left, 0) + 10}px`;
   }
 
   function show(video) {
-    if (target !== video && !busy) {
-      button.classList.remove("err");
-      label.textContent = "NetsuCast";
-    }
+    if (target !== video && !busy) status(null);
     target = video;
     mount();
     button.classList.add("show");
@@ -184,8 +238,9 @@
       hideTimer = setTimeout(hide, HIDE_AFTER);
       return;
     }
-    button.classList.remove("show", "err");
-    label.textContent = "NetsuCast";
+    button.classList.remove("show");
+    status(null);
+    hideTip();
     target = null;
   }
 
@@ -214,19 +269,16 @@
     e.stopPropagation();
     if (!target || busy) return;
     busy = true;
-    label.textContent = t("castSending");
+    status(t("castSending"));
     const video = target;
     try {
       const res = await chrome.runtime.sendMessage({ type: "cast", ...describe(video) });
       if (!res?.ok) throw new Error(res?.error ?? "failed");
       video.pause();
       if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-      label.textContent = t("castPlaying");
-      place();
+      status(t("castPlaying"));
     } catch (err) {
-      button.classList.add("err");
-      label.textContent = errorText(String(err?.message ?? err));
-      place(); // the label changed width: keep the button inside the video's right edge
+      status(errorText(String(err?.message ?? err)), "err");
     } finally {
       busy = false;
       clearTimeout(hideTimer);

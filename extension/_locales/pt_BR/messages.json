@@ -26,9 +26,6 @@
   "castPlaying": {
     "message": "Reproduzindo no NetsuCast ✓"
   },
-  "castButtonTitle": {
-    "message": "Continuar este vídeo no NetsuCast (upscale com ArtCNN)"
-  },
   "errNoVideo": {
     "message": "Vídeo não encontrado: passe o mouse sobre ele e clique no botão NetsuCast dele"
   },
@@ -55,12 +52,6 @@
   },
   "popupSendPage": {
     "message": "Transmitir a página"
-  },
-  "popupHintPageSite": {
-    "message": "Recomendado para este site: o yt-dlp busca a melhor qualidade e as legendas."
-  },
-  "popupHintGeneric": {
-    "message": "O yt-dlp tenta encontrar o vídeo da página. Se não conseguir, escolha um stream abaixo."
   },
   "popupNoPage": {
     "message": "Nenhuma página da web nesta guia."

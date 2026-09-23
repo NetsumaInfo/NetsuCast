@@ -1,5 +1,12 @@
 export const MODELS = ["off", "C4F16", "C4F16_DS", "C4F32", "C4F32_DS"] as const;
 export type Model = (typeof MODELS)[number];
+/** The model setting: a model, or "auto" (picked from the graphics card, see autoModel). */
+export type ModelSetting = Model | "auto";
+
+/** Auto: C4F32 DS on a discrete card, C4F16 DS on an integrated one or without a GPU. */
+export const autoModel = (env: Environment | null): Model => (env?.gpu?.strong ? "C4F32_DS" : "C4F16_DS");
+export const resolveModel = (setting: ModelSetting, env: Environment | null): Model =>
+  setting === "auto" ? autoModel(env) : setting;
 
 export type UpscaleScale = "auto" | "x2";
 
@@ -8,7 +15,7 @@ export const QUALITIES = [0, 2160, 1440, 1080, 720, 480] as const;
 
 export type Settings = {
   defaultsVersion: number;
-  model: Model;
+  model: ModelSetting;
   forceUpscale: boolean;
   upscaleScale: UpscaleScale;
   maxHeight: number;
@@ -18,6 +25,8 @@ export type Settings = {
   autoSubs: boolean;
   volume: number;
   language: string;
+  /** A ThemeId from src/lib/theme.ts. */
+  theme: string;
   seekStep: number;
   resumePosition: boolean;
   fullscreenOnCast: boolean;
@@ -39,6 +48,8 @@ export type Environment = {
   shaderCacheDir: string | null;
   extensionDir: string | null;
   mpvLog: string | null;
+  /** The card mpv renders on (src-tauri/src/gpu.rs). */
+  gpu: { name: string; vendorId: number; dedicatedMb: number; driver: string; strong: boolean } | null;
   receiverPort: number;
   receiverError: string | null;
 };

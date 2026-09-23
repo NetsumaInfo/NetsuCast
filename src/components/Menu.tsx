@@ -74,7 +74,7 @@ export function Menu({ id, open, setOpen, icon, title, shortcut, items, badge, e
                     item.onSelect();
                     setOpen(null);
                   }}
-                  className={`flex w-full items-center gap-2.5 rounded-control px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-white/8 ${item.active ? "text-ink" : "text-ink-muted hover:text-ink"}`}
+                  className={`flex w-full items-center gap-2.5 rounded-control px-2.5 py-1.5 text-start text-sm transition-colors hover:bg-ink/8 ${item.active ? "text-ink" : "text-ink-muted hover:text-ink"}`}
                 >
                   <span className="w-4 shrink-0 text-accent-text">{item.active && <Check size={15} strokeWidth={2} />}</span>
                   <span className="flex-1">{item.label}</span>

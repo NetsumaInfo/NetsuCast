@@ -27,6 +27,8 @@ pub struct Environment {
     pub extension_dir: Option<String>,
     /// mpv log, written in debug builds only.
     pub mpv_log: Option<String>,
+    /// The card mpv renders on, `None` when only software rendering exists.
+    pub gpu: Option<crate::gpu::Gpu>,
     pub receiver_port: u16,
     pub receiver_error: Option<String>,
 }
@@ -107,6 +109,7 @@ pub fn get_environment(
         shader_cache_dir: shader_cache_dir.map(display),
         extension_dir: extension_dir(&app).map(display),
         mpv_log: mpv_log.map(|p| p.to_string_lossy().into_owned()),
+        gpu: crate::gpu::detect(),
         receiver_port: receiver.port,
         receiver_error: receiver.error,
     }

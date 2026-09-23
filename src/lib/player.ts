@@ -1,5 +1,6 @@
+import { invoke } from "@tauri-apps/api/core";
 import { command, getProperty, init, setProperty } from "tauri-plugin-mpv-api";
-import type { Environment, LoadTarget, Model, Settings, UpscaleScale } from "./types";
+import { resolveModel, type Environment, type LoadTarget, type Model, type Settings, type UpscaleScale } from "./types";
 
 export const OBSERVED = [
   "pause",
@@ -17,6 +18,8 @@ export const OBSERVED = [
   "height",
   "osd-dimensions",
   "user-data/netsucast/ytdl-error",
+  "user-data/netsucast/upscale",
+  "user-data/netsucast/info",
   "video-codec",
   "estimated-vf-fps",
   "hwdec-current",
@@ -58,14 +61,14 @@ function mpvArgs(env: Environment, s: Settings): string[] {
   if (s.subLangs.trim()) args.push(`--slang=${s.subLangs.trim()}`);
   if (s.audioLangs.trim()) args.push(`--alang=${s.audioLangs.trim()}`);
   args.push(`--sub-scale=${s.subScale}`);
-  const shaders = shaderList(env, { model: s.model, force: s.forceUpscale, scale: s.upscaleScale });
+  const shaders = shaderList(env, { model: resolveModel(s.model, env), force: s.forceUpscale, scale: s.upscaleScale });
   // Path lists are separated by ";" on Windows.
   if (shaders.length) args.push(`--glsl-shaders=${shaders.join(";")}`);
   return args;
 }
 
-/** What drives the ArtCNN shader stack. */
-export type Upscale = { model: Model; force: boolean; scale: UpscaleScale };
+/** What drives the ArtCNN shader stack. `compare` splits the picture: source left, ArtCNN right. */
+export type Upscale = { model: Model; force: boolean; scale: UpscaleScale; compare?: boolean };
 
 /**
  * The shader stack for an upscale config:
@@ -88,16 +91,30 @@ export async function startMpv(env: Environment, settings: Settings) {
     observedProperties: OBSERVED,
     ipcTimeoutMs: 5000,
   });
+  // mpv ends with NetsuCast, however NetsuCast ends (src-tauri/src/child_job.rs): an mpv left
+  // behind would keep its files locked and make the next update fail.
+  try {
+    await invoke("bind_to_app", { pid: await getProperty("pid") });
+  } catch {
+    // not fatal: mpv still closes with the app on a normal exit
+  }
 }
 
-export async function applyUpscale(env: Environment, upscale: Upscale) {
-  await setProperty("glsl-shaders", shaderList(env, upscale));
+/**
+ * Loads the shader stack. With `compare`, the comparison shader (src-tauri/src/shaders/
+ * compare.glsl) goes first, its line at `split` (0 to 1 across the picture). The ArtCNN files
+ * stay the same, so mpv's shader cache still covers them: only the small comparison pass is new.
+ */
+export async function applyUpscale(env: Environment, upscale: Upscale, split = 0.5) {
+  const stack = shaderList(env, upscale);
+  if (upscale.compare && stack.length) stack.unshift(await invoke<string>("compare_shader", { split }));
+  await setProperty("glsl-shaders", stack);
 }
 
 type Pass = { desc?: string; avg?: number };
 type Passes = { fresh?: Pass[]; redraw?: Pass[] } | null;
 
-/** What the GPU actually ran on the last frames, read from mpv's render pass statistics. */
+/** What the GPU ran on the last frames, from mpv's render pass statistics (netsucast.lua). */
 export type UpscaleStatus = {
   /** ArtCNN passes run per frame: 1 = ×2, 2 = ×4, 0 = not running. */
   passes: number;
@@ -107,21 +124,8 @@ export type UpscaleStatus = {
   frameMs: number;
 };
 
-export async function readUpscaleStatus(): Promise<UpscaleStatus | null> {
-  const passes = (await getProperty("vo-passes")) as Passes;
-  const fresh = passes?.fresh ?? [];
-  if (!fresh.length) return null; // paused: nothing rendered lately
-  const artcnn = fresh.filter((p) => p.desc?.startsWith("ArtCNN"));
-  const ms = (list: Pass[]) => list.reduce((sum, p) => sum + (p.avg ?? 0), 0) / 1e6;
-  return {
-    // Every ArtCNN shader starts with exactly one "(Conv2D)" pass.
-    passes: artcnn.filter((p) => p.desc?.endsWith("(Conv2D)")).length,
-    artcnnMs: ms(artcnn),
-    frameMs: ms(fresh),
-  };
-}
-
-/** Stream details for the info panel. Every field is optional: mpv omits what a source lacks. */
+/** Stream details for the info panel (netsucast.lua). Every field is optional: mpv omits what a
+ *  source lacks. */
 export type StreamInfo = {
   path?: string;
   fileFormat?: string;
@@ -138,31 +142,14 @@ export type StreamInfo = {
   gpuContext?: string;
 };
 
-const STREAM_PROPS: [keyof StreamInfo, string][] = [
-  ["path", "path"],
-  ["fileFormat", "file-format"],
-  ["videoFormat", "video-format"],
-  ["videoBitrate", "video-bitrate"],
-  ["videoParams", "video-params"],
-  ["audioCodec", "audio-codec-name"],
-  ["audioBitrate", "audio-bitrate"],
-  ["audioParams", "audio-params"],
-  ["hlsBitrate", "hls-bitrate"],
-  ["cacheDuration", "demuxer-cache-duration"],
-  ["cacheSpeed", "cache-speed"],
-  ["displayFps", "display-fps"],
-  ["gpuContext", "current-gpu-context"],
-];
-
-/** Polled by the info panel while it is open (too chatty to observe permanently). */
-export async function readStreamInfo(): Promise<StreamInfo> {
-  const values = await Promise.allSettled(STREAM_PROPS.map(([, prop]) => getProperty(prop)));
-  const info: Record<string, unknown> = {};
-  values.forEach((v, i) => {
-    if (v.status === "fulfilled" && v.value != null) info[STREAM_PROPS[i][0]] = v.value;
-  });
-  return info as StreamInfo;
-}
+/**
+ * The info panel is open: netsucast.lua publishes the stream details while this is on. Sent one
+ * after the other: each IPC call opens its own pipe, so an "off" then "on" fired together (the
+ * panel remounting) could land in the wrong order and leave the panel without data.
+ */
+let wantInfoQueue: Promise<unknown> = Promise.resolve();
+export const setWantInfo = (want: boolean) =>
+  (wantInfoQueue = wantInfoQueue.catch(() => {}).then(() => setProperty("user-data/netsucast/want-info", want)));
 
 /**
  * Resolves once mpv has rendered a frame through `model`. Compiling an ArtCNN shader freezes
@@ -189,34 +176,36 @@ export async function waitForModel(model: Model, timeoutMs = 600_000): Promise<b
 /** Tiny black clip used to compile shaders while the welcome screen covers the video. */
 export const WARMUP_SOURCE = "av://lavfi:color=c=black:s=320x180:r=24:d=36000";
 
-const WARMED_KEY = "netsucast.warmedModels.v1";
+// Compiled shaders belong to one card and one driver: mpv's cache misses after a driver update
+// and the first use of a model would freeze again, so the list is kept per card + driver.
+const WARMED_KEY = "netsucast.warmedModels.v2";
 const warmKey = ({ model, force, scale }: Upscale) => `${model}:${force ? "forced" : "normal"}:${scale}`;
+let warmScope = "";
+
+/** The card and driver the warm-up list belongs to. Call once, before isWarmed/markWarmed. */
+export function setWarmScope(env: Environment) {
+  warmScope = env.gpu ? `${env.gpu.name}|${env.gpu.driver}` : "none";
+}
+
+function readWarmed(): Set<string> {
+  try {
+    const saved = JSON.parse(localStorage.getItem(WARMED_KEY) ?? "{}") as { scope?: string; done?: string[] };
+    return new Set(saved.scope === warmScope ? (saved.done ?? []) : []);
+  } catch {
+    return new Set();
+  }
+}
 
 export function isWarmed(upscale: Upscale): boolean {
-  if (upscale.model === "off") return true;
-  try {
-    return (JSON.parse(localStorage.getItem(WARMED_KEY) ?? "[]") as string[]).includes(warmKey(upscale));
-  } catch {
-    return false;
-  }
+  return upscale.model === "off" || readWarmed().has(warmKey(upscale));
 }
 
 export function markWarmed(upscale: Upscale) {
   try {
-    const list = new Set(JSON.parse(localStorage.getItem(WARMED_KEY) ?? "[]") as string[]);
-    list.add(warmKey(upscale));
-    localStorage.setItem(WARMED_KEY, JSON.stringify([...list]));
+    const done = readWarmed().add(warmKey(upscale));
+    localStorage.setItem(WARMED_KEY, JSON.stringify({ scope: warmScope, done: [...done] }));
   } catch {
     // storage unavailable: models will just be re-checked next time
-  }
-}
-
-/** Forgets which models were compiled: they are prepared again on the next launch. */
-export function resetWarmed() {
-  try {
-    localStorage.removeItem(WARMED_KEY);
-  } catch {
-    // storage unavailable: nothing was remembered anyway
   }
 }
 

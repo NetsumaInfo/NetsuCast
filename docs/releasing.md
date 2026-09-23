@@ -31,6 +31,10 @@ The version lives in three files and they must match — `build.ps1` refuses to 
 
 Bump **one patch at a time** (`0.1.0` → `0.1.1` → `0.1.2`…). Never skip versions.
 
+Each version also gets an entry at the top of `src/data/releases.json` (`id` and `version` = the new version, a date, a `title` and `changes` in `fr` and `en`, each change a `feature`, `improvement`, `performance` or `fix`). The app shows it once after the update (*What's new*) and in Settings ▸ Updates, and the updater manifest uses it as release notes.
+
+The updater downloads `latest.json` and the installer from the GitHub release without credentials: while the repository is private, installed copies cannot see updates.
+
 ## Release from a development machine
 
 ```powershell
@@ -97,4 +101,4 @@ Rule for every new runtime dependency (binary, DLL, script, asset), in the same 
 
 `scripts/create-update-manifest.mjs` (`pnpm update:manifest`) finds `NetsuCast_<version>_*-setup.exe` and its `.sig` in the NSIS output folder and writes `latest.json`. The `platforms.windows-x86_64.signature` field holds the signature **contents**, not a link to the `.sig` file. The download URL always uses the `v<version>` tag.
 
-Release notes, first match wins: `--notes-file <file>`, then the entry for the version in `src/data/releases.json` if the app ever gets one (same shape as NetsuBoard's), then `NetsuCast <version>`. `--dry-run` prints the manifest without needing a build.
+Release notes, first match wins: `--notes-file <file>`, then the entry for the version in `src/data/releases.json` (French lines), then `NetsuCast <version>`. `--dry-run` prints the manifest without needing a build.
