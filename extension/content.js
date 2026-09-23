@@ -130,8 +130,9 @@
       button:hover, button:focus-visible, button.open { background: #2F6FE0; }
       button:focus-visible { outline: 2px solid #4C8DFF; outline-offset: 2px; }
       button.err { background: #C93442; }
-      svg { flex: none; width: 18px; height: 18px; }
-      span {
+      /* Scoped to the button: the tooltip below has its own span and svg. */
+      button svg { flex: none; width: 18px; height: 18px; }
+      button span {
         overflow: hidden; white-space: nowrap; max-width: 0; opacity: 0;
         transition: max-width .18s ease-out, opacity .12s ease-out, margin .18s ease-out;
       }
