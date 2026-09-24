@@ -23,6 +23,9 @@
   "castSending": {
     "message": "Yayınlanıyor…"
   },
+  "castLaunching": {
+    "message": "NetsuCast açılıyor…"
+  },
   "castPlaying": {
     "message": "NetsuCast'ta oynatılıyor ✓"
   },

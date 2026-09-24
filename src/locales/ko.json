@@ -159,7 +159,9 @@
     "portBusy": "다른 프로그램이 포트 {{port}}을(를) 사용 중이에요. 여기와 확장 프로그램에서 다른 포트를 선택하세요.",
     "theme": "테마",
     "sectionUpdates": "업데이트",
-    "sectionAbout": "정보"
+    "sectionAbout": "정보",
+    "launchAtLogin": "Windows와 함께 시작",
+    "launchAtLoginHint": "창을 닫아도 NetsuCast가 백그라운드에서 대기해요. 시계 옆 아이콘으로 열거나 종료할 수 있어요."
   },
   "errors": {
     "generic": "재생할 수 없어요: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "커피 한 잔 사 주기",
     "legal": "© 2026 Haim Faraj · NetsuCast는 GNU AGPL v3.0-only로 배포돼요 · 보증은 제공하지 않아요.",
     "source": "소스 코드"
+  },
+  "tray": {
+    "open": "NetsuCast 열기",
+    "quit": "종료"
   }
 }

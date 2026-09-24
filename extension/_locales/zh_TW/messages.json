@@ -23,6 +23,9 @@
   "castSending": {
     "message": "投放中…"
   },
+  "castLaunching": {
+    "message": "正在開啟NetsuCast…"
+  },
   "castPlaying": {
     "message": "正在NetsuCast中播放 ✓"
   },

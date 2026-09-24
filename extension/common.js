@@ -10,14 +10,42 @@ export async function getPort() {
   return Number(port) || DEFAULT_PORT;
 }
 
+/**
+ * The app's answer, or null when it is not running: { version, ready, theme }. `ready` means the
+ * interface listens for casts; `theme` holds the colours of the app's current theme, kept in
+ * storage so the button and the popup match it even while the app is closed.
+ */
 export async function ping() {
   try {
     const res = await fetch(`http://127.0.0.1:${await getPort()}/ping`, { signal: AbortSignal.timeout(1500) });
-    return res.ok;
+    if (!res.ok) return null;
+    const info = await res.json().catch(() => ({}));
+    if (info.theme) await chrome.storage.local.set({ theme: info.theme });
+    return info;
   } catch {
-    return false;
+    return null;
   }
 }
+
+/**
+ * Starts NetsuCast when it is closed, through the netsucast:// link its installer registers:
+ * the browser asks once "Open NetsuCast?" (with a box to remember the answer), the page stays
+ * where it is. Resolves true once the app listens for casts.
+ */
+export async function launchApp(tabId) {
+  if ((await ping())?.ready) return true;
+  if (tabId == null) return false;
+  await chrome.tabs.update(tabId, { url: "netsucast://open" }).catch(() => {});
+  const deadline = Date.now() + 45_000; // time to answer the browser's question, then to start
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    if ((await ping())?.ready) return true;
+  }
+  return false;
+}
+
+/** A network failure (app closed) rather than an answer from the app. */
+export const unreachable = (error) => !/^(http-status:|no-video$)/.test(String(error?.message ?? error));
 
 /**
  * Hands a video to the player.

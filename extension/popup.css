@@ -1,4 +1,5 @@
-/* Same tokens as the app (src/index.css): quiet dark surfaces, one blue accent. */
+/* Same tokens as the app (src/index.css), default theme; popup.js swaps in the app's current
+   theme when it knows it. */
 :root {
   color-scheme: dark;
   --surface: #11151d;
@@ -11,6 +12,7 @@
   --accent: #2f6fe0;
   --accent-hover: #3b7bf0;
   --accent-text: #4c8dff;
+  --accent-ink: #ffffff;
   --success: #4fc98e;
   --danger: #f2767a;
 }
@@ -66,7 +68,7 @@ button {
 button:hover { background: var(--overlay); border-color: var(--muted); }
 button:disabled { opacity: 0.45; cursor: default; }
 button:disabled:hover { background: transparent; border-color: var(--line-strong); }
-button.primary { width: 100%; padding: 8px 12px; border: 0; background: var(--accent); color: #fff; font-weight: 600; }
+button.primary { width: 100%; padding: 8px 12px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
 button.primary:hover { background: var(--accent-hover); }
 button.primary:disabled:hover { background: var(--accent); }
 

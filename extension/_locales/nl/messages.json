@@ -23,6 +23,9 @@
   "castSending": {
     "message": "Casten…"
   },
+  "castLaunching": {
+    "message": "NetsuCast wordt geopend…"
+  },
   "castPlaying": {
     "message": "Speelt af in NetsuCast ✓"
   },

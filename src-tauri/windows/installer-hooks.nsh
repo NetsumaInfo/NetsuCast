@@ -52,6 +52,10 @@ LangString NCWriteError 1033 "Cannot write to:$\n$INSTDIR$\n$\nReinstall NetsuCa
   ; keep tools\mpv — and therefore $INSTDIR — on disk. Plain NSIS file operations only: no script,
   ; no PowerShell. Skipped during an update, where the next install reuses the folder.
   ${If} $UpdateMode <> 1
+    ; "Start with Windows" (Settings > Playback) writes this login entry; it must not outlive the
+    ; app. Windows adds the StartupApproved value when the entry is toggled in the Task Manager.
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "NetsuCast"
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run" "NetsuCast"
     Delete "$INSTDIR\tools\mpv\yt-dlp.exe.old"
     Delete "$INSTDIR\tools\mpv\yt-dlp.exe.new"
     RMDir "$INSTDIR\tools\mpv\licenses"

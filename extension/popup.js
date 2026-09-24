@@ -1,4 +1,4 @@
-import { cast, DEFAULT_PORT, getPort, ping } from "./common.js";
+import { cast, DEFAULT_PORT, getPort, launchApp, ping, unreachable } from "./common.js";
 
 const $ = (id) => document.getElementById(id);
 const t = (key, subs) => chrome.i18n.getMessage(key, subs);
@@ -12,6 +12,20 @@ for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el
 const tabId = Number(new URLSearchParams(location.search).get("tab"));
 const tab = tabId ? await chrome.tabs.get(tabId).catch(() => null) : (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
 
+// The app's theme, as the last ping saw it: same colours as NetsuCast itself.
+const POPUP_VARS = {
+  surface: "--surface", raised: "--raised", overlay: "--overlay", line: "--line", "line-strong": "--line-strong",
+  ink: "--text", "ink-muted": "--muted", accent: "--accent", "accent-hover": "--accent-hover",
+  "accent-text": "--accent-text", "accent-ink": "--accent-ink", success: "--success", danger: "--danger",
+};
+function applyTheme(theme) {
+  if (!theme) return;
+  for (const [token, name] of Object.entries(POPUP_VARS)) if (theme[token]) document.documentElement.style.setProperty(name, theme[token]);
+  if (theme.scheme) document.documentElement.style.colorScheme = theme.scheme;
+}
+applyTheme((await chrome.storage.local.get("theme")).theme);
+chrome.storage.onChanged.addListener((changes) => changes.theme && applyTheme(changes.theme.newValue));
+
 function say(text, ok) {
   const el = $("message");
   el.textContent = text;
@@ -21,7 +35,15 @@ function say(text, ok) {
 async function send(request, button) {
   button.disabled = true;
   try {
-    await cast({ ...request, title: tab?.title });
+    try {
+      await cast({ ...request, title: tab?.title });
+    } catch (error) {
+      // NetsuCast closed: start it, then send again.
+      if (!unreachable(error)) throw error;
+      say(t("castLaunching"), true);
+      if (!(await launchApp(tab?.id))) throw error;
+      await cast({ ...request, title: tab?.title });
+    }
     say(t("castDone"), true);
     setTimeout(() => window.close(), 600);
   } catch {

@@ -147,6 +147,12 @@ export function SettingsDialog({ settings, initialSection = "playback", env, onC
                 <Toggle label={t("settings.resume")} checked={draft.resumePosition} onChange={(v) => set("resumePosition", v)} />
                 <Toggle label={t("settings.fullscreenOnCast")} checked={draft.fullscreenOnCast} onChange={(v) => set("fullscreenOnCast", v)} />
                 <Toggle label={t("settings.alwaysOnTop")} checked={draft.alwaysOnTop} onChange={(v) => set("alwaysOnTop", v)} />
+                <Toggle
+                  label={t("settings.launchAtLogin")}
+                  hint={t("settings.launchAtLoginHint")}
+                  checked={draft.launchAtLogin}
+                  onChange={(v) => set("launchAtLogin", v)}
+                />
                 <Toggle label={t("settings.hwdec")} checked={draft.hwdec !== "no"} onChange={(v) => set("hwdec", v ? "auto-safe" : "no")} />
               </>
             )}

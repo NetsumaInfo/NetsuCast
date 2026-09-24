@@ -159,7 +159,9 @@
     "portBusy": "Порт {{port}} занят другой программой: выбери другой здесь и в расширении.",
     "theme": "Тема",
     "sectionUpdates": "Обновления",
-    "sectionAbout": "О программе"
+    "sectionAbout": "О программе",
+    "launchAtLogin": "Запускать вместе с Windows",
+    "launchAtLoginHint": "NetsuCast остаётся готовым в фоне, даже если окно закрыто. Значок рядом с часами открывает или закрывает его."
   },
   "errors": {
     "generic": "Не удалось воспроизвести: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "Угостить кофе",
     "legal": "© 2026 Haim Faraj · NetsuCast распространяется по лицензии GNU AGPL v3.0-only · Без гарантий.",
     "source": "Исходный код"
+  },
+  "tray": {
+    "open": "Открыть NetsuCast",
+    "quit": "Выйти"
   }
 }

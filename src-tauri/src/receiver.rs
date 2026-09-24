@@ -22,6 +22,28 @@ pub struct ReceiverStatus {
 
 pub struct ReceiverState(pub Mutex<ReceiverStatus>);
 
+/// What the extension learns from /ping besides "the app is there".
+#[derive(Default)]
+pub struct Link {
+    /// The interface listens for casts. The receiver starts before it does, and an extension that
+    /// just launched the app waits for this before sending, or the cast would be lost.
+    pub ready: bool,
+    /// Colours of the current theme, so the extension's button and popup match the app.
+    pub theme: Option<serde_json::Value>,
+}
+
+pub struct LinkState(pub Mutex<Link>);
+
+#[tauri::command]
+pub fn frontend_ready(link: tauri::State<LinkState>) {
+    link.0.lock().unwrap().ready = true;
+}
+
+#[tauri::command]
+pub fn set_extension_theme(link: tauri::State<LinkState>, theme: serde_json::Value) {
+    link.0.lock().unwrap().theme = Some(theme);
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct CastHeaders {
@@ -185,10 +207,17 @@ fn handle(app: &AppHandle, request: &mut tiny_http::Request) -> Response<std::io
     }
 
     match (request.method(), request.url()) {
-        (Method::Get, "/ping") => json(
-            200,
-            &format!(r#"{{"app":"NetsuCast","version":"{}"}}"#, env!("CARGO_PKG_VERSION")),
-        ),
+        (Method::Get, "/ping") => {
+            let link = app.state::<LinkState>();
+            let link = link.0.lock().unwrap();
+            let body = serde_json::json!({
+                "app": "NetsuCast",
+                "version": env!("CARGO_PKG_VERSION"),
+                "ready": link.ready,
+                "theme": link.theme,
+            });
+            json(200, &body.to_string())
+        }
         // Sent by the extension when it is installed or Chrome starts: lets the app know the
         // extension exists, so it can stop showing the install guide.
         (Method::Post, "/hello") => {

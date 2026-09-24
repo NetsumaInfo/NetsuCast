@@ -159,7 +159,9 @@
     "portBusy": "A porta {{port}} já está em uso por outro programa: escolha outra, aqui e na extensão.",
     "theme": "Tema",
     "sectionUpdates": "Atualizações",
-    "sectionAbout": "Sobre"
+    "sectionAbout": "Sobre",
+    "launchAtLogin": "Iniciar com o Windows",
+    "launchAtLoginHint": "O NetsuCast fica pronto em segundo plano, mesmo com a janela fechada. O ícone perto do relógio abre ou encerra o app."
   },
   "errors": {
     "generic": "Não foi possível reproduzir: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "Pagar um café",
     "legal": "© 2026 Haim Faraj · NetsuCast é distribuído sob a GNU AGPL v3.0-only · Sem garantia.",
     "source": "Código-fonte"
+  },
+  "tray": {
+    "open": "Abrir NetsuCast",
+    "quit": "Sair"
   }
 }

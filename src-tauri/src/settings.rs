@@ -44,6 +44,9 @@ pub struct Settings {
     pub resume_position: bool,
     pub fullscreen_on_cast: bool,
     pub always_on_top: bool,
+    /// Start hidden with Windows and keep running when the window is closed (tray icon), so the
+    /// extension always finds NetsuCast.
+    pub launch_at_login: bool,
     /// mpv `sub-scale`.
     pub sub_scale: f64,
     /// Preferred audio languages, comma separated (mpv `alang`).
@@ -73,6 +76,7 @@ impl Default for Settings {
             resume_position: true,
             fullscreen_on_cast: false,
             always_on_top: false,
+            launch_at_login: true,
             sub_scale: 1.0,
             audio_langs: String::new(),
             receiver_port: DEFAULT_RECEIVER_PORT,
@@ -125,6 +129,7 @@ pub fn save_settings(
     }
     let text = serde_json::to_string_pretty(&settings).map_err(|e| e.to_string())?;
     fs::write(&path, text).map_err(|e| e.to_string())?;
+    crate::background::apply_launch_at_login(&app, settings.launch_at_login);
     *state.0.lock().unwrap() = settings;
     Ok(())
 }

@@ -23,6 +23,9 @@
   "castSending": {
     "message": "מפעיל Cast…"
   },
+  "castLaunching": {
+    "message": "פותח את NetsuCast…"
+  },
   "castPlaying": {
     "message": "מופעל ב-NetsuCast ✓"
   },

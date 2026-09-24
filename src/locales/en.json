@@ -159,7 +159,9 @@
     "portBusy": "Port {{port}} is taken by another program: pick another one, here and in the extension.",
     "theme": "Theme",
     "sectionUpdates": "Updates",
-    "sectionAbout": "About"
+    "sectionAbout": "About",
+    "launchAtLogin": "Start with Windows",
+    "launchAtLoginHint": "NetsuCast stays ready in the background, even with the window closed. The icon near the clock opens or quits it."
   },
   "errors": {
     "generic": "Can't play this video: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "Buy a coffee",
     "legal": "© 2026 Haim Faraj · NetsuCast is distributed under GNU AGPL v3.0-only · No warranty.",
     "source": "Source code"
+  },
+  "tray": {
+    "open": "Open NetsuCast",
+    "quit": "Quit"
   }
 }

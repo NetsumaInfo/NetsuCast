@@ -159,7 +159,9 @@
     "portBusy": "المنفذ {{port}} يستخدمه برنامج آخر: اختر منفذًا آخر هنا وفي الإضافة.",
     "theme": "السمة",
     "sectionUpdates": "التحديثات",
-    "sectionAbout": "حول"
+    "sectionAbout": "حول",
+    "launchAtLogin": "التشغيل مع Windows",
+    "launchAtLoginHint": "يبقى NetsuCast جاهزًا في الخلفية حتى مع إغلاق النافذة. الأيقونة بجوار الساعة تفتحه أو تُنهيه."
   },
   "errors": {
     "generic": "تعذّر التشغيل: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "إهداء فنجان قهوة",
     "legal": "© 2026 Haim Faraj · يُوزَّع NetsuCast بموجب GNU AGPL v3.0-only · بلا أي ضمان.",
     "source": "الشيفرة المصدرية"
+  },
+  "tray": {
+    "open": "فتح NetsuCast",
+    "quit": "إنهاء"
   }
 }

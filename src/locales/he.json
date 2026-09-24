@@ -159,7 +159,9 @@
     "portBusy": "תוכנה אחרת כבר משתמשת בפורט {{port}}: יש לבחור פורט אחר, כאן ובתוסף.",
     "theme": "ערכת נושא",
     "sectionUpdates": "עדכונים",
-    "sectionAbout": "אודות"
+    "sectionAbout": "אודות",
+    "launchAtLogin": "הפעלה עם Windows",
+    "launchAtLoginHint": "NetsuCast נשאר מוכן ברקע גם כשהחלון סגור. הסמל ליד השעון פותח או סוגר אותו."
   },
   "errors": {
     "generic": "לא ניתן להפעיל: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "הזמנה לקפה",
     "legal": "© 2026 Haim Faraj · NetsuCast מופץ תחת GNU AGPL v3.0-only · ללא אחריות.",
     "source": "קוד מקור"
+  },
+  "tray": {
+    "open": "פתיחת NetsuCast",
+    "quit": "יציאה"
   }
 }

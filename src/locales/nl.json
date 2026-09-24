@@ -159,7 +159,9 @@
     "portBusy": "Poort {{port}} wordt al door een ander programma gebruikt: kies een andere, hier en in de extensie.",
     "theme": "Thema",
     "sectionUpdates": "Updates",
-    "sectionAbout": "Over"
+    "sectionAbout": "Over",
+    "launchAtLogin": "Starten met Windows",
+    "launchAtLoginHint": "NetsuCast blijft klaar op de achtergrond, ook als het venster dicht is. Het pictogram bij de klok opent of sluit het."
   },
   "errors": {
     "generic": "Kan niet afspelen: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "Op een koffie trakteren",
     "legal": "© 2026 Haim Faraj · NetsuCast wordt verspreid onder GNU AGPL v3.0-only · Geen garantie.",
     "source": "Broncode"
+  },
+  "tray": {
+    "open": "NetsuCast openen",
+    "quit": "Afsluiten"
   }
 }

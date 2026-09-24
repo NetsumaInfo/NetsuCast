@@ -31,6 +31,7 @@ export type Settings = {
   resumePosition: boolean;
   fullscreenOnCast: boolean;
   alwaysOnTop: boolean;
+  launchAtLogin: boolean;
   subScale: number;
   audioLangs: string;
   receiverPort: number;

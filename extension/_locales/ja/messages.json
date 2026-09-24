@@ -23,6 +23,9 @@
   "castSending": {
     "message": "キャスト中…"
   },
+  "castLaunching": {
+    "message": "NetsuCastを起動しています…"
+  },
   "castPlaying": {
     "message": "NetsuCastで再生中 ✓"
   },

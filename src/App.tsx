@@ -51,7 +51,7 @@ function targetFromInput(input: string): LoadTarget {
 }
 
 export default function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [env, setEnv] = useState<Environment | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [ready, setReady] = useState(false);
@@ -218,6 +218,8 @@ export default function App() {
       open(e.payload);
       if (live.current.settings?.fullscreenOnCast) toggleFullscreen(true);
     });
+    // Casts are heard from here on: an extension that just launched NetsuCast waits for this.
+    Promise.all([unHello, unCast]).then(() => invoke("frontend_ready")).catch(() => {});
     const unDrop = getCurrentWebview().onDragDropEvent((e) => {
       if (e.payload.type === "drop" && e.payload.paths.length) open({ url: e.payload.paths[0], kind: "file" });
     });
@@ -248,6 +250,21 @@ export default function App() {
       // mpv busy: the welcome screen is shown anyway, the next video replaces this one
     }
   }, [fullscreen, toggleFullscreen]);
+
+  // The tray menu speaks the interface language.
+  useEffect(() => {
+    invoke("set_tray_labels", { open: t("tray.open"), quit: t("tray.quit") }).catch(() => {});
+  }, [i18n.language, t]);
+
+  // Window closed while NetsuCast keeps running for the extension: the video stops, home shows.
+  useEffect(() => {
+    const un = listen("went-background", () => {
+      setShowSettings(false);
+      setShowInstall(false);
+      goHome();
+    });
+    return () => void un.then((u) => u());
+  }, [goHome]);
 
   useEffect(() => {
     getCurrentWindow().setTitle(playing && state.title ? `${state.title} — NetsuCast` : "NetsuCast");
@@ -297,21 +314,39 @@ export default function App() {
     return applyUpscale({ ...live.current.upscale, model: autoModel(live.current.env) });
   }, [applyUpscale]);
 
-  // Auto mode, measured: when C4F32 DS keeps the GPU above 90 % of the frame time for 5 s, or
-  // frames start dropping, it steps down to C4F16 DS for the rest of the session.
-  // One sample per second (the render statistics refresh rate), the last five kept.
-  const samples = useRef<{ slow: boolean; drops: number }[]>([]);
+  // Auto mode, measured: steps down to C4F16 DS for the rest of the session when C4F32 DS keeps
+  // the GPU over the frame time for 10 s in a row, or frames drop while the GPU is near its
+  // limit. Never judged while things settle: the first seconds after a file opens, a seek, a
+  // pause, buffering, a model or window change are shader compilation and cache filling, not the
+  // steady cost of the model, and they used to trip the step-down on a card that copes fine.
+  const SETTLE_MS = 20_000;
+  const settleUntil = useRef(0);
+  const lastPos = useRef(0);
+  const samples = useRef<{ slow: boolean; busy: boolean; drops: number }[]>([]);
+  useEffect(() => {
+    settleUntil.current = performance.now() + SETTLE_MS;
+    samples.current.length = 0;
+  }, [state.loading, state.buffering, state.pause, upscale.model, upscale.scale, upscale.compare, modelLoading, state.displayWidth, state.displayHeight]);
+  useEffect(() => {
+    // A jump in the position is a seek: the decoder and the cache start over.
+    if (Math.abs(state.timePos - lastPos.current) > 3) settleUntil.current = performance.now() + SETTLE_MS;
+    lastPos.current = state.timePos;
+  }, [state.timePos]);
   useEffect(() => {
     const gpu = state.upscale;
     const history = samples.current;
-    if (!auto || upscale.model === LIGHT_MODEL || upscale.model === "off" || !gpu || state.pause || !state.fps || modelLoading) {
+    if (!auto || upscale.model === LIGHT_MODEL || upscale.model === "off" || !gpu || state.pause || state.buffering || !state.fps || modelLoading) {
       history.length = 0;
       return;
     }
-    history.push({ slow: gpu.frameMs > (1000 / state.fps) * 0.9, drops: state.droppedFrames });
-    if (history.length > 5) history.shift();
-    const tooSlow = history.length === 5 && history.every((h) => h.slow);
-    const dropping = history.length > 1 && state.droppedFrames - history[0].drops > 10;
+    if (performance.now() < settleUntil.current) return;
+    const budget = 1000 / state.fps;
+    history.push({ slow: gpu.frameMs > budget, busy: gpu.frameMs > budget * 0.8, drops: state.droppedFrames });
+    if (history.length > 10) history.shift();
+    if (history.length < 10) return;
+    const tooSlow = history.every((h) => h.slow);
+    // More than 2 % of the frames dropped over those 10 s, with the GPU near its limit all along.
+    const dropping = state.droppedFrames - history[0].drops > state.fps * 10 * 0.02 && history.every((h) => h.busy);
     if (!tooSlow && !dropping) return;
     history.length = 0;
     const from = upscale.model;

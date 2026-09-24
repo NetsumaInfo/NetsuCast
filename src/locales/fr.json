@@ -159,7 +159,9 @@
     "portBusy": "Le port {{port}} est déjà pris par un autre programme : choisis-en un autre, ici et dans l'extension.",
     "theme": "Thème",
     "sectionUpdates": "Mises à jour",
-    "sectionAbout": "À propos"
+    "sectionAbout": "À propos",
+    "launchAtLogin": "Démarrer avec Windows",
+    "launchAtLoginHint": "NetsuCast reste prêt en arrière-plan, même fenêtre fermée. L'icône près de l'horloge le rouvre ou le quitte."
   },
   "errors": {
     "generic": "Lecture impossible : {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "Offrir un café",
     "legal": "© 2026 Haim Faraj · NetsuCast est distribué sous GNU AGPL v3.0-only · Sans garantie.",
     "source": "Code source"
+  },
+  "tray": {
+    "open": "Ouvrir NetsuCast",
+    "quit": "Quitter"
   }
 }

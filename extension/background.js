@@ -1,4 +1,4 @@
-import { cast, getPort, isPageSite, isVideoPage } from "./common.js";
+import { cast, getPort, isPageSite, isVideoPage, launchApp, ping, unreachable } from "./common.js";
 
 // Detected streams per tab, kept in session storage because the service worker is short-lived.
 // Entry: { url, type: "HLS" | "DASH" | "MP4" | "WEBM", referer, at }
@@ -136,7 +136,17 @@ async function pickSource(tab, { frameUrl, src, pageUrl: videoPage } = {}) {
 
 async function castTab(tab, info = {}) {
   const source = await pickSource(tab, info);
-  await cast({ ...source, title: tab.title, start: info.start ?? null });
+  const request = { ...source, title: tab.title, start: info.start ?? null };
+  try {
+    await cast(request);
+  } catch (error) {
+    if (!unreachable(error)) throw error;
+    // NetsuCast is closed: start it, then send again. The page is told, so the button says so
+    // and the video pauses where it is (the position sent stays right).
+    chrome.tabs.sendMessage(tab.id, { type: "launching" }).catch(() => {});
+    if (!(await launchApp(tab.id))) throw error;
+    await cast(request);
+  }
 }
 
 // Both run in the content scripts' isolated world, where content.js defines the helpers.
@@ -146,7 +156,8 @@ const pauseVideos = () => window.__netsucastPause?.();
 const t = (key, subs) => chrome.i18n.getMessage(key, subs);
 
 async function flash(tabId, ok, title) {
-  await chrome.action.setBadgeBackgroundColor({ tabId, color: ok ? "#2F6FE0" : "#dc2626" });
+  const { theme } = await chrome.storage.local.get("theme");
+  await chrome.action.setBadgeBackgroundColor({ tabId, color: ok ? (theme?.accent || "#2F6FE0") : "#dc2626" });
   await chrome.action.setBadgeText({ tabId, text: ok ? "✓" : "!" });
   await chrome.action.setTitle({ tabId, title });
   setTimeout(() => {
@@ -177,6 +188,15 @@ chrome.action.onClicked.addListener(async (tab) => {
     const code = String(e?.message ?? e);
     await flash(tab.id, false, code === "no-video" ? t("errNoVideo") : t("errNotRunning"));
   }
+});
+
+// The content script asks for the app's colours when a page loads; one ping refreshes them for
+// every tab (at most every 30 s).
+let themeCheckedAt = 0;
+chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type !== "refresh-theme" || Date.now() - themeCheckedAt < 30_000) return;
+  themeCheckedAt = Date.now();
+  ping();
 });
 
 // Cast button drawn over a video by content.js.

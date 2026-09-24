@@ -23,6 +23,9 @@
   "castSending": {
     "message": "جارٍ البث…"
   },
+  "castLaunching": {
+    "message": "جارٍ فتح NetsuCast…"
+  },
   "castPlaying": {
     "message": "قيد التشغيل في NetsuCast ✓"
   },

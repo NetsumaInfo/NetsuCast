@@ -20,7 +20,8 @@
         "minWidth": 640,
         "minHeight": 400,
         "transparent": true,
-        "center": true
+        "center": true,
+        "visible": false
       }
     ],
     "security": {
@@ -28,6 +29,11 @@
     }
   },
   "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["netsucast"]
+      }
+    },
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IENFQjNGMTFCMjlFRjQxQUQKUldTdFFlOHBHL0d6emdoY3pqbHhpdGdXZEpKVjEwdWlzeGFvWXpJZk9TNFd3NFhrUjNzSHRTdm8K",
       "endpoints": [

@@ -159,7 +159,9 @@
     "portBusy": "ポート {{port}} は別のプログラムが使用しています。ここと拡張機能の両方で別のポートを選んでください。",
     "theme": "テーマ",
     "sectionUpdates": "アップデート",
-    "sectionAbout": "このアプリについて"
+    "sectionAbout": "このアプリについて",
+    "launchAtLogin": "Windowsと同時に起動",
+    "launchAtLoginHint": "ウィンドウを閉じてもNetsuCastはバックグラウンドで待機します。時計の近くのアイコンから開いたり終了したりできます。"
   },
   "errors": {
     "generic": "再生できません：{{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "コーヒーをおごる",
     "legal": "© 2026 Haim Faraj · NetsuCastはGNU AGPL v3.0-onlyのもとで配布されています · 保証はありません。",
     "source": "ソースコード"
+  },
+  "tray": {
+    "open": "NetsuCastを開く",
+    "quit": "終了"
   }
 }

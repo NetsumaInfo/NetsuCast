@@ -159,7 +159,9 @@
     "portBusy": "{{port}} numaralı bağlantı noktasını başka bir program kullanıyor: burada ve uzantıda başka bir tane seç.",
     "theme": "Tema",
     "sectionUpdates": "Güncellemeler",
-    "sectionAbout": "Hakkında"
+    "sectionAbout": "Hakkında",
+    "launchAtLogin": "Windows ile başlat",
+    "launchAtLoginHint": "NetsuCast pencere kapalıyken bile arka planda hazır bekler. Saatin yanındaki simge onu açar veya kapatır."
   },
   "errors": {
     "generic": "Oynatılamıyor: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "Bir kahve ısmarla",
     "legal": "© 2026 Haim Faraj · NetsuCast, GNU AGPL v3.0-only kapsamında dağıtılır · Garanti verilmez.",
     "source": "Kaynak kod"
+  },
+  "tray": {
+    "open": "NetsuCast'i aç",
+    "quit": "Çık"
   }
 }

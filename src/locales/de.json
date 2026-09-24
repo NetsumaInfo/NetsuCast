@@ -159,7 +159,9 @@
     "portBusy": "Port {{port}} wird schon von einem anderen Programm genutzt: Wähl einen anderen, hier und in der Erweiterung.",
     "theme": "Design",
     "sectionUpdates": "Updates",
-    "sectionAbout": "Über"
+    "sectionAbout": "Über",
+    "launchAtLogin": "Mit Windows starten",
+    "launchAtLoginHint": "NetsuCast bleibt im Hintergrund bereit, auch bei geschlossenem Fenster. Das Symbol neben der Uhr öffnet oder beendet es."
   },
   "errors": {
     "generic": "Wiedergabe nicht möglich: {{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "Einen Kaffee spendieren",
     "legal": "© 2026 Haim Faraj · NetsuCast wird unter GNU AGPL v3.0-only vertrieben · Keine Gewährleistung.",
     "source": "Quellcode"
+  },
+  "tray": {
+    "open": "NetsuCast öffnen",
+    "quit": "Beenden"
   }
 }

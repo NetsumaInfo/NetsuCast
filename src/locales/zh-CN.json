@@ -159,7 +159,9 @@
     "portBusy": "端口 {{port}} 已被其他程序占用：在这里和扩展中改用其他端口。",
     "theme": "主题",
     "sectionUpdates": "更新",
-    "sectionAbout": "关于"
+    "sectionAbout": "关于",
+    "launchAtLogin": "随Windows启动",
+    "launchAtLoginHint": "即使关闭窗口，NetsuCast也会在后台待命。可通过时钟旁的图标打开或退出。"
   },
   "errors": {
     "generic": "无法播放：{{reason}}",
@@ -257,5 +259,9 @@
     "coffee": "请作者喝杯咖啡",
     "legal": "© 2026 Haim Faraj · NetsuCast依据GNU AGPL v3.0-only发布 · 不提供任何担保。",
     "source": "源代码"
+  },
+  "tray": {
+    "open": "打开NetsuCast",
+    "quit": "退出"
   }
 }

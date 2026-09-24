@@ -41,6 +41,11 @@ The extension picks the source for you:
    with the page's Referer, User-Agent and cookies, which most video hosts check.
 3. Failing both, it sends the page and lets yt-dlp's generic extractor try.
 
+If NetsuCast is closed, the extension starts it through a `netsucast://` link (the browser asks
+once), waits until it listens, then casts. With **Start with Windows** (on by default) NetsuCast
+starts hidden at login, and closing its window keeps it running near the clock, where its icon
+opens or quits it. The extension's button and popup take the colours of the app's theme.
+
 It talks to the player over `http://127.0.0.1:47800` only. The player binds to loopback, refuses
 requests carrying a web page's origin, and accepts only `http(s)` URLs, so a website cannot make
 it open something.
@@ -94,7 +99,7 @@ for yt-dlp sources) and speed from 0.5× to 2×.
 
 | Section | Settings |
 |---|---|
-| Playback | Skip length (5, 10, 15, 30 s) · resume at the browser's position · full screen on every cast · keep the window on top · decode with the graphics card |
+| Playback | Skip length (5, 10, 15, 30 s) · resume at the browser's position · full screen on every cast · keep the window on top · start with Windows · decode with the graphics card |
 | Upscale | Default model (Auto or one of the four) · always upscale · scale · maximum source quality · smooth gradients (debanding) |
 | Subtitles and audio | Subtitle languages · YouTube's automatic subtitles · subtitle size · preferred audio languages |
 | Interface | Theme (dark, midnight, navy, graphite, forest, ember, plum, high contrast, light, soft light, paper) · language, or the system's |

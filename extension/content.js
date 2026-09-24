@@ -117,7 +117,12 @@
   const root = host.attachShadow({ mode: "closed" });
   root.innerHTML = `
     <style>
-      :host { all: initial; }
+      /* The app's theme colours (see applyTheme below); these are its default theme. */
+      :host {
+        all: initial;
+        --nc-accent: #2F6FE0; --nc-accent-hover: #3B7BF0; --nc-accent-ink: #FFFFFF; --nc-accent-text: #4C8DFF;
+        --nc-overlay: #1D2330; --nc-ink: #E7EAF0; --nc-line: #222836;
+      }
       button {
         position: fixed; z-index: 2147483647; display: none; align-items: center;
         height: 36px; min-width: 36px; max-width: 360px; margin: 0; padding: 0 9px; border: 0;
@@ -127,8 +132,9 @@
         text-align: start; transition: background-color .15s ease-out;
       }
       button.show { display: inline-flex; }
-      button:hover, button:focus-visible, button.open { background: #2F6FE0; }
-      button:focus-visible { outline: 2px solid #4C8DFF; outline-offset: 2px; }
+      button:hover, button:focus-visible, button.open { background: var(--nc-accent); color: var(--nc-accent-ink); }
+      button:focus-visible { outline: 2px solid var(--nc-accent-text); outline-offset: 2px; }
+      button.err { color: #fff; }
       button.err { background: #C93442; }
       /* Scoped to the button: the tooltip below has its own span and svg. */
       button svg { flex: none; width: 18px; height: 18px; }
@@ -143,13 +149,14 @@
          slide from the arrow side. */
       [role="tooltip"] {
         position: fixed; z-index: 2147483647; display: none; max-width: 208px; padding: 6px 10px;
-        border: 1px solid #222836; border-radius: 6px; background: #1D2330; color: #E7EAF0;
+        border: 1px solid var(--nc-line); border-radius: 6px; background: var(--nc-overlay); color: var(--nc-ink);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1);
         font: 400 12px/1.35 "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
         overflow-wrap: break-word; pointer-events: none; transform-origin: 18px top;
       }
       [role="tooltip"].show { display: block; animation: tip-in .15s ease-out; }
       [role="tooltip"] svg { position: absolute; top: -8px; left: 8px; width: 20px; height: 10px; }
+      .tip-fill { fill: var(--nc-overlay); } .tip-edge { fill: var(--nc-line); }
       @keyframes tip-in { from { opacity: 0; scale: .98; translate: 0 -6px; } }
       @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
     </style>
@@ -160,8 +167,8 @@
       <span>NetsuCast</span>
     </button>
     <div id="tip" role="tooltip"><span></span><svg viewBox="0 0 20 10" fill="none" aria-hidden="true">
-      <path fill="#1D2330" d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V10H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"/>
-      <path fill="#222836" d="M8.99542 1.85876C9.75604 1.17425 10.9106 1.17422 11.6713 1.85878L16.5281 6.22989C17.0789 6.72568 17.7938 7.00001 18.5349 7.00001L15.89 7L11.0023 2.60207C10.622 2.2598 10.0447 2.2598 9.66437 2.60207L4.77907 7L2.13172 7.00001C2.87268 7.00001 3.58761 6.72568 4.13844 6.22989L8.99542 1.85876Z"/>
+      <path class="tip-fill" d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V10H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"/>
+      <path class="tip-edge" d="M8.99542 1.85876C9.75604 1.17425 10.9106 1.17422 11.6713 1.85878L16.5281 6.22989C17.0789 6.72568 17.7938 7.00001 18.5349 7.00001L15.89 7L11.0023 2.60207C10.622 2.2598 10.0447 2.2598 9.66437 2.60207L4.77907 7L2.13172 7.00001C2.87268 7.00001 3.58761 6.72568 4.13844 6.22989L8.99542 1.85876Z"/>
     </svg></div>`;
   const button = root.querySelector("button");
   const label = root.querySelector("span");
@@ -187,6 +194,22 @@
   button.addEventListener("focus", () => button.matches(":focus-visible") && showTip());
   button.addEventListener("blur", hideTip);
   button.addEventListener("keydown", (e) => e.key === "Escape" && hideTip());
+
+  // Same colours as the app: its theme reaches the extension through /ping (background.js keeps
+  // it in storage), and changes apply to every open page.
+  const THEME_VARS = { accent: "accent", "accent-hover": "accent-hover", "accent-ink": "accent-ink", "accent-text": "accent-text", overlay: "overlay", ink: "ink", line: "line" };
+  function applyTheme(theme) {
+    for (const [token, name] of Object.entries(THEME_VARS)) {
+      if (theme?.[token]) host.style.setProperty(`--nc-${name}`, theme[token]);
+    }
+  }
+  try {
+    chrome.storage.local.get("theme").then(({ theme }) => applyTheme(theme));
+    chrome.storage.onChanged.addListener((changes) => changes.theme && applyTheme(changes.theme.newValue));
+    chrome.runtime.sendMessage({ type: "refresh-theme" }).catch(() => {});
+  } catch {
+    // extension reloaded under this page: the default colours stay
+  }
 
   /** Shows a status in the pill (sending, playing, error) or goes back to the icon. */
   function status(text, kind) {
@@ -265,6 +288,19 @@
   window.addEventListener("scroll", place, { capture: true, passive: true });
   window.addEventListener("resize", place, { passive: true });
 
+  // background.js is starting NetsuCast (it was closed): say so, and hold the video where it is so
+  // the position already sent stays right.
+  let casting = null;
+  try {
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message?.type !== "launching" || !casting) return;
+      status(t("castLaunching"));
+      casting.pause();
+    });
+  } catch {
+    // extension reloaded under this page
+  }
+
   button.addEventListener("click", async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -272,6 +308,7 @@
     busy = true;
     status(t("castSending"));
     const video = target;
+    casting = video;
     try {
       const res = await chrome.runtime.sendMessage({ type: "cast", ...describe(video) });
       if (!res?.ok) throw new Error(res?.error ?? "failed");
@@ -281,6 +318,7 @@
     } catch (err) {
       status(errorText(String(err?.message ?? err)), "err");
     } finally {
+      casting = null;
       busy = false;
       clearTimeout(hideTimer);
       hideTimer = setTimeout(hide, HIDE_AFTER);

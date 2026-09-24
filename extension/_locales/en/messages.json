@@ -31,6 +31,9 @@
     "message": "Casting…",
     "description": "In-page cast button label while the cast is being sent. Short."
   },
+  "castLaunching": {
+    "message": "Opening NetsuCast…"
+  },
   "castPlaying": {
     "message": "Playing in NetsuCast ✓",
     "description": "In-page cast button label after a successful cast. Short."
