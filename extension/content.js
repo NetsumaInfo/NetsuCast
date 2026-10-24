@@ -11,6 +11,22 @@
   const VIDEO_LINK = /\/watch\?(.*&)?v=|\/shorts\/|\/live\/[\w-]{6,}|\/status(es)?\/\d|\/videos?\/[\w-]+|\/clip\/|youtu\.be\/[\w-]{6,}/i;
   const LINK_SELECTOR = "a[href]";
 
+  // The settings this script uses (common.js DEFAULT_PREFS holds them all; content scripts
+  // cannot import it).
+  let prefs = { castButton: true, hiddenSites: [], buttonCorner: "left", hideInFullscreen: false, pauseOnCast: true };
+  // The tab's site, also inside a player iframe from another host: the user hid the button
+  // on the site they see in the address bar.
+  const site = (() => {
+    try {
+      const top = location.ancestorOrigins?.length ? location.ancestorOrigins[location.ancestorOrigins.length - 1] : location.origin;
+      return new URL(top).hostname;
+    } catch {
+      return location.hostname;
+    }
+  })();
+  const buttonWanted = () =>
+    prefs.castButton && !prefs.hiddenSites.includes(site) && !(prefs.hideInFullscreen && document.fullscreenElement);
+
   // --- finding videos (shadow DOM included) --------------------------------------------------
 
   function allVideos(root = document, out = []) {
@@ -156,6 +172,8 @@
       }
       [role="tooltip"].show { display: block; animation: tip-in .15s ease-out; }
       [role="tooltip"] svg { position: absolute; top: -8px; left: 8px; width: 20px; height: 10px; }
+      [role="tooltip"].end { transform-origin: calc(100% - 18px) top; }
+      [role="tooltip"].end svg { left: auto; right: 8px; }
       .tip-fill { fill: var(--nc-overlay); } .tip-edge { fill: var(--nc-line); }
       @keyframes tip-in { from { opacity: 0; scale: .98; translate: 0 -6px; } }
       @media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
@@ -182,8 +200,11 @@
   function showTip() {
     if (button.classList.contains("open")) return;
     const r = button.getBoundingClientRect();
-    tip.style.left = `${r.left}px`;
+    const end = prefs.buttonCorner === "right";
+    tip.classList.toggle("end", end);
     tip.style.top = `${r.bottom + 8}px`;
+    tip.style.left = end ? "auto" : `${r.left}px`;
+    tip.style.right = end ? `${innerWidth - r.right}px` : "auto";
     tip.classList.add("show");
   }
   function hideTip() {
@@ -204,8 +225,18 @@
     }
   }
   try {
-    chrome.storage.local.get("theme").then(({ theme }) => applyTheme(theme));
-    chrome.storage.onChanged.addListener((changes) => changes.theme && applyTheme(changes.theme.newValue));
+    chrome.storage.local.get(["theme", "prefs"]).then(({ theme, prefs: saved }) => {
+      applyTheme(theme);
+      prefs = { ...prefs, ...saved };
+    });
+    chrome.storage.onChanged.addListener((changes) => {
+      if (changes.theme) applyTheme(changes.theme.newValue);
+      if (changes.prefs) {
+        prefs = { ...prefs, ...changes.prefs.newValue };
+        if (!buttonWanted()) hide(true);
+        else place();
+      }
+    });
     chrome.runtime.sendMessage({ type: "refresh-theme" }).catch(() => {});
   } catch {
     // extension reloaded under this page: the default colours stay
@@ -244,7 +275,10 @@
     if (!target) return;
     const r = target.getBoundingClientRect();
     button.style.top = `${Math.max(r.top, 0) + 10}px`;
-    button.style.left = `${Math.max(r.left, 0) + 10}px`;
+    // Right corner: anchored by its right edge, so the pill opens towards the video.
+    const right = prefs.buttonCorner === "right";
+    button.style.left = right ? "auto" : `${Math.max(r.left, 0) + 10}px`;
+    button.style.right = right ? `${Math.max(innerWidth - r.right, 0) + 10}px` : "auto";
   }
 
   function show(video) {
@@ -257,8 +291,8 @@
     hideTimer = setTimeout(hide, HIDE_AFTER);
   }
 
-  function hide() {
-    if (busy || button.matches(":hover")) {
+  function hide(now = false) {
+    if (!now && (busy || button.matches(":hover"))) {
       hideTimer = setTimeout(hide, HIDE_AFTER);
       return;
     }
@@ -276,12 +310,14 @@
       const now = performance.now();
       if (now - lastMove < 120) return;
       lastMove = now;
+      if (!buttonWanted()) return;
       const video = videoAt(e.clientX, e.clientY);
       if (video) show(video);
     },
     { capture: true, passive: true },
   );
   document.addEventListener("fullscreenchange", () => {
+    if (!buttonWanted()) return hide(true);
     mount();
     place();
   });
@@ -295,7 +331,7 @@
     chrome.runtime.onMessage.addListener((message) => {
       if (message?.type !== "launching" || !casting) return;
       status(t("castLaunching"));
-      casting.pause();
+      if (prefs.pauseOnCast) casting.pause();
     });
   } catch {
     // extension reloaded under this page
@@ -312,8 +348,10 @@
     try {
       const res = await chrome.runtime.sendMessage({ type: "cast", ...describe(video) });
       if (!res?.ok) throw new Error(res?.error ?? "failed");
-      video.pause();
-      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      if (prefs.pauseOnCast) {
+        video.pause();
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      }
       status(t("castPlaying"));
     } catch (err) {
       status(errorText(String(err?.message ?? err)), "err");

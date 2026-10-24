@@ -1,4 +1,4 @@
-import { cast, getPort, isPageSite, isVideoPage, launchApp, ping, unreachable } from "./common.js";
+import { cast, getPort, getPrefs, isPageSite, isVideoPage, launchApp, ping, unreachable } from "./common.js";
 
 // Detected streams per tab, kept in session storage because the service worker is short-lived.
 // Entry: { url, type: "HLS" | "DASH" | "MP4" | "WEBM", referer, at }
@@ -136,7 +136,8 @@ async function pickSource(tab, { frameUrl, src, pageUrl: videoPage } = {}) {
 
 async function castTab(tab, info = {}) {
   const source = await pickSource(tab, info);
-  const request = { ...source, title: tab.title, start: info.start ?? null };
+  const { sendPosition } = await getPrefs();
+  const request = { ...source, title: tab.title, start: sendPosition ? (info.start ?? null) : null };
   try {
     await cast(request);
   } catch (error) {
@@ -166,8 +167,16 @@ async function flash(tabId, ok, title) {
   }, ok ? 2500 : 6000);
 }
 
-// Toolbar icon or Alt+Shift+C: cast right away, no menu.
-chrome.action.onClicked.addListener(async (tab) => {
+// Toolbar icon (when it does not open the popup) or the shortcut (Alt+Shift+C by default, which
+// casts even when the icon opens the popup): cast right away, no menu.
+chrome.action.onClicked.addListener((tab) => castActive(tab));
+chrome.commands.onCommand.addListener(async (name, tab) => {
+  if (name !== "cast-video") return;
+  castActive(tab ?? (await chrome.tabs.query({ active: true, currentWindow: true }))[0]);
+});
+
+async function castActive(tab) {
+  if (!tab) return;
   if (!tab.id || !/^https?:/i.test(tab.url ?? "")) return;
   let found = null;
   try {
@@ -181,14 +190,14 @@ chrome.action.onClicked.addListener(async (tab) => {
   try {
     await castTab(tab, found?.result ?? {});
     await flash(tab.id, true, t("castDone"));
-    if (found) {
+    if (found && (await getPrefs()).pauseOnCast) {
       chrome.scripting.executeScript({ target: { tabId: tab.id, frameIds: [found.frameId] }, func: pauseVideos }).catch(() => {});
     }
   } catch (e) {
     const code = String(e?.message ?? e);
     await flash(tab.id, false, code === "no-video" ? t("errNoVideo") : t("errNotRunning"));
   }
-});
+}
 
 // The content script asks for the app's colours when a page loads; one ping refreshes them for
 // every tab (at most every 30 s).
@@ -218,17 +227,35 @@ async function hello() {
     // app not running
   }
 }
-chrome.runtime.onStartup.addListener(hello);
+// Menus and the toolbar icon follow the settings: "Play in NetsuCast" can be turned off, and a
+// click on the icon can open the popup instead of casting at once.
+let syncing = Promise.resolve();
+function applyPrefs() {
+  syncing = syncing.then(async () => {
+    const prefs = await getPrefs();
+    await chrome.action.setPopup({ popup: prefs.iconClick === "menu" ? "popup.html" : "" });
+    await chrome.contextMenus.removeAll();
+    if (prefs.contextMenu) chrome.contextMenus.create({ id: "netsucast-play", title: t("menuPlay"), contexts: ["page", "video", "link"] });
+    chrome.contextMenus.create({ id: "netsucast-pick", title: t("menuPick"), contexts: ["action"] });
+    chrome.contextMenus.create({ id: "netsucast-settings", title: t("menuSettings"), contexts: ["action"] });
+  }).catch(() => {});
+}
+chrome.storage.onChanged.addListener((changes, area) => area === "local" && changes.prefs && applyPrefs());
+
+chrome.runtime.onStartup.addListener(() => {
+  hello();
+  applyPrefs();
+});
 
 chrome.runtime.onInstalled.addListener(() => {
   hello();
-  chrome.contextMenus.create({ id: "netsucast-play", title: t("menuPlay"), contexts: ["page", "video", "link"] });
-  chrome.contextMenus.create({ id: "netsucast-pick", title: t("menuPick"), contexts: ["action"] });
+  applyPrefs();
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === "netsucast-pick") {
-    chrome.windows.create({ url: `popup.html?tab=${tab?.id ?? ""}`, type: "popup", width: 420, height: 560 });
+  if (info.menuItemId === "netsucast-pick" || info.menuItemId === "netsucast-settings") {
+    const view = info.menuItemId === "netsucast-settings" ? "&view=settings" : "&view=cast";
+    chrome.windows.create({ url: `popup.html?tab=${tab?.id ?? ""}${view}`, type: "popup", width: 420, height: 560 });
     return;
   }
   if (!tab) return;

@@ -1,7 +1,7 @@
 {
   "name": "netsucast",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "AGPL-3.0-only",
   "author": "Netsuma",
   "repository": {
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "~2.7.3",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-updater": "^2",
     "i18next": "^26.4.2",
@@ -37,6 +38,7 @@
     "tauri-plugin-mpv-api": "0.5.2"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "2.6.2",
     "@tailwindcss/vite": "^4.3.3",
     "@tauri-apps/cli": "^2",
     "@types/react": "^19.1.8",

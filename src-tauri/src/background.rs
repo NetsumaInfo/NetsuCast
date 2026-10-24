@@ -23,17 +23,45 @@ impl TrayItems {
     }
 }
 
+/// Brings the window back. The interface is told, so it starts mpv again (it only runs while
+/// the window is on screen, see App.tsx).
 pub fn show_main(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
         let _ = window.show();
         let _ = window.set_focus();
+        let _ = window.emit("window-shown", ());
     }
 }
 
-/// Shows the window unless Windows started NetsuCast at login.
+/// A video file among launch arguments: "Open with NetsuCast", a double click on an associated
+/// file, or a file dropped on the shortcut. Flags and `netsucast://` links are skipped.
+pub fn file_arg<I: IntoIterator<Item = String>>(args: I) -> Option<String> {
+    args.into_iter()
+        .skip(1)
+        .find(|arg| !arg.starts_with('-') && !arg.contains("://") && std::path::Path::new(arg).is_file())
+}
+
+/// The file NetsuCast was started with, handed over once to the interface when it is ready.
+pub struct LaunchFile(pub Mutex<Option<String>>);
+
+#[tauri::command]
+pub fn take_launch_file(file: State<LaunchFile>) -> Option<String> {
+    file.0.lock().unwrap().take()
+}
+
+/// A second launch with a file (NetsuCast already running): play it in this window.
+pub fn on_second_instance(app: &AppHandle, args: Vec<String>) {
+    show_main(app);
+    if let Some(path) = file_arg(args) {
+        let _ = app.emit("open-file", path);
+    }
+}
+
+/// Shows the window unless Windows started NetsuCast at login (a file to play always shows it).
 pub fn show_unless_background(app: &AppHandle) {
-    if !std::env::args().any(|arg| arg == BACKGROUND_ARG) {
+    let file = app.state::<LaunchFile>().0.lock().unwrap().is_some();
+    if file || !std::env::args().any(|arg| arg == BACKGROUND_ARG) {
         show_main(app);
     }
 }

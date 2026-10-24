@@ -1,5 +1,41 @@
 [
   {
+    "id": "0.2.0",
+    "version": "0.2.0",
+    "date": "2026-10-24",
+    "title": {
+      "fr": "Lecteur vidéo et nouvelle icône",
+      "en": "Video player and a new icon"
+    },
+    "changes": [
+      {
+        "kind": "feature",
+        "fr": "Ouvre tes vidéos du PC : bouton « Ouvrir une vidéo », glisser-déposer ou « Ouvrir avec NetsuCast », avec l'upscale.",
+        "en": "Open videos from your PC: the Open a video button, drag and drop or Open with NetsuCast, with the upscale."
+      },
+      {
+        "kind": "feature",
+        "fr": "L'extension a ses paramètres : bouton sur les vidéos, par site, coin, plein écran, pause, reprise, clic droit et raccourci.",
+        "en": "The extension has settings: the button on videos, per site, its corner, full screen, pause, resume, right-click and shortcut."
+      },
+      {
+        "kind": "performance",
+        "fr": "Fenêtre fermée, NetsuCast n'utilise plus qu'environ 55 Mo : le lecteur démarre seulement quand la fenêtre s'ouvre.",
+        "en": "With its window closed, NetsuCast now uses about 55 MB: the player only starts when the window opens."
+      },
+      {
+        "kind": "improvement",
+        "fr": "L'extension lance NetsuCast s'il est fermé, et prend les couleurs de son thème.",
+        "en": "The extension starts NetsuCast when it is closed, and takes the colours of its theme."
+      },
+      {
+        "kind": "improvement",
+        "fr": "Nouvel accueil et nouvelle icône avec Netsu, la mascotte.",
+        "en": "A new home screen and a new icon featuring Netsu, the mascot."
+      }
+    ]
+  },
+  {
     "id": "0.1.0",
     "version": "0.1.0",
     "date": "2026-09-24",

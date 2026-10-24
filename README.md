@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="src-tauri/icons/128x128.png" alt="" width="112" height="112">
+  <img src="src-tauri/icons/128x128@2x.png" alt="NetsuCast icon: the Netsu mascot in a cast screen" width="128" height="128">
 
 # NetsuCast
 
@@ -15,20 +15,32 @@ a browser extension that finds the video you are watching, and a desktop player 
 plays it with an [ArtCNN](https://github.com/Artoriuz/ArtCNN) shader upscaling every frame. The
 video pauses in the browser and resumes in the player at the same second.
 
+The icon is Netsu, the mascot of the Netsu apps, inside a screen whose corner holds the cast
+mark. Its sources live in [`icon-design/`](icon-design); `node scripts/make-icon.mjs` rebuilds
+every app and extension icon from them.
+
 It does not play DRM-protected streams and does not try to: Netflix, Crunchyroll and similar
 services stay in the browser.
 
 > [!NOTE]
-> Version 0.1.0, no published installer yet. Windows only.
+> Version 0.2.0. Windows only.
 
 ## How a video gets to the player
 
 | From | What happens |
 |---|---|
 | The cast icon shown in the top-left corner of any video on hover (iframes included); it opens into a **NetsuCast** button | Casts that video and pauses it in the page |
-| The extension icon, or <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> | Casts the main video of the tab |
-| Right-click on the icon, *Choose the stream to cast…* | Lists the streams the extension saw in the tab |
-| A link pasted on the home screen, or a file dropped on the window | Plays it directly |
+| <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> | Casts the main video of the tab |
+| The extension icon | Opens its menu: **Settings**, and a **Cast** tab (cast the page, or pick one of the streams the extension saw) |
+| A video file: *Open a video* on the home screen, dropped on the window, or *Open with NetsuCast* in Explorer | Plays it, upscaled like any cast |
+| A link pasted on the home screen | Plays it directly |
+
+NetsuCast is also a plain video player: the installer offers it for mp4, mkv, webm, mov, avi,
+ts and the other common formats.
+
+The extension's settings: the cast button on videos (everywhere, or turned off for one site),
+its corner, hiding it in full screen, pausing the browser's video, resuming at the same second,
+the right-click entry, the cast shortcut and the port.
 
 The extension picks the source for you:
 
@@ -44,7 +56,8 @@ The extension picks the source for you:
 If NetsuCast is closed, the extension starts it through a `netsucast://` link (the browser asks
 once), waits until it listens, then casts. With **Start with Windows** (on by default) NetsuCast
 starts hidden at login, and closing its window keeps it running near the clock, where its icon
-opens or quits it. The extension's button and popup take the colours of the app's theme.
+opens or quits it. Hidden, it keeps only the small receiver the extension talks to (about 55 MB):
+mpv and its GPU context start when the window shows, in under a second, and stop when it closes. The extension's button and popup take the colours of the app's theme.
 
 It talks to the player over `http://127.0.0.1:47800` only. The player binds to loopback, refuses
 requests carrying a web page's origin, and accepts only `http(s)` URLs, so a website cannot make

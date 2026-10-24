@@ -1,6 +1,6 @@
 [package]
 name = "netsucast"
-version = "0.1.0"
+version = "0.2.0"
 description = "NetsuCast — video player that continues browser videos with real-time ArtCNN upscaling on the GPU"
 authors = ["Netsuma"]
 license = "AGPL-3.0-only"
@@ -36,6 +36,7 @@ semver = "1"
 tauri-plugin-autostart = "2"
 tauri-plugin-deep-link = "2"
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
+tauri-plugin-dialog = "2"
 
 # DXGI: which graphics card mpv renders on (automatic model choice); job objects: mpv ends
 # with NetsuCast (child_job.rs). Same version Tauri uses.

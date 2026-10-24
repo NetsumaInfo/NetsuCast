@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "播放"
+  },
+  "setTitle": {
+    "message": "設定"
+  },
+  "menuSettings": {
+    "message": "設定…"
+  },
+  "setCastButton": {
+    "message": "影片上的 NetsuCast 按鈕"
+  },
+  "setCastButtonHint": {
+    "message": "滑鼠移到影片上時顯示。"
+  },
+  "setButtonOnSite": {
+    "message": "在 $SITE$ 上",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "按鈕位置"
+  },
+  "setCornerLeft": {
+    "message": "左側"
+  },
+  "setCornerRight": {
+    "message": "右側"
+  },
+  "setIconClick": {
+    "message": "點擊圖示時"
+  },
+  "setIconCast": {
+    "message": "投放"
+  },
+  "setIconMenu": {
+    "message": "開啟此選單"
+  },
+  "setPauseOnCast": {
+    "message": "暫停瀏覽器中的影片"
+  },
+  "setSendPosition": {
+    "message": "從同一位置繼續"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast 會從你在瀏覽器中看到的位置開始。"
+  },
+  "setContextMenu": {
+    "message": "右鍵選單"
+  },
+  "setHiddenSites": {
+    "message": "不顯示按鈕的網站：$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "在所有網站顯示"
+  },
+  "setPortHint": {
+    "message": "與 NetsuCast 設定中的連接埠相同。"
+  },
+  "setHideFullscreen": {
+    "message": "全螢幕時隱藏按鈕"
+  },
+  "setShortcut": {
+    "message": "投放快速鍵"
+  },
+  "setShortcutChange": {
+    "message": "變更"
+  },
+  "setShortcutNone": {
+    "message": "無"
+  },
+  "tabCast": {
+    "message": "投放"
   }
 }

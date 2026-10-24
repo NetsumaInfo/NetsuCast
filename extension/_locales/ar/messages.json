@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "تشغيل"
+  },
+  "setTitle": {
+    "message": "الإعدادات"
+  },
+  "menuSettings": {
+    "message": "الإعدادات…"
+  },
+  "setCastButton": {
+    "message": "زر NetsuCast على الفيديوهات"
+  },
+  "setCastButtonHint": {
+    "message": "يظهر عند تمرير المؤشر فوق فيديو."
+  },
+  "setButtonOnSite": {
+    "message": "على $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "موضع الزر"
+  },
+  "setCornerLeft": {
+    "message": "يسار"
+  },
+  "setCornerRight": {
+    "message": "يمين"
+  },
+  "setIconClick": {
+    "message": "النقر على الأيقونة"
+  },
+  "setIconCast": {
+    "message": "البث"
+  },
+  "setIconMenu": {
+    "message": "فتح هذه القائمة"
+  },
+  "setPauseOnCast": {
+    "message": "إيقاف فيديو المتصفح مؤقتًا"
+  },
+  "setSendPosition": {
+    "message": "المتابعة من اللحظة نفسها"
+  },
+  "setSendPositionHint": {
+    "message": "يبدأ NetsuCast من حيث كنت في المتصفح."
+  },
+  "setContextMenu": {
+    "message": "قائمة النقر بزر الماوس الأيمن"
+  },
+  "setHiddenSites": {
+    "message": "مواقع بلا زر: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "الإظهار في كل مكان"
+  },
+  "setPortHint": {
+    "message": "نفس المنفذ في إعدادات NetsuCast."
+  },
+  "setHideFullscreen": {
+    "message": "إخفاء الزر في وضع ملء الشاشة"
+  },
+  "setShortcut": {
+    "message": "اختصار البث"
+  },
+  "setShortcutChange": {
+    "message": "تغيير"
+  },
+  "setShortcutNone": {
+    "message": "لا يوجد"
+  },
+  "tabCast": {
+    "message": "البث"
   }
 }

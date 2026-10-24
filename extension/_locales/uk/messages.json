@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "Відтворити"
+  },
+  "setTitle": {
+    "message": "Налаштування"
+  },
+  "menuSettings": {
+    "message": "Налаштування…"
+  },
+  "setCastButton": {
+    "message": "Кнопка NetsuCast на відео"
+  },
+  "setCastButtonHint": {
+    "message": "З'являється, коли наводиш на відео."
+  },
+  "setButtonOnSite": {
+    "message": "На $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "Розташування кнопки"
+  },
+  "setCornerLeft": {
+    "message": "Ліворуч"
+  },
+  "setCornerRight": {
+    "message": "Праворуч"
+  },
+  "setIconClick": {
+    "message": "Натискання на значок"
+  },
+  "setIconCast": {
+    "message": "Кастити"
+  },
+  "setIconMenu": {
+    "message": "Відкрити це меню"
+  },
+  "setPauseOnCast": {
+    "message": "Ставити відео в браузері на паузу"
+  },
+  "setSendPosition": {
+    "message": "Продовжувати з того самого місця"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast почне там, де ти зупинився в браузері."
+  },
+  "setContextMenu": {
+    "message": "Меню правої кнопки"
+  },
+  "setHiddenSites": {
+    "message": "Сайти без кнопки: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "Показувати всюди"
+  },
+  "setPortHint": {
+    "message": "Той самий, що в налаштуваннях NetsuCast."
+  },
+  "setHideFullscreen": {
+    "message": "Ховати кнопку в повноекранному режимі"
+  },
+  "setShortcut": {
+    "message": "Сполучення клавіш для касту"
+  },
+  "setShortcutChange": {
+    "message": "Змінити"
+  },
+  "setShortcutNone": {
+    "message": "Немає"
+  },
+  "tabCast": {
+    "message": "Каст"
   }
 }

@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "NetsuCast",
   "mainBinaryName": "NetsuCast",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "identifier": "com.netsucast.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -52,6 +52,14 @@
     ],
     "license": "AGPL-3.0-only",
     "licenseFile": "../LICENSE",
+    "fileAssociations": [
+      {
+        "ext": ["mp4", "mkv", "webm", "mov", "m4v", "avi", "wmv", "flv", "ts", "m2ts", "mpg", "mpeg", "ogv", "3gp"],
+        "name": "NetsuCast video",
+        "description": "Video",
+        "role": "Viewer"
+      }
+    ],
     "publisher": "Haim Faraj",
     "homepage": "https://github.com/NetsumaInfo/NetsuCast",
     "copyright": "© 2026 Haim Faraj — AGPL-3.0-only",

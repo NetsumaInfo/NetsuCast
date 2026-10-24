@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "Oynat"
+  },
+  "setTitle": {
+    "message": "Ayarlar"
+  },
+  "menuSettings": {
+    "message": "Ayarlar…"
+  },
+  "setCastButton": {
+    "message": "Videolarda NetsuCast düğmesi"
+  },
+  "setCastButtonHint": {
+    "message": "Bir videonun üzerine gelince görünür."
+  },
+  "setButtonOnSite": {
+    "message": "$SITE$ üzerinde",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "Düğmenin konumu"
+  },
+  "setCornerLeft": {
+    "message": "Sol"
+  },
+  "setCornerRight": {
+    "message": "Sağ"
+  },
+  "setIconClick": {
+    "message": "Simgeye tıklama"
+  },
+  "setIconCast": {
+    "message": "Cast et"
+  },
+  "setIconMenu": {
+    "message": "Bu menüyü aç"
+  },
+  "setPauseOnCast": {
+    "message": "Tarayıcıdaki videoyu duraklat"
+  },
+  "setSendPosition": {
+    "message": "Aynı yerden devam et"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast tarayıcıda kaldığın yerden başlar."
+  },
+  "setContextMenu": {
+    "message": "Sağ tık menüsü"
+  },
+  "setHiddenSites": {
+    "message": "Düğmesiz siteler: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "Her yerde göster"
+  },
+  "setPortHint": {
+    "message": "NetsuCast ayarlarındakiyle aynı."
+  },
+  "setHideFullscreen": {
+    "message": "Tam ekranda düğmeyi gizle"
+  },
+  "setShortcut": {
+    "message": "Cast etme kısayolu"
+  },
+  "setShortcutChange": {
+    "message": "Değiştir"
+  },
+  "setShortcutNone": {
+    "message": "Yok"
+  },
+  "tabCast": {
+    "message": "Cast"
   }
 }

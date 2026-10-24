@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "Afspelen"
+  },
+  "setTitle": {
+    "message": "Instellingen"
+  },
+  "menuSettings": {
+    "message": "Instellingen…"
+  },
+  "setCastButton": {
+    "message": "NetsuCast-knop op video's"
+  },
+  "setCastButtonHint": {
+    "message": "Verschijnt als je over een video beweegt."
+  },
+  "setButtonOnSite": {
+    "message": "Op $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "Positie van de knop"
+  },
+  "setCornerLeft": {
+    "message": "Links"
+  },
+  "setCornerRight": {
+    "message": "Rechts"
+  },
+  "setIconClick": {
+    "message": "Klik op het pictogram"
+  },
+  "setIconCast": {
+    "message": "Casten"
+  },
+  "setIconMenu": {
+    "message": "Dit menu openen"
+  },
+  "setPauseOnCast": {
+    "message": "Video in de browser pauzeren"
+  },
+  "setSendPosition": {
+    "message": "Verder op hetzelfde moment"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast begint waar je in de browser was."
+  },
+  "setContextMenu": {
+    "message": "Rechtermuisknopmenu"
+  },
+  "setHiddenSites": {
+    "message": "Sites zonder knop: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "Overal tonen"
+  },
+  "setPortHint": {
+    "message": "Dezelfde als in de instellingen van NetsuCast."
+  },
+  "setHideFullscreen": {
+    "message": "Knop verbergen op volledig scherm"
+  },
+  "setShortcut": {
+    "message": "Sneltoets om te casten"
+  },
+  "setShortcutChange": {
+    "message": "Wijzigen"
+  },
+  "setShortcutNone": {
+    "message": "Geen"
+  },
+  "tabCast": {
+    "message": "Casten"
   }
 }

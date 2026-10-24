@@ -91,5 +91,86 @@
   "popupPlay": {
     "message": "Play",
     "description": "Popup button on each stream row: play this stream in the app."
+  },
+  "setTitle": {
+    "message": "Settings"
+  },
+  "menuSettings": {
+    "message": "Settings…"
+  },
+  "setCastButton": {
+    "message": "NetsuCast button on videos"
+  },
+  "setCastButtonHint": {
+    "message": "Shows when you hover a video."
+  },
+  "setButtonOnSite": {
+    "message": "On $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "Button position"
+  },
+  "setCornerLeft": {
+    "message": "Left"
+  },
+  "setCornerRight": {
+    "message": "Right"
+  },
+  "setIconClick": {
+    "message": "Clicking the icon"
+  },
+  "setIconCast": {
+    "message": "Casts"
+  },
+  "setIconMenu": {
+    "message": "Opens this menu"
+  },
+  "setPauseOnCast": {
+    "message": "Pause the browser's video"
+  },
+  "setSendPosition": {
+    "message": "Continue at the same moment"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast starts where you were in the browser."
+  },
+  "setContextMenu": {
+    "message": "Right-click menu"
+  },
+  "setHiddenSites": {
+    "message": "Sites without the button: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "Show everywhere"
+  },
+  "setPortHint": {
+    "message": "The same as in NetsuCast's settings."
+  },
+  "setHideFullscreen": {
+    "message": "Hide the button in full screen"
+  },
+  "setShortcut": {
+    "message": "Shortcut to cast"
+  },
+  "setShortcutChange": {
+    "message": "Change"
+  },
+  "setShortcutNone": {
+    "message": "None"
+  },
+  "tabCast": {
+    "message": "Cast"
   }
 }

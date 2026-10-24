@@ -12,6 +12,16 @@
       <span id="status" class="status">…</span>
     </header>
 
+    <div class="segmented tabs" role="tablist">
+      <button id="tab-cast" type="button" role="tab" aria-selected="true" aria-controls="main" data-i18n="tabCast">Caster</button>
+      <button id="tab-settings" type="button" role="tab" aria-selected="false" aria-controls="settings" data-i18n="setTitle">Paramètres</button>
+    </div>
+
+    <section id="settings" hidden>
+      <div id="settings-list"></div>
+    </section>
+
+    <div id="main">
     <section>
       <button id="send-page" class="primary" data-i18n="popupSendPage">Caster la page</button>
       <p id="page-hint" class="hint"></p>
@@ -23,8 +33,9 @@
       <p id="empty" class="hint" data-i18n="popupEmpty" hidden>Aucun flux détecté. Lance la vidéo dans la page, puis rouvre ce menu.</p>
     </section>
 
+    </div>
+
     <footer>
-      <label><span data-i18n="popupPort">Port</span> <input id="port" type="number" min="1" max="65535" /></label>
       <span id="message" role="status"></span>
     </footer>
 

@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "הפעלה"
+  },
+  "setTitle": {
+    "message": "הגדרות"
+  },
+  "menuSettings": {
+    "message": "הגדרות…"
+  },
+  "setCastButton": {
+    "message": "כפתור NetsuCast על סרטונים"
+  },
+  "setCastButtonHint": {
+    "message": "מופיע כשמעבירים את העכבר מעל סרטון."
+  },
+  "setButtonOnSite": {
+    "message": "באתר $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "מיקום הכפתור"
+  },
+  "setCornerLeft": {
+    "message": "שמאל"
+  },
+  "setCornerRight": {
+    "message": "ימין"
+  },
+  "setIconClick": {
+    "message": "לחיצה על הסמל"
+  },
+  "setIconCast": {
+    "message": "שידור"
+  },
+  "setIconMenu": {
+    "message": "פתיחת התפריט הזה"
+  },
+  "setPauseOnCast": {
+    "message": "השהיית הסרטון בדפדפן"
+  },
+  "setSendPosition": {
+    "message": "המשך מאותו רגע"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast מתחיל מהמקום שבו היית בדפדפן."
+  },
+  "setContextMenu": {
+    "message": "תפריט הלחיצה הימנית"
+  },
+  "setHiddenSites": {
+    "message": "אתרים בלי כפתור: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "הצגה בכל מקום"
+  },
+  "setPortHint": {
+    "message": "אותו פורט כמו בהגדרות של NetsuCast."
+  },
+  "setHideFullscreen": {
+    "message": "הסתרת הכפתור במסך מלא"
+  },
+  "setShortcut": {
+    "message": "קיצור דרך לשידור"
+  },
+  "setShortcutChange": {
+    "message": "שינוי"
+  },
+  "setShortcutNone": {
+    "message": "אין"
+  },
+  "tabCast": {
+    "message": "שידור"
   }
 }

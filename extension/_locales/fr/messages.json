@@ -91,5 +91,93 @@
   "popupPlay": {
     "message": "Lire",
     "description": "Popup button on each stream row: play this stream in the app."
+  },
+  "setTitle": {
+    "message": "Paramètres",
+    "description": "Popup: settings view title and the gear button's label."
+  },
+  "menuSettings": {
+    "message": "Paramètres…",
+    "description": "Right-click menu on the toolbar icon; opens the extension settings."
+  },
+  "setCastButton": {
+    "message": "Bouton NetsuCast sur les vidéos",
+    "description": "Settings switch: show the cast button over videos in pages."
+  },
+  "setCastButtonHint": {
+    "message": "Apparaît au survol d'une vidéo."
+  },
+  "setButtonOnSite": {
+    "message": "Sur $SITE$",
+    "description": "Settings switch: show the button on the current site (hostname).",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "Position du bouton"
+  },
+  "setCornerLeft": {
+    "message": "Gauche"
+  },
+  "setCornerRight": {
+    "message": "Droite"
+  },
+  "setIconClick": {
+    "message": "Clic sur l'icône",
+    "description": "Settings: what a click on the toolbar icon does. Choices: setIconCast, setIconMenu."
+  },
+  "setIconCast": {
+    "message": "Caster"
+  },
+  "setIconMenu": {
+    "message": "Ouvrir ce menu"
+  },
+  "setPauseOnCast": {
+    "message": "Mettre en pause la vidéo du navigateur"
+  },
+  "setSendPosition": {
+    "message": "Reprendre au même moment"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast démarre là où tu en étais dans le navigateur."
+  },
+  "setContextMenu": {
+    "message": "Menu du clic droit",
+    "description": "Settings switch: the 'Play in NetsuCast' right-click entry (shown below as hint)."
+  },
+  "setHiddenSites": {
+    "message": "Sites sans bouton : $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "Afficher partout"
+  },
+  "setPortHint": {
+    "message": "Le même que dans les paramètres de NetsuCast.",
+    "description": "Hint under the port field: must match the port set in the app."
+  },
+  "setHideFullscreen": {
+    "message": "Masquer le bouton en plein écran"
+  },
+  "setShortcut": {
+    "message": "Raccourci pour caster"
+  },
+  "setShortcutChange": {
+    "message": "Modifier"
+  },
+  "setShortcutNone": {
+    "message": "Aucun"
+  },
+  "tabCast": {
+    "message": "Caster"
   }
 }

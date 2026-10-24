@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "再生"
+  },
+  "setTitle": {
+    "message": "設定"
+  },
+  "menuSettings": {
+    "message": "設定…"
+  },
+  "setCastButton": {
+    "message": "動画上のNetsuCastボタン"
+  },
+  "setCastButtonHint": {
+    "message": "動画にカーソルを合わせると表示されます。"
+  },
+  "setButtonOnSite": {
+    "message": "$SITE$で表示",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "ボタンの位置"
+  },
+  "setCornerLeft": {
+    "message": "左"
+  },
+  "setCornerRight": {
+    "message": "右"
+  },
+  "setIconClick": {
+    "message": "アイコンをクリックしたとき"
+  },
+  "setIconCast": {
+    "message": "キャストする"
+  },
+  "setIconMenu": {
+    "message": "このメニューを開く"
+  },
+  "setPauseOnCast": {
+    "message": "ブラウザの動画を一時停止する"
+  },
+  "setSendPosition": {
+    "message": "同じ位置から再生する"
+  },
+  "setSendPositionHint": {
+    "message": "ブラウザで見ていた位置からNetsuCastで再生します。"
+  },
+  "setContextMenu": {
+    "message": "右クリックメニュー"
+  },
+  "setHiddenSites": {
+    "message": "ボタンを表示しないサイト：$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "すべてのサイトで表示する"
+  },
+  "setPortHint": {
+    "message": "NetsuCastの設定と同じ番号にします。"
+  },
+  "setHideFullscreen": {
+    "message": "全画面表示ではボタンを隠す"
+  },
+  "setShortcut": {
+    "message": "キャストのショートカット"
+  },
+  "setShortcutChange": {
+    "message": "変更する"
+  },
+  "setShortcutNone": {
+    "message": "なし"
+  },
+  "tabCast": {
+    "message": "キャスト"
   }
 }

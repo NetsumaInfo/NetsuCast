@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "Reproduzir"
+  },
+  "setTitle": {
+    "message": "Configurações"
+  },
+  "menuSettings": {
+    "message": "Configurações…"
+  },
+  "setCastButton": {
+    "message": "Botão do NetsuCast nos vídeos"
+  },
+  "setCastButtonHint": {
+    "message": "Aparece quando você passa o mouse sobre um vídeo."
+  },
+  "setButtonOnSite": {
+    "message": "Em $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "Posição do botão"
+  },
+  "setCornerLeft": {
+    "message": "Esquerda"
+  },
+  "setCornerRight": {
+    "message": "Direita"
+  },
+  "setIconClick": {
+    "message": "Clique no ícone"
+  },
+  "setIconCast": {
+    "message": "Transmitir"
+  },
+  "setIconMenu": {
+    "message": "Abrir este menu"
+  },
+  "setPauseOnCast": {
+    "message": "Pausar o vídeo do navegador"
+  },
+  "setSendPosition": {
+    "message": "Continuar do mesmo ponto"
+  },
+  "setSendPositionHint": {
+    "message": "O NetsuCast começa de onde você estava no navegador."
+  },
+  "setContextMenu": {
+    "message": "Menu do clique direito"
+  },
+  "setHiddenSites": {
+    "message": "Sites sem o botão: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "Mostrar em todos"
+  },
+  "setPortHint": {
+    "message": "A mesma das configurações do NetsuCast."
+  },
+  "setHideFullscreen": {
+    "message": "Ocultar o botão em tela cheia"
+  },
+  "setShortcut": {
+    "message": "Atalho para transmitir"
+  },
+  "setShortcutChange": {
+    "message": "Alterar"
+  },
+  "setShortcutNone": {
+    "message": "Nenhum"
+  },
+  "tabCast": {
+    "message": "Transmitir"
   }
 }

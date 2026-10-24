@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "播放"
+  },
+  "setTitle": {
+    "message": "设置"
+  },
+  "menuSettings": {
+    "message": "设置…"
+  },
+  "setCastButton": {
+    "message": "视频上的 NetsuCast 按钮"
+  },
+  "setCastButtonHint": {
+    "message": "鼠标悬停在视频上时显示。"
+  },
+  "setButtonOnSite": {
+    "message": "在 $SITE$ 上",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "按钮位置"
+  },
+  "setCornerLeft": {
+    "message": "左侧"
+  },
+  "setCornerRight": {
+    "message": "右侧"
+  },
+  "setIconClick": {
+    "message": "点击图标时"
+  },
+  "setIconCast": {
+    "message": "投放"
+  },
+  "setIconMenu": {
+    "message": "打开此菜单"
+  },
+  "setPauseOnCast": {
+    "message": "暂停浏览器中的视频"
+  },
+  "setSendPosition": {
+    "message": "从同一位置继续"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast 从你在浏览器中看到的位置开始。"
+  },
+  "setContextMenu": {
+    "message": "右键菜单"
+  },
+  "setHiddenSites": {
+    "message": "不显示按钮的网站：$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "在所有网站显示"
+  },
+  "setPortHint": {
+    "message": "与 NetsuCast 设置中的端口相同。"
+  },
+  "setHideFullscreen": {
+    "message": "全屏时隐藏按钮"
+  },
+  "setShortcut": {
+    "message": "投放快捷键"
+  },
+  "setShortcutChange": {
+    "message": "更改"
+  },
+  "setShortcutNone": {
+    "message": "无"
+  },
+  "tabCast": {
+    "message": "投放"
   }
 }

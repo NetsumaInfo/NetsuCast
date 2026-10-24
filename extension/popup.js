@@ -1,4 +1,5 @@
-import { cast, DEFAULT_PORT, getPort, launchApp, ping, unreachable } from "./common.js";
+import { cast, getPrefs, launchApp, ping, unreachable } from "./common.js";
+import { mountSettings } from "./settings.js";
 
 const $ = (id) => document.getElementById(id);
 const t = (key, subs) => chrome.i18n.getMessage(key, subs);
@@ -8,6 +9,10 @@ const lang = t("langTag") || "fr";
 document.documentElement.lang = lang;
 document.documentElement.dir = t("@@bidi_dir") || "ltr";
 for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
+for (const el of document.querySelectorAll("[data-i18n-label]")) {
+  el.setAttribute("aria-label", t(el.dataset.i18nLabel));
+  el.title = t(el.dataset.i18nLabel);
+}
 // Opened from the toolbar icon's context menu, in its own window: the tab comes as ?tab=<id>.
 const tabId = Number(new URLSearchParams(location.search).get("tab"));
 const tab = tabId ? await chrome.tabs.get(tabId).catch(() => null) : (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
@@ -36,20 +41,37 @@ async function send(request, button) {
   button.disabled = true;
   try {
     try {
-      await cast({ ...request, title: tab?.title });
+      await cast({ ...request, title: tab?.title, start: await startOf() });
     } catch (error) {
       // NetsuCast closed: start it, then send again.
       if (!unreachable(error)) throw error;
       say(t("castLaunching"), true);
       if (!(await launchApp(tab?.id))) throw error;
-      await cast({ ...request, title: tab?.title });
+      await cast({ ...request, title: tab?.title, start: await startOf() });
     }
+    if ((await getPrefs()).pauseOnCast) pauseTab();
     say(t("castDone"), true);
     setTimeout(() => window.close(), 600);
   } catch {
     say(t("errNotRunning"), false);
     button.disabled = false;
   }
+}
+
+// Where the tab's main video is, and pausing it once it plays in the app (content.js helpers).
+async function startOf() {
+  if (!tab?.id || !(await getPrefs()).sendPosition) return null;
+  try {
+    const results = await chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: true }, func: () => window.__netsucastGrab?.() ?? null });
+    const found = results.map((r) => r.result).filter(Boolean).sort((a, b) => Number(b.playing) - Number(a.playing) || b.area - a.area)[0];
+    return found?.start ?? null;
+  } catch {
+    return null;
+  }
+}
+function pauseTab() {
+  if (!tab?.id) return;
+  chrome.scripting.executeScript({ target: { tabId: tab.id, allFrames: true }, func: () => window.__netsucastPause?.() }).catch(() => {});
 }
 
 async function refreshStatus() {
@@ -108,13 +130,25 @@ for (const stream of streams) {
   $("streams").append(li);
 }
 
-// --- port --------------------------------------------------------------------------------------
-const portInput = $("port");
-portInput.value = await getPort();
-portInput.addEventListener("change", async () => {
-  const port = Number(portInput.value) || DEFAULT_PORT;
-  await chrome.storage.local.set({ port });
-  refreshStatus();
-});
+// --- settings ----------------------------------------------------------------------------------
+let site = null;
+try {
+  if (/^https?:/i.test(pageUrl)) site = new URL(pageUrl).hostname;
+} catch {
+  // no site: the "on this site" switch is left out
+}
+// Two tabs: casting, and the extension's settings.
+function showSettings(open) {
+  $("settings").hidden = !open;
+  $("main").hidden = open;
+  $("tab-cast").setAttribute("aria-selected", String(!open));
+  $("tab-settings").setAttribute("aria-selected", String(open));
+}
+$("tab-cast").addEventListener("click", () => showSettings(false));
+$("tab-settings").addEventListener("click", () => showSettings(true));
+await mountSettings($("settings-list"), { site, onPort: refreshStatus });
+// A click on the toolbar icon opens on the settings; "Choose the stream" (right-click on the
+// icon) opens on the cast tab.
+showSettings(new URLSearchParams(location.search).get("view") !== "cast");
 
 refreshStatus();

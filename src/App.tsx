@@ -4,7 +4,8 @@ import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { useTranslation } from "react-i18next";
-import { command } from "tauri-plugin-mpv-api";
+import { open as pickFile } from "@tauri-apps/plugin-dialog";
+import { command, destroy } from "tauri-plugin-mpv-api";
 import { House, LoaderCircle, Sparkles, TriangleAlert, X } from "lucide-react";
 import { CompareOverlay } from "./components/CompareOverlay";
 import { Controls } from "./components/Controls";
@@ -25,6 +26,8 @@ import { modelName, summarize } from "./lib/upscaleInfo";
 
 const HIDE_DELAY = 2500;
 const EXTENSION_SEEN_KEY = "netsucast.extensionSeen";
+/** Offered by the file picker; the installer associates the same list (tauri.conf.json). */
+const VIDEO_EXTENSIONS = ["mp4", "mkv", "webm", "mov", "m4v", "avi", "wmv", "flv", "ts", "m2ts", "mpg", "mpeg", "ogv", "3gp"];
 const DIRECT_MEDIA = /\.(m3u8|mpd|mp4|m4v|webm|mkv|mov|ts)(\?|#|$)/i;
 
 function readExtensionSeen(): boolean {
@@ -85,6 +88,7 @@ export default function App() {
   // Set by the home button: shows the welcome screen right away, without waiting for mpv to
   // report that it went idle.
   const [atHome, setAtHome] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const { state, dismissError } = usePlayer(ready);
 
   // Casts can arrive at any time (even before mpv is up), so the latest values live in a ref.
@@ -96,6 +100,7 @@ export default function App() {
     maxHeight,
     pending: null as LoadTarget | null,
     warming: false,
+    mpvUp: false,
   });
   live.current = { ...live.current, ready, env, settings, upscale, maxHeight };
 
@@ -123,18 +128,50 @@ export default function App() {
       setUpscale(upscaleOf(s, e));
       setMaxHeight(s.maxHeight);
       if (s.alwaysOnTop) getCurrentWindow().setAlwaysOnTop(true);
+      live.current = { ...live.current, env: e, settings: s };
       if (!e.mpvPath) {
         setMpvError(t("welcome.mpvMissing"));
         return;
       }
-      try {
-        await player.startMpv(e, s);
-        setReady(true);
-      } catch (err) {
-        setMpvError(String(err));
-      }
+      // Started in the tray at login: mpv waits until the window shows.
+      if (await getCurrentWindow().isVisible()) runMpv(true);
+      const file = await invoke<string | null>("take_launch_file");
+      if (file) open({ url: file, kind: "file" });
     })();
-  }, [t]);
+  }, [t]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // --- mpv only while the window is on screen ------------------------------------------------
+  // Idle, mpv still holds its GPU context (~400 MB). Hidden in the tray, NetsuCast keeps only
+  // the receiver for the extension; mpv starts again (under a second) when the window shows,
+  // and a cast that arrives meanwhile waits in `pending`. One change at a time, in order.
+  const mpvQueue = useRef<Promise<void>>(Promise.resolve());
+  const runMpv = useCallback((run: boolean) => {
+    mpvQueue.current = mpvQueue.current.then(async () => {
+      const { env, settings, mpvUp } = live.current;
+      if (!env?.mpvPath || !settings || run === mpvUp) return;
+      if (run) {
+        try {
+          await player.startMpv(env, settings);
+          live.current.mpvUp = true;
+          setMpvError(null);
+          setReady(true);
+        } catch (err) {
+          setMpvError(String(err));
+        }
+        return;
+      }
+      live.current.mpvUp = false;
+      live.current.warming = false;
+      setWarmup(null);
+      setReady(false);
+      await destroy().catch(() => {});
+    });
+  }, []);
+
+  useEffect(() => {
+    const un = listen("window-shown", () => runMpv(true));
+    return () => void un.then((u) => u());
+  }, [runMpv]);
 
   // --- model warm-up -------------------------------------------------------------------------
   // The first compilation of an ArtCNN model freezes the picture for a long while. It is done
@@ -221,12 +258,16 @@ export default function App() {
     // Casts are heard from here on: an extension that just launched NetsuCast waits for this.
     Promise.all([unHello, unCast]).then(() => invoke("frontend_ready")).catch(() => {});
     const unDrop = getCurrentWebview().onDragDropEvent((e) => {
+      setDragging(e.payload.type === "enter" || e.payload.type === "over");
       if (e.payload.type === "drop" && e.payload.paths.length) open({ url: e.payload.paths[0], kind: "file" });
     });
+    // "Open with NetsuCast" while it already runs (background.rs).
+    const unFile = listen<string>("open-file", (e) => open({ url: e.payload, kind: "file" }));
     return () => {
       unHello.then((u) => u());
       unCast.then((u) => u());
       unDrop.then((u) => u());
+      unFile.then((u) => u());
     };
   }, [open, toggleFullscreen]);
 
@@ -261,10 +302,19 @@ export default function App() {
     const un = listen("went-background", () => {
       setShowSettings(false);
       setShowInstall(false);
-      goHome();
+      goHome().then(() => runMpv(false));
     });
     return () => void un.then((u) => u());
-  }, [goHome]);
+  }, [goHome, runMpv]);
+
+  const openFile = useCallback(async () => {
+    const path = await pickFile({
+      multiple: false,
+      directory: false,
+      filters: [{ name: t("welcome.videoFiles"), extensions: VIDEO_EXTENSIONS }],
+    }).catch(() => null);
+    if (path) open({ url: path, kind: "file" });
+  }, [open, t]);
 
   useEffect(() => {
     getCurrentWindow().setTitle(playing && state.title ? `${state.title} — NetsuCast` : "NetsuCast");
@@ -497,6 +547,8 @@ export default function App() {
             mpvError={mpvError}
             warmup={warmup}
             onOpen={(url) => open(targetFromInput(url))}
+            onOpenFile={openFile}
+            dragging={dragging}
             onSettings={settings ? () => openSettings("playback") : undefined}
             onSupport={settings ? () => openSettings("about") : undefined}
             extensionInstalled={extensionInstalled}

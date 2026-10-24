@@ -241,11 +241,7 @@ fn handle(app: &AppHandle, request: &mut tiny_http::Request) -> Response<std::io
             }
             cast.cookie_file = if cast.cookies.is_empty() { None } else { write_cookie_file(app, &cast.cookies) };
             log_cast(app, &cast);
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.unminimize();
-                let _ = window.show();
-                let _ = window.set_focus();
-            }
+            crate::background::show_main(app);
             let _ = app.emit("cast", cast);
             json(200, r#"{"ok":true}"#)
         }

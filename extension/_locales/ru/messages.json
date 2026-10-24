@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "Воспроизвести"
+  },
+  "setTitle": {
+    "message": "Настройки"
+  },
+  "menuSettings": {
+    "message": "Настройки…"
+  },
+  "setCastButton": {
+    "message": "Кнопка NetsuCast на видео"
+  },
+  "setCastButtonHint": {
+    "message": "Появляется при наведении на видео."
+  },
+  "setButtonOnSite": {
+    "message": "На $SITE$",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "Положение кнопки"
+  },
+  "setCornerLeft": {
+    "message": "Слева"
+  },
+  "setCornerRight": {
+    "message": "Справа"
+  },
+  "setIconClick": {
+    "message": "Нажатие на значок"
+  },
+  "setIconCast": {
+    "message": "Кастить"
+  },
+  "setIconMenu": {
+    "message": "Открыть это меню"
+  },
+  "setPauseOnCast": {
+    "message": "Ставить видео в браузере на паузу"
+  },
+  "setSendPosition": {
+    "message": "Продолжать с того же места"
+  },
+  "setSendPositionHint": {
+    "message": "NetsuCast начнёт там, где ты остановился в браузере."
+  },
+  "setContextMenu": {
+    "message": "Меню правой кнопки"
+  },
+  "setHiddenSites": {
+    "message": "Сайты без кнопки: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "Показывать везде"
+  },
+  "setPortHint": {
+    "message": "Тот же, что в настройках NetsuCast."
+  },
+  "setHideFullscreen": {
+    "message": "Скрывать кнопку в полноэкранном режиме"
+  },
+  "setShortcut": {
+    "message": "Сочетание клавиш для каста"
+  },
+  "setShortcutChange": {
+    "message": "Изменить"
+  },
+  "setShortcutNone": {
+    "message": "Нет"
+  },
+  "tabCast": {
+    "message": "Каст"
   }
 }

@@ -15,9 +15,10 @@ pub fn run() {
     tauri::Builder::default()
         // First, so a second launch (Start menu, a `netsucast://` link from the extension) is
         // caught before anything else starts: it only brings the running window back.
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| background::show_main(app)))
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| background::on_second_instance(app, args)))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_mpv::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
@@ -29,6 +30,7 @@ pub fn run() {
         .manage(receiver::ReceiverState(Mutex::new(Default::default())))
         .manage(receiver::LinkState(Mutex::new(Default::default())))
         .manage(background::TrayItems::new())
+        .manage(background::LaunchFile(Mutex::new(background::file_arg(std::env::args()))))
         .setup(|app| {
             // An update downloaded last session installs now, before anything plays.
             staged_update::install_at_launch(app.handle());
@@ -61,6 +63,7 @@ pub fn run() {
             staged_update::discard_staged_update,
             child_job::bind_to_app,
             background::set_tray_labels,
+            background::take_launch_file,
             receiver::frontend_ready,
             receiver::set_extension_theme,
         ])

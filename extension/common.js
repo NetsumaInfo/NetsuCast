@@ -5,6 +5,38 @@ export const DEFAULT_PORT = 47800;
 /** Sites yt-dlp resolves better than any intercepted request (signed or split streams). */
 export const PAGE_SITES = /(^|\.)(youtube\.com|youtu\.be|x\.com|twitter\.com|twitch\.tv|vimeo\.com|dailymotion\.com|reddit\.com|tiktok\.com|instagram\.com|facebook\.com|bilibili\.com|nicovideo\.jp|streamable\.com|kick\.com)$/i;
 
+/**
+ * What the user can change in the extension's settings (settings.js). content.js keeps its own
+ * copy of these defaults: content scripts cannot import modules.
+ *   castButton    the NetsuCast button over videos
+ *   hiddenSites   sites (hostnames) where that button never shows
+ *   buttonCorner  "left" | "right": top corner of the video it sits in
+ *   hideInFullscreen  no button while the video is full screen
+ *   pauseOnCast   pause the browser's video once it plays in the app
+ *   sendPosition  the app starts where the browser was
+ *   contextMenu   "Play in NetsuCast" in the page's right-click menu
+ *   iconClick     "cast" | "menu": what a click on the toolbar icon does
+ */
+export const DEFAULT_PREFS = {
+  castButton: true,
+  hiddenSites: [],
+  buttonCorner: "left",
+  hideInFullscreen: false,
+  pauseOnCast: true,
+  sendPosition: true,
+  contextMenu: true,
+  iconClick: "menu",
+};
+
+export async function getPrefs() {
+  const { prefs } = await chrome.storage.local.get("prefs");
+  return { ...DEFAULT_PREFS, ...prefs };
+}
+
+export async function setPref(key, value) {
+  await chrome.storage.local.set({ prefs: { ...(await getPrefs()), [key]: value } });
+}
+
 export async function getPort() {
   const { port } = await chrome.storage.local.get("port");
   return Number(port) || DEFAULT_PORT;

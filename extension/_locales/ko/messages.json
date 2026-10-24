@@ -70,5 +70,86 @@
   },
   "popupPlay": {
     "message": "재생"
+  },
+  "setTitle": {
+    "message": "설정"
+  },
+  "menuSettings": {
+    "message": "설정…"
+  },
+  "setCastButton": {
+    "message": "동영상 위 NetsuCast 버튼"
+  },
+  "setCastButtonHint": {
+    "message": "동영상에 마우스를 올리면 나타나요."
+  },
+  "setButtonOnSite": {
+    "message": "$SITE$에서 표시",
+    "placeholders": {
+      "site": {
+        "content": "$1",
+        "example": "youtube.com"
+      }
+    }
+  },
+  "setButtonCorner": {
+    "message": "버튼 위치"
+  },
+  "setCornerLeft": {
+    "message": "왼쪽"
+  },
+  "setCornerRight": {
+    "message": "오른쪽"
+  },
+  "setIconClick": {
+    "message": "아이콘 클릭 시"
+  },
+  "setIconCast": {
+    "message": "캐스트"
+  },
+  "setIconMenu": {
+    "message": "이 메뉴 열기"
+  },
+  "setPauseOnCast": {
+    "message": "브라우저 동영상 일시정지"
+  },
+  "setSendPosition": {
+    "message": "같은 지점에서 이어 보기"
+  },
+  "setSendPositionHint": {
+    "message": "브라우저에서 보던 지점부터 NetsuCast가 재생해요."
+  },
+  "setContextMenu": {
+    "message": "오른쪽 클릭 메뉴"
+  },
+  "setHiddenSites": {
+    "message": "버튼을 숨긴 사이트: $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "setShowEverywhere": {
+    "message": "모든 사이트에 표시"
+  },
+  "setPortHint": {
+    "message": "NetsuCast 설정과 같은 번호여야 해요."
+  },
+  "setHideFullscreen": {
+    "message": "전체 화면에서 버튼 숨기기"
+  },
+  "setShortcut": {
+    "message": "캐스트 단축키"
+  },
+  "setShortcutChange": {
+    "message": "변경"
+  },
+  "setShortcutNone": {
+    "message": "없음"
+  },
+  "tabCast": {
+    "message": "캐스트"
   }
 }
