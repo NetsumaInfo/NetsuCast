@@ -1,5 +1,31 @@
 [
   {
+    "id": "0.2.1",
+    "version": "0.2.1",
+    "date": "2026-10-25",
+    "title": {
+      "fr": "Corrections",
+      "en": "Fixes"
+    },
+    "changes": [
+      {
+        "kind": "fix",
+        "fr": "Fermer la fenêtre garde NetsuCast en arrière-plan au lieu de le quitter.",
+        "en": "Closing the window keeps NetsuCast in the background instead of quitting it."
+      },
+      {
+        "kind": "fix",
+        "fr": "Caster depuis le bouton ou le menu de l'extension relance NetsuCast quand il est fermé.",
+        "en": "Casting from the extension's button or menu starts NetsuCast again when it is closed."
+      },
+      {
+        "kind": "fix",
+        "fr": "Sur les sites qui changent d'épisode sans changer de page (anime-sama…), c'est bien l'épisode affiché qui est casté.",
+        "en": "On sites that switch episodes without changing page (anime-sama…), the episode on screen is the one cast."
+      }
+    ]
+  },
+  {
     "id": "0.2.0",
     "version": "0.2.0",
     "date": "2026-10-24",

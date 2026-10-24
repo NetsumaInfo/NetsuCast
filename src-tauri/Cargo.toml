@@ -1,6 +1,6 @@
 [package]
 name = "netsucast"
-version = "0.2.0"
+version = "0.2.1"
 description = "NetsuCast — video player that continues browser videos with real-time ArtCNN upscaling on the GPU"
 authors = ["Netsuma"]
 license = "AGPL-3.0-only"
@@ -49,5 +49,6 @@ windows = { version = "0.61", features = ["Win32_Graphics_Dxgi", "Win32_System_J
 codegen-units = 1
 lto = true
 opt-level = 3
-panic = "abort"
+# unwind, not abort: tauri-plugin-mpv panics on some calls, and abort would end the whole app.
+panic = "unwind"
 strip = true

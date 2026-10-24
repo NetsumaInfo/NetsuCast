@@ -46,6 +46,13 @@ LangString NCWriteError 1033 "Cannot write to:$\n$INSTDIR$\n$\nReinstall NetsuCa
   ${EndIf}
 !macroend
 
+; Windows keeps the icon it drew for a shortcut (Start menu, a taskbar pin) in its own cache:
+; without this, an update that changes the app's icon still shows the old one there.
+; SHCNE_ASSOCCHANGED (0x08000000) with SHCNF_IDLIST (0) makes the shell redraw them.
+!macro NSIS_HOOK_POSTINSTALL
+  System::Call 'shell32::SHChangeNotify(i 0x08000000, i 0, p 0, p 0)'
+!macroend
+
 !macro NSIS_HOOK_POSTUNINSTALL
   ; `yt-dlp -U` (Settings > update yt-dlp) replaces yt-dlp.exe in place and can leave its previous
   ; binary beside it. The uninstaller only deletes the files it installed, so that leftover would

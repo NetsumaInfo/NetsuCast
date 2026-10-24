@@ -1,4 +1,4 @@
-import { cast, getPrefs, launchApp, ping, unreachable } from "./common.js";
+import { cast, getPrefs, launchApp, openAppLink, ping, unreachable } from "./common.js";
 import { mountSettings } from "./settings.js";
 
 const $ = (id) => document.getElementById(id);
@@ -46,7 +46,8 @@ async function send(request, button) {
       // NetsuCast closed: start it, then send again.
       if (!unreachable(error)) throw error;
       say(t("castLaunching"), true);
-      if (!(await launchApp(tab?.id))) throw error;
+      openAppLink();
+      if (!(await launchApp(tab?.id, { opened: true }))) throw error;
       await cast({ ...request, title: tab?.title, start: await startOf() });
     }
     if ((await getPrefs()).pauseOnCast) pauseTab();

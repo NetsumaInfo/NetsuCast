@@ -23,7 +23,7 @@ It does not play DRM-protected streams and does not try to: Netflix, Crunchyroll
 services stay in the browser.
 
 > [!NOTE]
-> Version 0.2.0. Windows only.
+> Version 0.2.1. Windows only.
 
 ## How a video gets to the player
 

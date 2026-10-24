@@ -63,11 +63,25 @@ export async function ping() {
  * Starts NetsuCast when it is closed, through the netsucast:// link its installer registers:
  * the browser asks once "Open NetsuCast?" (with a box to remember the answer), the page stays
  * where it is. Resolves true once the app listens for casts.
+ *
+ * Chrome only opens such a link right after a click in the page that opens it. A click on the
+ * cast button or in the popup opens it there (openAppLink) and passes `opened`; the keyboard
+ * shortcut has no click, so the tab is sent to the link instead, which Chrome may ignore.
  */
-export async function launchApp(tabId) {
+export const APP_LINK = "netsucast://open";
+
+export function openAppLink() {
+  const a = document.createElement("a");
+  a.href = APP_LINK;
+  a.click();
+}
+
+export async function launchApp(tabId, { opened = false } = {}) {
   if ((await ping())?.ready) return true;
-  if (tabId == null) return false;
-  await chrome.tabs.update(tabId, { url: "netsucast://open" }).catch(() => {});
+  if (!opened) {
+    if (tabId == null) return false;
+    await chrome.tabs.update(tabId, { url: APP_LINK }).catch(() => {});
+  }
   const deadline = Date.now() + 45_000; // time to answer the browser's question, then to start
   while (Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, 700));

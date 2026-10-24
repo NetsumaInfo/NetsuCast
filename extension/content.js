@@ -331,6 +331,11 @@
     chrome.runtime.onMessage.addListener((message) => {
       if (message?.type !== "launching" || !casting) return;
       status(t("castLaunching"));
+      // Same link as common.js APP_LINK. Opened from here: the click that started the cast lets
+      // this page open it, where the extension's background could not.
+      const link = document.createElement("a");
+      link.href = "netsucast://open";
+      link.click();
       if (prefs.pauseOnCast) casting.pause();
     });
   } catch {

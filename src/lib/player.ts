@@ -1,6 +1,17 @@
 import { invoke } from "@tauri-apps/api/core";
-import { command, getProperty, init, setProperty } from "tauri-plugin-mpv-api";
+import * as mpv from "tauri-plugin-mpv-api";
 import { resolveModel, type Environment, type LoadTarget, type Model, type Settings, type UpscaleScale } from "./types";
+
+/**
+ * Whether mpv runs (it stops while the window is hidden, see App.tsx). tauri-plugin-mpv panics on
+ * a call for an mpv that is not there, and the panic poisons its lock: every later call, even a
+ * new start, then fails too. So nothing reaches the plugin unless mpv is up.
+ */
+let running = false;
+const stopped = () => Promise.reject(new Error("mpv-stopped"));
+export const command = (name: string, args: unknown[] = []) => (running ? mpv.command(name, args) : stopped());
+const getProperty = (name: string) => (running ? mpv.getProperty(name) : stopped());
+const setProperty = (name: string, value: unknown) => (running ? mpv.setProperty(name, value as never) : stopped());
 
 export const OBSERVED = [
   "pause",
@@ -85,12 +96,13 @@ function shaderList(env: Environment, { model, force, scale }: Upscale): string[
 }
 
 export async function startMpv(env: Environment, settings: Settings) {
-  await init({
+  await mpv.init({
     path: env.mpvPath ?? "mpv",
     args: mpvArgs(env, settings),
     observedProperties: OBSERVED,
     ipcTimeoutMs: 5000,
   });
+  running = true;
   // mpv ends with NetsuCast, however NetsuCast ends (src-tauri/src/child_job.rs): an mpv left
   // behind would keep its files locked and make the next update fail.
   try {
@@ -261,3 +273,18 @@ export const setSubScale = (value: number) => setProperty("sub-scale", value);
 export const setSlang = (value: string) => setProperty("slang", value.split(",").map((l) => l.trim()).filter(Boolean));
 export const toggleStats = () => command("script-binding", ["stats/display-stats-toggle"]);
 export const stop = () => command("stop", []);
+
+/**
+ * The window is closing: tauri-plugin-mpv ends mpv by itself on a close request, so from here on
+ * nothing may reach it (a `stop` sent now would hit the missing instance and poison the plugin).
+ */
+export function forgetMpv() {
+  running = false;
+}
+
+/** Ends mpv. No call reaches the plugin from here on, until startMpv. */
+export async function stopMpv() {
+  if (!running) return;
+  running = false;
+  await mpv.destroy().catch(() => {});
+}

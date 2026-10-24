@@ -5,7 +5,6 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { useTranslation } from "react-i18next";
 import { open as pickFile } from "@tauri-apps/plugin-dialog";
-import { command, destroy } from "tauri-plugin-mpv-api";
 import { House, LoaderCircle, Sparkles, TriangleAlert, X } from "lucide-react";
 import { CompareOverlay } from "./components/CompareOverlay";
 import { Controls } from "./components/Controls";
@@ -164,7 +163,7 @@ export default function App() {
       live.current.warming = false;
       setWarmup(null);
       setReady(false);
-      await destroy().catch(() => {});
+      await player.stopMpv();
     });
   }, []);
 
@@ -190,7 +189,7 @@ export default function App() {
 
     live.current.warming = true;
     (async () => {
-      await command("loadfile", [player.WARMUP_SOURCE, "replace"]);
+      await player.command("loadfile", [player.WARMUP_SOURCE, "replace"]);
       for (const [i, u] of todo.entries()) {
         if (!live.current.warming) return;
         setWarmup({ model: u.model, index: i + 1, total: todo.length });
@@ -300,6 +299,7 @@ export default function App() {
   // Window closed while NetsuCast keeps running for the extension: the video stops, home shows.
   useEffect(() => {
     const un = listen("went-background", () => {
+      player.forgetMpv();
       setShowSettings(false);
       setShowInstall(false);
       goHome().then(() => runMpv(false));
@@ -506,7 +506,7 @@ export default function App() {
         ArrowUp: () => player.setVolume(state.volume + 5),
         ArrowDown: () => player.setVolume(state.volume - 5),
         m: player.toggleMute,
-        c: () => command("cycle", ["sub"]),
+        c: () => player.command("cycle", ["sub"]),
         i: () => setShowInfo((v) => !v),
         I: player.toggleStats,
         h: goHome,

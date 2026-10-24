@@ -1,7 +1,8 @@
 import { cast, getPort, getPrefs, isPageSite, isVideoPage, launchApp, ping, unreachable } from "./common.js";
 
 // Detected streams per tab, kept in session storage because the service worker is short-lived.
-// Entry: { url, type: "HLS" | "DASH" | "MP4" | "WEBM", referer, at }
+// Entry: { url, type: "HLS" | "DASH" | "MP4" | "WEBM", referer, at, documentId }
+// documentId: the page (or iframe) that requested it.
 
 const MAX_PER_TAB = 30;
 const FILE_URL = /\.(mp4|webm|m4v|mov|mkv)(\?|#|$)/i;
@@ -67,7 +68,7 @@ chrome.webRequest.onHeadersReceived.addListener(
     const type = typeOf(details.url, contentType, details.type);
     if (!type) return;
 
-    record(details.tabId, { url: details.url, type, referer, at: Date.now() });
+    record(details.tabId, { url: details.url, type, referer, at: Date.now(), documentId: details.documentId });
   },
   { urls: ["<all_urls>"], types: ["xmlhttprequest", "media", "other"] },
   ["responseHeaders"],
@@ -104,7 +105,7 @@ chrome.tabs.onRemoved.addListener((tabId) => chrome.storage.session.remove(key(t
  * 3. a progressive file the <video> loaded directly;
  * 4. otherwise the page, and yt-dlp's generic extractor tries its luck.
  */
-async function pickSource(tab, { frameUrl, src, pageUrl: videoPage } = {}) {
+async function pickSource(tab, { frameUrl, src, pageUrl: videoPage, documentId } = {}) {
   const pageUrl = videoPage ?? tab.url;
   if (isPageSite(pageUrl)) {
     // A feed, channel or home page is a list: yt-dlp would play its first entry.
@@ -116,7 +117,12 @@ async function pickSource(tab, { frameUrl, src, pageUrl: videoPage } = {}) {
     return { url: src, kind: "stream", referer: frameUrl ?? pageUrl };
   }
 
-  const streams = await getStreams(tab.id);
+  // A player in an iframe: sites like anime-sama switch episodes by loading another iframe and
+  // keep the tab's URL, so only what this player's document loaded belongs to this video, and
+  // the iframe (not the tab) is the page to resolve.
+  const inFrame = !!frameUrl && frameUrl !== tab.url;
+  let streams = await getStreams(tab.id);
+  if (inFrame && documentId) streams = streams.filter((s) => s.documentId === documentId);
   const playlists = streams.filter((s) => s.type === "HLS" || s.type === "DASH");
   if (playlists.length) {
     const latest = playlists[playlists.length - 1].at;
@@ -131,10 +137,11 @@ async function pickSource(tab, { frameUrl, src, pageUrl: videoPage } = {}) {
     return { url: file.url, kind: "stream", referer: file.referer ?? frameUrl ?? pageUrl };
   }
 
-  return { url: pageUrl, kind: "page" };
+  return { url: inFrame ? frameUrl : pageUrl, kind: "page" };
 }
 
-async function castTab(tab, info = {}) {
+/** `fromPage`: the cast button was clicked, and its page opens the app's link itself. */
+async function castTab(tab, info = {}, fromPage = false) {
   const source = await pickSource(tab, info);
   const { sendPosition } = await getPrefs();
   const request = { ...source, title: tab.title, start: sendPosition ? (info.start ?? null) : null };
@@ -145,7 +152,7 @@ async function castTab(tab, info = {}) {
     // NetsuCast is closed: start it, then send again. The page is told, so the button says so
     // and the video pauses where it is (the position sent stays right).
     chrome.tabs.sendMessage(tab.id, { type: "launching" }).catch(() => {});
-    if (!(await launchApp(tab.id))) throw error;
+    if (!(await launchApp(tab.id, { opened: fromPage }))) throw error;
     await cast(request);
   }
 }
@@ -188,7 +195,7 @@ async function castActive(tab) {
     // restricted page: fall back to the page URL
   }
   try {
-    await castTab(tab, found?.result ?? {});
+    await castTab(tab, found ? { ...found.result, documentId: found.documentId } : {});
     await flash(tab.id, true, t("castDone"));
     if (found && (await getPrefs()).pauseOnCast) {
       chrome.scripting.executeScript({ target: { tabId: tab.id, frameIds: [found.frameId] }, func: pauseVideos }).catch(() => {});
@@ -211,7 +218,7 @@ chrome.runtime.onMessage.addListener((message) => {
 // Cast button drawn over a video by content.js.
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (message?.type !== "cast" || !sender.tab) return;
-  castTab(sender.tab, message)
+  castTab(sender.tab, { ...message, documentId: sender.documentId }, true)
     .then(() => reply({ ok: true }))
     .catch((e) => reply({ ok: false, error: String(e?.message ?? e) }));
   return true;
