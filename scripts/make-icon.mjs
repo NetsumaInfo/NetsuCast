@@ -1,6 +1,5 @@
-// Builds every NetsuCast icon from the sources in icon-design/:
-//   netsucast-app-icon.svg        the app icon (1024, full bleed)
-//   netsucast-app-icon-small.svg  the same, cropped to the mascot, for 16 and 32 px
+// Builds every NetsuCast icon from icon-design/netsucast-app-icon.svg (transparent, cropped to
+// the drawing), at every size.
 // Writes extension/icons/*.png and runs `tauri icon` for src-tauri/icons/.
 //
 //   node scripts/make-icon.mjs
@@ -15,10 +14,9 @@ const svg = (name) => readFileSync(join(root, "icon-design", name), "utf8");
 const render = (source, size) => new Resvg(source, { fitTo: { mode: "width", value: size } }).render().asPng();
 
 const full = svg("netsucast-app-icon.svg");
-const small = svg("netsucast-app-icon-small.svg");
 
 for (const size of [16, 32, 48, 128]) {
-  writeFileSync(join(root, "extension", "icons", `${size}.png`), render(size <= 32 ? small : full, size));
+  writeFileSync(join(root, "extension", "icons", `${size}.png`), render(full, size));
 }
 
 const dir = mkdtempSync(join(tmpdir(), "netsucast-icon-"));
