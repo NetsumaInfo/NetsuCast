@@ -1,6 +1,7 @@
 mod background;
 mod child_job;
 mod compare;
+mod discord;
 mod gpu;
 mod receiver;
 mod settings;
@@ -30,6 +31,7 @@ pub fn run() {
         .manage(receiver::ReceiverState(Mutex::new(Default::default())))
         .manage(receiver::LinkState(Mutex::new(Default::default())))
         .manage(background::TrayItems::new())
+        .manage(discord::DiscordState::start())
         .manage(background::LaunchFile(Mutex::new(background::file_arg(std::env::args()))))
         .setup(|app| {
             // An update downloaded last session installs now, before anything plays.
@@ -66,6 +68,7 @@ pub fn run() {
             background::take_launch_file,
             receiver::frontend_ready,
             receiver::set_extension_theme,
+            discord::discord_set_activity,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

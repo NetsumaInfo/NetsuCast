@@ -271,6 +271,18 @@ export const setHwdec = (value: string) => setProperty("hwdec", value);
 export const setAlang = (value: string) => setProperty("alang", value.split(",").map((l) => l.trim()).filter(Boolean));
 export const setSubScale = (value: number) => setProperty("sub-scale", value);
 export const setSlang = (value: string) => setProperty("slang", value.split(",").map((l) => l.trim()).filter(Boolean));
+/** What yt-dlp said about the video playing (series, episode, thumbnail…), or null. mpv's ytdl hook
+ *  keeps its raw answer in this property; its `stdout` is yt-dlp's JSON. */
+export async function ytdlInfo(): Promise<import("./media").YtdlInfo | null> {
+  try {
+    const raw = (await getProperty("user-data/mpv/ytdl/json-subprocess-result")) as { stdout?: string } | string | null;
+    const result = typeof raw === "string" ? JSON.parse(raw) : raw;
+    return result?.stdout ? JSON.parse(result.stdout) : null;
+  } catch {
+    return null; // not a yt-dlp source, or an mpv without that property
+  }
+}
+
 export const toggleStats = () => command("script-binding", ["stats/display-stats-toggle"]);
 export const stop = () => command("stop", []);
 

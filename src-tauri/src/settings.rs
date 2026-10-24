@@ -52,6 +52,14 @@ pub struct Settings {
     /// Preferred audio languages, comma separated (mpv `alang`).
     pub audio_langs: String,
     pub receiver_port: u16,
+    /// Discord status: "Watching <title>" on the user's profile (discord.rs).
+    pub discord_enabled: bool,
+    /// Show what is watched; off, the status only says a video is playing.
+    pub discord_show_title: bool,
+    /// The show's cover (or the video's thumbnail) as the status picture.
+    pub discord_show_image: bool,
+    /// Picture and title open the show's page and the video's page.
+    pub discord_links: bool,
     /// Overrides for the bundled tools. Empty = auto-detect.
     pub mpv_path: String,
     pub ytdlp_path: String,
@@ -80,6 +88,10 @@ impl Default for Settings {
             sub_scale: 1.0,
             audio_langs: String::new(),
             receiver_port: DEFAULT_RECEIVER_PORT,
+            discord_enabled: true,
+            discord_show_title: true,
+            discord_show_image: true,
+            discord_links: true,
             mpv_path: String::new(),
             ytdlp_path: String::new(),
         }

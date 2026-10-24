@@ -164,7 +164,16 @@
     "sectionUpdates": "עדכונים",
     "sectionAbout": "אודות",
     "launchAtLogin": "הפעלה עם Windows",
-    "launchAtLoginHint": "NetsuCast נשאר מוכן ברקע גם כשהחלון סגור. הסמל ליד השעון פותח או סוגר אותו."
+    "launchAtLoginHint": "NetsuCast נשאר מוכן ברקע גם כשהחלון סגור. הסמל ליד השעון פותח או סוגר אותו.",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "סטטוס ב-Discord",
+    "discordEnabledHint": "הפרופיל שלך ב-Discord מציג מה אתה צופה.",
+    "discordShowTitle": "הצגת הכותרת",
+    "discordShowTitleHint": "אחרת הסטטוס אומר רק שאתה צופה בסרטון.",
+    "discordShowImage": "הצגת הפוסטר",
+    "discordShowImageHint": "הפוסטר של האנימה או הסרט, ואם אין, התמונה הממוזערת של הסרטון.",
+    "discordLinks": "כרטיס לחיץ",
+    "discordLinksHint": "הפוסטר פותח את דף האנימה או הסרט, והכותרת פותחת את הסרטון."
   },
   "errors": {
     "generic": "לא ניתן להפעיל: {{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "פתיחת NetsuCast",
     "quit": "יציאה"
+  },
+  "discord": {
+    "season": "עונה {{n}}",
+    "episode": "פרק {{n}}",
+    "watchingVideo": "צופה בסרטון",
+    "paused": "מושהה"
   }
 }

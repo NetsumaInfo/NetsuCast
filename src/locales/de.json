@@ -164,7 +164,16 @@
     "sectionUpdates": "Updates",
     "sectionAbout": "Über",
     "launchAtLogin": "Mit Windows starten",
-    "launchAtLoginHint": "NetsuCast bleibt im Hintergrund bereit, auch bei geschlossenem Fenster. Das Symbol neben der Uhr öffnet oder beendet es."
+    "launchAtLoginHint": "NetsuCast bleibt im Hintergrund bereit, auch bei geschlossenem Fenster. Das Symbol neben der Uhr öffnet oder beendet es.",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Discord-Status",
+    "discordEnabledHint": "Dein Discord-Profil zeigt, was du schaust.",
+    "discordShowTitle": "Titel anzeigen",
+    "discordShowTitleHint": "Sonst sagt der Status nur, dass du ein Video schaust.",
+    "discordShowImage": "Poster anzeigen",
+    "discordShowImageHint": "Das Poster des Animes oder Films, sonst das Vorschaubild des Videos.",
+    "discordLinks": "Klickbare Karte",
+    "discordLinksHint": "Das Poster öffnet die Seite des Animes oder Films, der Titel das Video."
   },
   "errors": {
     "generic": "Wiedergabe nicht möglich: {{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "NetsuCast öffnen",
     "quit": "Beenden"
+  },
+  "discord": {
+    "season": "Staffel {{n}}",
+    "episode": "Folge {{n}}",
+    "watchingVideo": "Schaut ein Video",
+    "paused": "Pausiert"
   }
 }

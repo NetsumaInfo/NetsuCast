@@ -15,6 +15,7 @@ import { UpdateButton } from "./components/UpdateButton";
 import { WhatsNew } from "./components/WhatsNew";
 import { IconButton, TooltipLayer } from "./components/ui";
 import { Welcome, type Warmup } from "./components/Welcome";
+import { useDiscordPresence } from "./hooks/useDiscordPresence";
 import { usePlayer } from "./hooks/usePlayer";
 import { applyLanguage } from "./i18n";
 import { applyTheme } from "./lib/theme";
@@ -271,6 +272,13 @@ export default function App() {
   }, [open, toggleFullscreen]);
 
   const playing = ready && !state.idle && !warmup && !atHome;
+
+  useDiscordPresence({
+    settings,
+    target,
+    state,
+    playing,
+  });
 
   const goHome = useCallback(async () => {
     setAtHome(true);

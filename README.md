@@ -23,7 +23,7 @@ It does not play DRM-protected streams and does not try to: Netflix, Crunchyroll
 services stay in the browser.
 
 > [!NOTE]
-> Version 0.2.1. Windows only.
+> Version 0.2.2. Windows only.
 
 ## How a video gets to the player
 
@@ -62,6 +62,18 @@ mpv and its GPU context start when the window shows, in under a second, and stop
 It talks to the player over `http://127.0.0.1:47800` only. The player binds to loopback, refuses
 requests carrying a web page's origin, and accepts only `http(s)` URLs, so a website cannot make
 it open something.
+
+## Discord status
+
+While a video plays, your Discord profile shows **Watching** with the show or film, the season
+and episode, its poster and a progress bar (Discord must be running on the PC). The extension
+reads the show, season and episode from the streaming page; yt-dlp and file names fill in the
+rest. Posters come from [AniList](https://anilist.co) (anime) and [TMDB](https://www.themoviedb.org)
+(films and series), and clicking one opens that page. Settings ▸ Discord turns it off, or hides
+the title or the poster.
+
+TMDB needs an API key, read at build time from `VITE_TMDB_KEY` in `.env.local` (ignored by git).
+Without it, posters come from AniList and the page only.
 
 ## Upscaling
 

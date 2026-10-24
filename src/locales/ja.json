@@ -164,7 +164,16 @@
     "sectionUpdates": "アップデート",
     "sectionAbout": "このアプリについて",
     "launchAtLogin": "Windowsと同時に起動",
-    "launchAtLoginHint": "ウィンドウを閉じてもNetsuCastはバックグラウンドで待機します。時計の近くのアイコンから開いたり終了したりできます。"
+    "launchAtLoginHint": "ウィンドウを閉じてもNetsuCastはバックグラウンドで待機します。時計の近くのアイコンから開いたり終了したりできます。",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Discordのステータス",
+    "discordEnabledHint": "見ているものがDiscordのプロフィールに表示されます。",
+    "discordShowTitle": "タイトルを表示する",
+    "discordShowTitleHint": "オフにすると、動画を見ていることだけが表示されます。",
+    "discordShowImage": "ポスターを表示する",
+    "discordShowImageHint": "アニメや映画のポスター、なければ動画のサムネイルを表示します。",
+    "discordLinks": "クリックできるカードにする",
+    "discordLinksHint": "ポスターでアニメや映画のページ、タイトルで動画を開きます。"
   },
   "errors": {
     "generic": "再生できません：{{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "NetsuCastを開く",
     "quit": "終了"
+  },
+  "discord": {
+    "season": "シーズン{{n}}",
+    "episode": "第{{n}}話",
+    "watchingVideo": "動画を視聴中",
+    "paused": "一時停止中"
   }
 }

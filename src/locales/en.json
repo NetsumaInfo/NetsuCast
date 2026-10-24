@@ -164,7 +164,16 @@
     "sectionUpdates": "Updates",
     "sectionAbout": "About",
     "launchAtLogin": "Start with Windows",
-    "launchAtLoginHint": "NetsuCast stays ready in the background, even with the window closed. The icon near the clock opens or quits it."
+    "launchAtLoginHint": "NetsuCast stays ready in the background, even with the window closed. The icon near the clock opens or quits it.",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Discord status",
+    "discordEnabledHint": "Your Discord profile shows what you are watching.",
+    "discordShowTitle": "Show the title",
+    "discordShowTitleHint": "Otherwise the status only says you are watching a video.",
+    "discordShowImage": "Show the poster",
+    "discordShowImageHint": "The anime's or film's poster, else the video's thumbnail.",
+    "discordLinks": "Clickable card",
+    "discordLinksHint": "The poster opens the anime's or film's page, the title opens the video."
   },
   "errors": {
     "generic": "Can't play this video: {{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "Open NetsuCast",
     "quit": "Quit"
+  },
+  "discord": {
+    "season": "Season {{n}}",
+    "episode": "Episode {{n}}",
+    "watchingVideo": "Watching a video",
+    "paused": "Paused"
   }
 }

@@ -26,13 +26,14 @@ type Props = {
 
 /** Fields that mpv only reads at startup, or that the receiver binds once. */
 const RESTART_FIELDS: (keyof Settings)[] = ["receiverPort", "mpvPath", "ytdlpPath"];
-const SECTIONS = ["playback", "upscale", "subtitles", "interface", "advanced", "updates", "about"] as const;
+const SECTIONS = ["playback", "upscale", "subtitles", "interface", "discord", "advanced", "updates", "about"] as const;
 export type Section = (typeof SECTIONS)[number];
 const SECTION_ICON: Record<Section, ReactNode> = {
   playback: <Film size={16} strokeWidth={1.75} />,
   upscale: <Sparkles size={16} strokeWidth={1.75} />,
   subtitles: <Captions size={16} strokeWidth={1.75} />,
   interface: <Languages size={16} strokeWidth={1.75} />,
+  discord: <DiscordIcon size={16} />,
   advanced: <SlidersHorizontal size={16} strokeWidth={1.75} />,
   updates: <Download size={16} strokeWidth={1.75} />,
   about: <Info size={16} strokeWidth={1.75} />,
@@ -42,6 +43,7 @@ const SECTION_KEY: Record<Section, string> = {
   upscale: "settings.sectionUpscale",
   subtitles: "settings.sectionSubtitles",
   interface: "settings.sectionInterface",
+  discord: "settings.sectionDiscord",
   advanced: "settings.sectionAdvanced",
   updates: "settings.sectionUpdates",
   about: "settings.sectionAbout",
@@ -264,6 +266,43 @@ export function SettingsDialog({ settings, initialSection = "playback", env, onC
                 <Row label={t("settings.ytdlpPath")} wide>
                   {(id) => <TextInput id={id} dir="ltr" value={draft.ytdlpPath} placeholder={env?.ytdlpPath ?? t("settings.pathAuto")} onChange={(e) => set("ytdlpPath", e.target.value)} />}
                 </Row>
+              </>
+            )}
+
+            {section === "discord" && (
+              <>
+                <Toggle
+                  label={t("settings.discordEnabled")}
+                  hint={t("settings.discordEnabledHint")}
+                  checked={draft.discordEnabled}
+                  onChange={(v) => set("discordEnabled", v)}
+                />
+                {draft.discordEnabled && (
+                  <>
+                    <Toggle
+                      label={t("settings.discordShowTitle")}
+                      hint={t("settings.discordShowTitleHint")}
+                      checked={draft.discordShowTitle}
+                      onChange={(v) => set("discordShowTitle", v)}
+                    />
+                    {draft.discordShowTitle && (
+                      <>
+                        <Toggle
+                          label={t("settings.discordShowImage")}
+                          hint={t("settings.discordShowImageHint")}
+                          checked={draft.discordShowImage}
+                          onChange={(v) => set("discordShowImage", v)}
+                        />
+                        <Toggle
+                          label={t("settings.discordLinks")}
+                          hint={t("settings.discordLinksHint")}
+                          checked={draft.discordLinks}
+                          onChange={(v) => set("discordLinks", v)}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
               </>
             )}
 

@@ -164,7 +164,16 @@
     "sectionUpdates": "업데이트",
     "sectionAbout": "정보",
     "launchAtLogin": "Windows와 함께 시작",
-    "launchAtLoginHint": "창을 닫아도 NetsuCast가 백그라운드에서 대기해요. 시계 옆 아이콘으로 열거나 종료할 수 있어요."
+    "launchAtLoginHint": "창을 닫아도 NetsuCast가 백그라운드에서 대기해요. 시계 옆 아이콘으로 열거나 종료할 수 있어요.",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Discord 상태",
+    "discordEnabledHint": "보고 있는 영상이 Discord 프로필에 표시돼요.",
+    "discordShowTitle": "제목 표시",
+    "discordShowTitleHint": "끄면 영상을 보고 있다는 것만 표시돼요.",
+    "discordShowImage": "포스터 표시",
+    "discordShowImageHint": "애니메이션이나 영화의 포스터, 없으면 영상 썸네일을 보여줘요.",
+    "discordLinks": "클릭할 수 있는 카드",
+    "discordLinksHint": "포스터는 애니메이션이나 영화 페이지를, 제목은 영상을 열어요."
   },
   "errors": {
     "generic": "재생할 수 없어요: {{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "NetsuCast 열기",
     "quit": "종료"
+  },
+  "discord": {
+    "season": "시즌 {{n}}",
+    "episode": "{{n}}화",
+    "watchingVideo": "영상 시청 중",
+    "paused": "일시정지됨"
   }
 }

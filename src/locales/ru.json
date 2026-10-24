@@ -164,7 +164,16 @@
     "sectionUpdates": "Обновления",
     "sectionAbout": "О программе",
     "launchAtLogin": "Запускать вместе с Windows",
-    "launchAtLoginHint": "NetsuCast остаётся готовым в фоне, даже если окно закрыто. Значок рядом с часами открывает или закрывает его."
+    "launchAtLoginHint": "NetsuCast остаётся готовым в фоне, даже если окно закрыто. Значок рядом с часами открывает или закрывает его.",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Статус в Discord",
+    "discordEnabledHint": "Твой профиль в Discord показывает, что ты смотришь.",
+    "discordShowTitle": "Показывать название",
+    "discordShowTitleHint": "Иначе статус говорит только, что ты смотришь видео.",
+    "discordShowImage": "Показывать постер",
+    "discordShowImageHint": "Постер аниме или фильма, иначе миниатюра видео.",
+    "discordLinks": "Кликабельная карточка",
+    "discordLinksHint": "Постер открывает страницу аниме или фильма, название — видео."
   },
   "errors": {
     "generic": "Не удалось воспроизвести: {{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "Открыть NetsuCast",
     "quit": "Выйти"
+  },
+  "discord": {
+    "season": "Сезон {{n}}",
+    "episode": "Серия {{n}}",
+    "watchingVideo": "Смотрит видео",
+    "paused": "Пауза"
   }
 }

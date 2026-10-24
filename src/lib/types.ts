@@ -35,6 +35,10 @@ export type Settings = {
   subScale: number;
   audioLangs: string;
   receiverPort: number;
+  discordEnabled: boolean;
+  discordShowTitle: boolean;
+  discordShowImage: boolean;
+  discordLinks: boolean;
   mpvPath: string;
   ytdlpPath: string;
 };
@@ -67,6 +71,21 @@ export type LoadTarget = {
   /** What the extension saw when it sent the cast. */
   diag?: { extensionVersion?: string | null; cookiesFound?: number | null; cookieError?: string | null } | null;
   headers?: { referer?: string | null; userAgent?: string | null; cookie?: string | null };
+  /** What the page said about the video when it was cast (extension background.js pageMeta). */
+  meta?: {
+    /** The show, when the page names it on its own (schema.org data, video:series). */
+    series?: string | null;
+    season?: number | null;
+    episode?: number | null;
+    kind?: "movie" | "tv" | null;
+    /** Sharing title, tab title, main heading: candidates for the show's name, best first. */
+    titles?: string[] | null;
+    /** The episode picked in the page's list ("Episode 3"). */
+    episodeText?: string | null;
+    image?: string | null;
+    site?: string | null;
+    url?: string | null;
+  } | null;
 };
 
 export type Track = {

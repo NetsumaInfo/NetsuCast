@@ -164,7 +164,16 @@
     "sectionUpdates": "Atualizações",
     "sectionAbout": "Sobre",
     "launchAtLogin": "Iniciar com o Windows",
-    "launchAtLoginHint": "O NetsuCast fica pronto em segundo plano, mesmo com a janela fechada. O ícone perto do relógio abre ou encerra o app."
+    "launchAtLoginHint": "O NetsuCast fica pronto em segundo plano, mesmo com a janela fechada. O ícone perto do relógio abre ou encerra o app.",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Status do Discord",
+    "discordEnabledHint": "Seu perfil do Discord mostra o que você está assistindo.",
+    "discordShowTitle": "Mostrar o título",
+    "discordShowTitleHint": "Senão, o status só diz que você está assistindo a um vídeo.",
+    "discordShowImage": "Mostrar o pôster",
+    "discordShowImageHint": "O pôster do anime ou do filme, senão a miniatura do vídeo.",
+    "discordLinks": "Cartão clicável",
+    "discordLinksHint": "O pôster abre a página do anime ou do filme, o título abre o vídeo."
   },
   "errors": {
     "generic": "Não foi possível reproduzir: {{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "Abrir NetsuCast",
     "quit": "Sair"
+  },
+  "discord": {
+    "season": "Temporada {{n}}",
+    "episode": "Episódio {{n}}",
+    "watchingVideo": "Assistindo a um vídeo",
+    "paused": "Pausado"
   }
 }

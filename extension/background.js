@@ -141,10 +141,82 @@ async function pickSource(tab, { frameUrl, src, pageUrl: videoPage, documentId }
 }
 
 /** `fromPage`: the cast button was clicked, and its page opens the app's link itself. */
+// What the tab's page says about the video, for the app's Discord status: read in the top frame,
+// where the site's titles and episode list live (the player is often an iframe). Every site says
+// it differently, so everything that can name the show is collected, best first, and the app
+// (src/lib/media.ts) picks the show, season and episode out of it.
+const pageMeta = () => {
+  const tag = (name) => document.querySelector(`meta[property="${name}"], meta[name="${name}"]`)?.content?.trim() || null;
+  const absolute = (url) => {
+    try {
+      return url ? new URL(url, location.href).href : null;
+    } catch {
+      return null;
+    }
+  };
+  const text = (el) => el?.textContent?.replace(/\s+/g, " ").trim() || null;
+
+  // schema.org data (JSON-LD), the most precise when a site has it: Episode, TVSeries, Movie.
+  let ld = {};
+  const visit = (node) => {
+    if (!node || typeof node !== "object") return;
+    if (Array.isArray(node)) return node.forEach(visit);
+    if (node["@graph"]) visit(node["@graph"]);
+    const type = [].concat(node["@type"] ?? []).join(" ");
+    if (/Episode/i.test(type)) {
+      ld.series ??= node.partOfSeries?.name ?? node.partOfTVSeries?.name;
+      ld.season ??= node.partOfSeason?.seasonNumber;
+      ld.episode ??= node.episodeNumber;
+      ld.image ??= [].concat(node.partOfSeries?.image ?? node.image ?? [])[0];
+    } else if (/TVSeries|Movie|CreativeWorkSeries/i.test(type)) {
+      ld.series ??= node.name;
+      ld.kind ??= /Movie/i.test(type) ? "movie" : "tv";
+      ld.image ??= [].concat(node.image ?? [])[0];
+    }
+  };
+  for (const script of document.querySelectorAll('script[type="application/ld+json"]')) {
+    try {
+      visit(JSON.parse(script.textContent));
+    } catch {
+      // a broken block: the others still count
+    }
+  }
+  const image = typeof ld.image === "object" ? ld.image?.url : ld.image;
+
+  // The episode on screen: a list (<select>) or a highlighted entry that names an episode.
+  const EP = /[ée]pisode|\bep\b/i;
+  const select = [...document.querySelectorAll("select")].find((s) => EP.test(`${s.id} ${s.name} ${s.className} ${s.selectedOptions[0]?.text ?? ""}`));
+  const highlighted = [...document.querySelectorAll('[aria-current="true"], [aria-current="page"], [aria-selected="true"], .active, .current, .selected')]
+    .map(text)
+    .find((t) => t && t.length < 60 && /(?:[ée]pisode|ep\.?)\s*\d/i.test(t));
+
+  return {
+    series: ld.series ?? tag("video:series") ?? null,
+    season: Number(ld.season) || null,
+    episode: Number(ld.episode) || null,
+    kind: ld.kind ?? (/movie/i.test(tag("og:type") ?? "") ? "movie" : /episode|tv_show/i.test(tag("og:type") ?? "") ? "tv" : null),
+    // Candidates for the show's name, best first; the app strips the site's name and the noise.
+    titles: [tag("og:title"), tag("twitter:title"), document.title, text(document.querySelector("h1"))].filter(Boolean),
+    episodeText: select?.selectedOptions[0]?.text?.trim() || highlighted || null,
+    image: absolute(image) ?? absolute(tag("og:image")) ?? absolute(tag("twitter:image")),
+    site: tag("og:site_name") || location.hostname.replace(/^www\./, ""),
+    url: location.href,
+  };
+};
+
+async function metaOf(tabId) {
+  try {
+    const [top] = await chrome.scripting.executeScript({ target: { tabId, frameIds: [0] }, func: pageMeta });
+    return top?.result ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function castTab(tab, info = {}, fromPage = false) {
   const source = await pickSource(tab, info);
   const { sendPosition } = await getPrefs();
-  const request = { ...source, title: tab.title, start: sendPosition ? (info.start ?? null) : null };
+  const request = { ...source, title: tab.title, start: sendPosition ? (info.start ?? null) : null, meta: await metaOf(tab.id) };
   try {
     await cast(request);
   } catch (error) {

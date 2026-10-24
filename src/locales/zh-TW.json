@@ -164,7 +164,16 @@
     "sectionUpdates": "更新",
     "sectionAbout": "關於",
     "launchAtLogin": "隨Windows啟動",
-    "launchAtLoginHint": "即使關閉視窗，NetsuCast也會在背景待命。可透過時鐘旁的圖示開啟或結束。"
+    "launchAtLoginHint": "即使關閉視窗，NetsuCast也會在背景待命。可透過時鐘旁的圖示開啟或結束。",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Discord 狀態",
+    "discordEnabledHint": "你的 Discord 個人檔案會顯示你正在看的內容。",
+    "discordShowTitle": "顯示標題",
+    "discordShowTitleHint": "關閉後，狀態只會顯示你在看影片。",
+    "discordShowImage": "顯示海報",
+    "discordShowImageHint": "動畫或電影的海報，沒有則顯示影片縮圖。",
+    "discordLinks": "可點擊的卡片",
+    "discordLinksHint": "點擊海報開啟動畫或電影頁面，點擊標題開啟影片。"
   },
   "errors": {
     "generic": "無法播放：{{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "開啟NetsuCast",
     "quit": "結束"
+  },
+  "discord": {
+    "season": "第 {{n}} 季",
+    "episode": "第 {{n}} 集",
+    "watchingVideo": "正在看影片",
+    "paused": "已暫停"
   }
 }

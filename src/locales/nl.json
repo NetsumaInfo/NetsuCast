@@ -164,7 +164,16 @@
     "sectionUpdates": "Updates",
     "sectionAbout": "Over",
     "launchAtLogin": "Starten met Windows",
-    "launchAtLoginHint": "NetsuCast blijft klaar op de achtergrond, ook als het venster dicht is. Het pictogram bij de klok opent of sluit het."
+    "launchAtLoginHint": "NetsuCast blijft klaar op de achtergrond, ook als het venster dicht is. Het pictogram bij de klok opent of sluit het.",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Discord-status",
+    "discordEnabledHint": "Je Discord-profiel toont wat je kijkt.",
+    "discordShowTitle": "Titel tonen",
+    "discordShowTitleHint": "Anders zegt de status alleen dat je een video kijkt.",
+    "discordShowImage": "Poster tonen",
+    "discordShowImageHint": "De poster van de anime of film, anders de miniatuur van de video.",
+    "discordLinks": "Klikbare kaart",
+    "discordLinksHint": "De poster opent de pagina van de anime of film, de titel opent de video."
   },
   "errors": {
     "generic": "Kan niet afspelen: {{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "NetsuCast openen",
     "quit": "Afsluiten"
+  },
+  "discord": {
+    "season": "Seizoen {{n}}",
+    "episode": "Aflevering {{n}}",
+    "watchingVideo": "Kijkt een video",
+    "paused": "Gepauzeerd"
   }
 }

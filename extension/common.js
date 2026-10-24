@@ -126,7 +126,7 @@ async function siteCookies(url) {
   return { cookies: [...found.values()], error: errors.join(" / ") || null };
 }
 
-export async function cast({ url, kind, title, referer, start }) {
+export async function cast({ url, kind, title, referer, start, meta }) {
   const headers = { userAgent: navigator.userAgent };
   const { cookies, error: cookieError } = await siteCookies(url);
   let jar = [];
@@ -150,6 +150,8 @@ export async function cast({ url, kind, title, referer, start }) {
       headers,
       cookies: jar,
       start: Number.isFinite(start) ? start : null,
+      // Sharing title and picture of the page, episode picked in it: the app's Discord status.
+      meta: meta ?? null,
       // What the app shows when a site still refuses playback.
       diag: { extensionVersion: chrome.runtime.getManifest().version, cookiesFound: cookies.length, cookieError },
     }),

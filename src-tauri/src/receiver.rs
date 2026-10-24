@@ -71,6 +71,10 @@ pub struct CastRequest {
     pub cookies: Vec<Cookie>,
     #[serde(default)]
     pub cookie_file: Option<String>,
+    /// What the page says about the video (its sharing title and picture, the episode picked in
+    /// the page), for the Discord status. Passed to the interface as is.
+    #[serde(default)]
+    pub meta: Option<serde_json::Value>,
     /// What the extension saw, shown when a site still refuses playback.
     #[serde(default)]
     pub diag: Option<CastDiag>,

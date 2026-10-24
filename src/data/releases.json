@@ -1,5 +1,36 @@
 [
   {
+    "id": "0.2.2",
+    "version": "0.2.2",
+    "date": "2026-10-25",
+    "title": {
+      "fr": "Statut Discord",
+      "en": "Discord status"
+    },
+    "changes": [
+      {
+        "kind": "feature",
+        "fr": "Ton profil Discord affiche ce que tu regardes : la série ou le film, la saison, l'épisode, l'affiche et une barre de progression.",
+        "en": "Your Discord profile shows what you are watching: the show or film, season, episode, poster and a progress bar."
+      },
+      {
+        "kind": "feature",
+        "fr": "L'affiche vient d'AniList ou de TMDB, et un clic dessus ouvre la fiche de l'animé ou du film.",
+        "en": "The poster comes from AniList or TMDB, and clicking it opens the anime's or film's page."
+      },
+      {
+        "kind": "improvement",
+        "fr": "L'extension reconnaît la série, la saison et l'épisode sur les sites de streaming.",
+        "en": "The extension recognises the show, season and episode on streaming sites."
+      },
+      {
+        "kind": "improvement",
+        "fr": "Paramètres ▸ Discord pour couper le statut, cacher le titre ou l'affiche.",
+        "en": "Settings ▸ Discord to turn the status off, or hide the title or the poster."
+      }
+    ]
+  },
+  {
     "id": "0.2.1",
     "version": "0.2.1",
     "date": "2026-10-25",

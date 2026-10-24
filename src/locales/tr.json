@@ -164,7 +164,16 @@
     "sectionUpdates": "Güncellemeler",
     "sectionAbout": "Hakkında",
     "launchAtLogin": "Windows ile başlat",
-    "launchAtLoginHint": "NetsuCast pencere kapalıyken bile arka planda hazır bekler. Saatin yanındaki simge onu açar veya kapatır."
+    "launchAtLoginHint": "NetsuCast pencere kapalıyken bile arka planda hazır bekler. Saatin yanındaki simge onu açar veya kapatır.",
+    "sectionDiscord": "Discord",
+    "discordEnabled": "Discord durumu",
+    "discordEnabledHint": "Discord profilin ne izlediğini gösterir.",
+    "discordShowTitle": "Başlığı göster",
+    "discordShowTitleHint": "Yoksa durum yalnızca video izlediğini söyler.",
+    "discordShowImage": "Afişi göster",
+    "discordShowImageHint": "Animenin ya da filmin afişi, yoksa videonun küçük resmi.",
+    "discordLinks": "Tıklanabilir kart",
+    "discordLinksHint": "Afiş animenin ya da filmin sayfasını, başlık videoyu açar."
   },
   "errors": {
     "generic": "Oynatılamıyor: {{reason}}",
@@ -266,5 +275,11 @@
   "tray": {
     "open": "NetsuCast'i aç",
     "quit": "Çık"
+  },
+  "discord": {
+    "season": "{{n}}. sezon",
+    "episode": "{{n}}. bölüm",
+    "watchingVideo": "Video izliyor",
+    "paused": "Duraklatıldı"
   }
 }
